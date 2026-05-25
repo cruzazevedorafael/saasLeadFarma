@@ -41,11 +41,16 @@ create table public.store_settings (
 insert into public.store_settings (id) values (1);
 
 -- VIEW PÚBLICA SEGURA (sem custo; expõe disponibilidade = estoque na Fase 1)
-create view public.public_product_variants as
+-- security_invoker = false: a view roda com privilégios do dono (postgres),
+-- então o anon lê pelas views sem precisar de policy nas tabelas base (e o RLS
+-- das tabelas base continua protegendo acesso direto / colunas sensíveis).
+create view public.public_product_variants
+  with (security_invoker = false) as
   select id, product_id, size, color, (stock > 0) as available
   from public.product_variants;
 
-create view public.public_products as
+create view public.public_products
+  with (security_invoker = false) as
   select id, code, name, category, description, image_url,
          price_wholesale, price_retail, min_wholesale, sort_order
   from public.products
@@ -68,7 +73,6 @@ create policy "admin all settings" on public.store_settings
 create policy "anon read settings" on public.store_settings
   for select to anon using (true);
 
--- As views public_* rodam com privilégios do dono (security definer por padrão em views),
--- então o anon lê produtos ativos/disponibilidade sem acessar as tabelas base.
+-- Anon precisa de SELECT nas views para consultá-las (as views rodam como dono).
 grant select on public.public_products to anon;
 grant select on public.public_product_variants to anon;

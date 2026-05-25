@@ -155,11 +155,15 @@ create table public.store_settings (
 insert into public.store_settings (id) values (1);
 
 -- VIEW PÚBLICA SEGURA (sem custo; expõe disponibilidade = estoque na Fase 1)
-create view public.public_product_variants as
+-- security_invoker = false: view roda como dono → anon lê pelas views sem
+-- policy nas tabelas base; o RLS continua protegendo acesso direto.
+create view public.public_product_variants
+  with (security_invoker = false) as
   select id, product_id, size, color, (stock > 0) as available
   from public.product_variants;
 
-create view public.public_products as
+create view public.public_products
+  with (security_invoker = false) as
   select id, code, name, category, description, image_url,
          price_wholesale, price_retail, min_wholesale, sort_order
   from public.products
