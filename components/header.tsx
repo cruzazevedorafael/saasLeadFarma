@@ -11,13 +11,13 @@ export function Header() {
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl"
     >
-      <div className="container mx-auto flex h-14 md:h-20 items-center justify-between px-3 md:px-4">
-        <motion.div 
-          className="flex items-center gap-2 md:gap-3"
+      <div className="container mx-auto flex h-12 md:h-16 items-center justify-between px-3 md:px-4">
+        <motion.div
+          className="flex items-center gap-2 md:gap-2.5"
           whileHover={{ scale: 1.02 }}
           transition={{ type: 'spring', stiffness: 400 }}
         >
-          <div className="relative h-10 w-10 md:h-14 md:w-14 overflow-hidden rounded-full border-2 border-[#CFFF04]/50">
+          <div className="relative h-9 w-9 md:h-11 md:w-11 shrink-0 overflow-hidden rounded-full border-2 border-[#CFFF04]/50">
             <Image
               src="/logo.jpeg"
               alt="KAROLLA FIT"
@@ -26,12 +26,12 @@ export function Header() {
               priority
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-base md:text-xl font-bold tracking-tight text-foreground">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-base md:text-xl font-bold tracking-tight text-foreground leading-none">
               KAROLLA <span className="text-[#CFFF04]">FIT</span>
             </span>
-            <span className="text-[10px] md:text-xs text-muted-foreground">
-              Atacado & Varejo
+            <span className="hidden sm:inline text-[10px] md:text-xs text-muted-foreground leading-none">
+              · Atacado & Varejo
             </span>
           </div>
         </motion.div>
