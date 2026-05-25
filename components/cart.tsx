@@ -1,0 +1,407 @@
+'use client'
+
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useCartStore, CartItem } from '@/lib/store'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { 
+  ShoppingCart, 
+  X, 
+  Trash2, 
+  Plus, 
+  Minus, 
+  Send,
+  User,
+  Phone
+} from 'lucide-react'
+
+export function Cart() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [showCheckout, setShowCheckout] = useState(false)
+  const [customerName, setCustomerName] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const { items, removeItem, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCartStore()
+
+  const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
+
+  const generateOrderText = () => {
+    const date = new Date().toLocaleDateString('pt-BR')
+    let text = `*PEDIDO KAROLLA FIT*\n`
+    text += `Data: ${date}\n\n`
+    text += `*Cliente:* ${customerName}\n`
+    text += `*Telefone:* ${customerPhone}\n\n`
+    text += `*ITENS DO PEDIDO:*\n`
+    text += `━━━━━━━━━━━━━━━━━━\n\n`
+
+    items.forEach((item, index) => {
+      const price = item.priceType === 'wholesale' ? item.product.priceWholesale : item.product.priceRetail
+      const subtotal = price * item.quantity
+      text += `${index + 1}. *${item.product.name}*\n`
+      text += `   Tamanho: ${item.size}\n`
+      text += `   Cor: ${item.color}\n`
+      text += `   Tipo: ${item.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}\n`
+      text += `   Qtd: ${item.quantity} x ${formatPrice(price)}\n`
+      text += `   Subtotal: *${formatPrice(subtotal)}*\n\n`
+    })
+
+    text += `━━━━━━━━━━━━━━━━━━\n`
+    text += `*TOTAL GERAL: ${formatPrice(getTotalPrice())}*\n`
+    text += `━━━━━━━━━━━━━━━━━━\n\n`
+    text += `_Pedido enviado pelo Menu Digital KAROLLA FIT_`
+
+    return text
+  }
+
+  const handleSendOrder = () => {
+    if (!customerName.trim() || !customerPhone.trim()) return
+    
+    setIsLoading(true)
+    
+    const orderText = generateOrderText()
+    const phoneNumber = '5500000000000' // Substitua pelo número do WhatsApp
+    const encodedText = encodeURIComponent(orderText)
+    
+    // Abre WhatsApp com o pedido
+    window.open(`https://wa.me/${phoneNumber}?text=${encodedText}`, '_blank')
+    
+    setTimeout(() => {
+      setIsLoading(false)
+      clearCart()
+      setShowCheckout(false)
+      setIsOpen(false)
+      setCustomerName('')
+      setCustomerPhone('')
+    }, 1000)
+  }
+
+  const totalItems = getTotalItems()
+
+  return (
+    <>
+      {/* Cart Button */}
+      <motion.button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#CFFF04] px-6 py-4 text-black font-semibold shadow-lg shadow-[#CFFF04]/20"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <ShoppingCart className="h-5 w-5" />
+        <span>Carrinho</span>
+        {totalItems > 0 && (
+          <motion.span
+            key={totalItems}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-[#CFFF04] text-sm"
+          >
+            {totalItems}
+          </motion.span>
+        )}
+      </motion.button>
+
+      {/* Cart Drawer */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-hidden bg-background border-l border-border shadow-2xl"
+            >
+              <div className="flex h-full flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-border p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#CFFF04]/10">
+                      <ShoppingCart className="h-5 w-5 text-[#CFFF04]" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold">Seu Carrinho</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {totalItems} {totalItems === 1 ? 'item' : 'itens'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-full p-2 hover:bg-muted transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  <AnimatePresence mode="popLayout">
+                    {!showCheckout ? (
+                      <motion.div
+                        key="cart-items"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-4"
+                      >
+                        {items.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="mb-4 rounded-full bg-muted p-6">
+                              <ShoppingCart className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                            <h3 className="font-semibold">Carrinho vazio</h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Adicione produtos para começar
+                            </p>
+                          </div>
+                        ) : (
+                          items.map((item, index) => (
+                            <CartItemCard
+                              key={`${item.product.id}-${item.size}-${item.color}`}
+                              item={item}
+                              index={index}
+                              onRemove={() => removeItem(item.product.id, item.size, item.color)}
+                              onUpdateQuantity={(qty) => 
+                                updateQuantity(item.product.id, item.size, item.color, qty)
+                              }
+                            />
+                          ))
+                        )}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="checkout"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center">
+                          <h3 className="text-xl font-semibold mb-2">Finalizar Pedido</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Preencha seus dados para enviar o pedido via WhatsApp
+                          </p>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="name" className="text-sm">
+                              Seu Nome
+                            </Label>
+                            <div className="relative">
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="name"
+                                placeholder="Digite seu nome"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                className="pl-10 h-12 bg-muted border-border"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="phone" className="text-sm">
+                              Seu Telefone
+                            </Label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id="phone"
+                                placeholder="(00) 00000-0000"
+                                value={customerPhone}
+                                onChange={(e) => setCustomerPhone(e.target.value)}
+                                className="pl-10 h-12 bg-muted border-border"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="rounded-xl bg-muted/50 p-4 space-y-3">
+                          <h4 className="font-semibold text-sm">Resumo do Pedido</h4>
+                          {items.map((item) => {
+                            const price = item.priceType === 'wholesale' 
+                              ? item.product.priceWholesale 
+                              : item.product.priceRetail
+                            return (
+                              <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                  {item.quantity}x {item.product.name} ({item.size})
+                                </span>
+                                <span>{formatPrice(price * item.quantity)}</span>
+                              </div>
+                            )
+                          })}
+                          <div className="border-t border-border pt-3 flex justify-between font-semibold">
+                            <span>Total</span>
+                            <span className="text-[#CFFF04]">{formatPrice(getTotalPrice())}</span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => setShowCheckout(false)}
+                          className="text-sm text-muted-foreground hover:text-foreground underline"
+                        >
+                          Voltar ao carrinho
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Footer */}
+                {items.length > 0 && (
+                  <div className="border-t border-border p-4 space-y-4 bg-card">
+                    {!showCheckout && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Total</span>
+                        <span className="text-2xl font-bold text-[#CFFF04]">
+                          {formatPrice(getTotalPrice())}
+                        </span>
+                      </div>
+                    )}
+
+                    {showCheckout ? (
+                      <Button
+                        onClick={handleSendOrder}
+                        disabled={!customerName.trim() || !customerPhone.trim() || isLoading}
+                        className="w-full h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-lg font-semibold"
+                      >
+                        {isLoading ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                            className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full"
+                          />
+                        ) : (
+                          <>
+                            <Send className="h-5 w-5 mr-2" />
+                            Enviar pelo WhatsApp
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setShowCheckout(true)}
+                        className="w-full h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-lg font-semibold"
+                      >
+                        Continuar
+                      </Button>
+                    )}
+
+                    {!showCheckout && (
+                      <button
+                        onClick={clearCart}
+                        className="w-full text-sm text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        Limpar carrinho
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
+function CartItemCard({ 
+  item, 
+  index, 
+  onRemove, 
+  onUpdateQuantity 
+}: { 
+  item: CartItem
+  index: number
+  onRemove: () => void
+  onUpdateQuantity: (qty: number) => void
+}) {
+  const price = item.priceType === 'wholesale' ? item.product.priceWholesale : item.product.priceRetail
+  const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      transition={{ delay: index * 0.05 }}
+      className="flex gap-3 rounded-xl bg-muted/30 p-3 border border-border/50"
+    >
+      <div className="relative h-20 w-20 overflow-hidden rounded-lg bg-muted flex-shrink-0">
+        <img
+          src={item.product.image}
+          alt={item.product.name}
+          className="h-full w-full object-cover"
+        />
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <h4 className="font-medium text-sm truncate">{item.product.name}</h4>
+        <div className="flex gap-2 mt-1">
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+            {item.size}
+          </span>
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+            {item.color}
+          </span>
+          <span className={`text-xs px-2 py-0.5 rounded ${
+            item.priceType === 'wholesale' 
+              ? 'bg-[#CFFF04]/20 text-[#CFFF04]' 
+              : 'bg-muted text-muted-foreground'
+          }`}>
+            {item.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}
+          </span>
+        </div>
+        
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-2 bg-background rounded-lg p-0.5">
+            <button
+              onClick={() => onUpdateQuantity(Math.max(1, item.quantity - 1))}
+              className="h-6 w-6 rounded flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
+            <button
+              onClick={() => onUpdateQuantity(item.quantity + 1)}
+              className="h-6 w-6 rounded flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+          
+          <span className="font-semibold text-[#CFFF04]">
+            {formatPrice(price * item.quantity)}
+          </span>
+        </div>
+      </div>
+
+      <button
+        onClick={onRemove}
+        className="self-start p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </motion.div>
+  )
+}
