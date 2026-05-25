@@ -85,33 +85,74 @@ export function Hero() {
             </div>
           </motion.div>
 
-          {/* Stats */}
+          {/* Banner de Promocoes */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-12 grid grid-cols-3 gap-8 md:gap-16"
+            className="mt-12 w-full max-w-2xl"
           >
-            {[
-              { value: '500+', label: 'Clientes' },
-              { value: '50+', label: 'Produtos' },
-              { value: '24h', label: 'Entrega' },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
-                className="text-center"
-              >
-                <div className="text-2xl md:text-3xl font-bold text-[#CFFF04]">
-                  {stat.value}
+            <motion.div
+              animate={{ 
+                boxShadow: [
+                  '0 0 20px rgba(207, 255, 4, 0.3)',
+                  '0 0 40px rgba(207, 255, 4, 0.5)',
+                  '0 0 20px rgba(207, 255, 4, 0.3)'
+                ]
+              }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#CFFF04] via-[#e8ff66] to-[#CFFF04] p-[2px]"
+            >
+              <div className="relative rounded-2xl bg-background/95 backdrop-blur-sm px-6 py-5 md:px-8 md:py-6">
+                {/* Estrelas decorativas */}
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+                  className="absolute top-3 left-4 text-[#CFFF04] text-lg"
+                >
+                  ✦
+                </motion.span>
+                <motion.span
+                  animate={{ rotate: -360 }}
+                  transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+                  className="absolute top-3 right-4 text-[#CFFF04] text-lg"
+                >
+                  ✦
+                </motion.span>
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="absolute bottom-3 left-1/4 text-[#CFFF04]/60 text-sm"
+                >
+                  ★
+                </motion.span>
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5, delay: 0.5 }}
+                  className="absolute bottom-3 right-1/4 text-[#CFFF04]/60 text-sm"
+                >
+                  ★
+                </motion.span>
+
+                {/* Conteudo do banner */}
+                <div className="flex flex-col items-center gap-2">
+                  <motion.span
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="inline-block px-3 py-1 rounded-full bg-[#CFFF04] text-black text-xs font-bold uppercase tracking-wider"
+                  >
+                    Oferta Especial
+                  </motion.span>
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground text-center">
+                    Compre 5 Pecas e Ganhe{' '}
+                    <span className="text-[#CFFF04]">10% OFF</span>
+                  </h3>
+                  <p className="text-muted-foreground text-sm text-center">
+                    Valido para compras no atacado • Frete gratis acima de R$300
+                  </p>
                 </div>
-                <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Scroll Indicator */}
