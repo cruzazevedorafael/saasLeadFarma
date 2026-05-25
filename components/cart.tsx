@@ -85,21 +85,21 @@ export function Cart() {
       {/* Cart Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#CFFF04] px-6 py-4 text-black font-semibold shadow-lg shadow-[#CFFF04]/20"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-1.5 md:gap-2 rounded-full bg-[#CFFF04] px-4 py-3 md:px-6 md:py-4 text-black font-semibold shadow-lg shadow-[#CFFF04]/20"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <ShoppingCart className="h-5 w-5" />
-        <span>Carrinho</span>
+        <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+        <span className="text-sm md:text-base">Carrinho</span>
         {totalItems > 0 && (
           <motion.span
             key={totalItems}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-[#CFFF04] text-sm"
+            className="flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-black text-[#CFFF04] text-xs md:text-sm"
           >
             {totalItems}
           </motion.span>
@@ -125,18 +125,18 @@ export function Cart() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 z-50 h-full w-full max-w-md overflow-hidden bg-background border-l border-border shadow-2xl"
+              className="fixed right-0 top-0 z-50 h-full w-full sm:max-w-md overflow-hidden bg-background border-l border-border shadow-2xl"
             >
               <div className="flex h-full flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-border p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#CFFF04]/10">
-                      <ShoppingCart className="h-5 w-5 text-[#CFFF04]" />
+                <div className="flex items-center justify-between border-b border-border p-3 md:p-4">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-[#CFFF04]/10">
+                      <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 text-[#CFFF04]" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold">Seu Carrinho</h2>
-                      <p className="text-sm text-muted-foreground">
+                      <h2 className="text-base md:text-lg font-semibold">Seu Carrinho</h2>
+                      <p className="text-xs md:text-sm text-muted-foreground">
                         {totalItems} {totalItems === 1 ? 'item' : 'itens'}
                       </p>
                     </div>
@@ -150,7 +150,7 @@ export function Cart() {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4">
+                <div className="flex-1 overflow-y-auto p-3 md:p-4">
                   <AnimatePresence mode="popLayout">
                     {!showCheckout ? (
                       <motion.div
@@ -158,16 +158,16 @@ export function Cart() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0, x: -20 }}
-                        className="space-y-4"
+                        className="space-y-3 md:space-y-4"
                       >
                         {items.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <div className="mb-4 rounded-full bg-muted p-6">
-                              <ShoppingCart className="h-8 w-8 text-muted-foreground" />
+                          <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
+                            <div className="mb-4 rounded-full bg-muted p-4 md:p-6">
+                              <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
                             </div>
-                            <h3 className="font-semibold">Carrinho vazio</h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Adicione produtos para começar
+                            <h3 className="font-semibold text-sm md:text-base">Carrinho vazio</h3>
+                            <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                              Adicione produtos para comecar
                             </p>
                           </div>
                         ) : (
@@ -190,18 +190,18 @@ export function Cart() {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
-                        className="space-y-6"
+                        className="space-y-4 md:space-y-6"
                       >
                         <div className="text-center">
-                          <h3 className="text-xl font-semibold mb-2">Finalizar Pedido</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <h3 className="text-lg md:text-xl font-semibold mb-1 md:mb-2">Finalizar Pedido</h3>
+                          <p className="text-xs md:text-sm text-muted-foreground">
                             Preencha seus dados para enviar o pedido via WhatsApp
                           </p>
                         </div>
 
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm">
+                        <div className="space-y-3 md:space-y-4">
+                          <div className="space-y-1.5 md:space-y-2">
+                            <Label htmlFor="name" className="text-xs md:text-sm">
                               Seu Nome
                             </Label>
                             <div className="relative">
@@ -211,13 +211,13 @@ export function Cart() {
                                 placeholder="Digite seu nome"
                                 value={customerName}
                                 onChange={(e) => setCustomerName(e.target.value)}
-                                className="pl-10 h-12 bg-muted border-border"
+                                className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base"
                               />
                             </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-sm">
+                          <div className="space-y-1.5 md:space-y-2">
+                            <Label htmlFor="phone" className="text-xs md:text-sm">
                               Seu Telefone
                             </Label>
                             <div className="relative">
@@ -227,21 +227,21 @@ export function Cart() {
                                 placeholder="(00) 00000-0000"
                                 value={customerPhone}
                                 onChange={(e) => setCustomerPhone(e.target.value)}
-                                className="pl-10 h-12 bg-muted border-border"
+                                className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base"
                               />
                             </div>
                           </div>
                         </div>
 
                         {/* Order Summary */}
-                        <div className="rounded-xl bg-muted/50 p-4 space-y-3">
-                          <h4 className="font-semibold text-sm">Resumo do Pedido</h4>
+                        <div className="rounded-xl bg-muted/50 p-3 md:p-4 space-y-2 md:space-y-3">
+                          <h4 className="font-semibold text-xs md:text-sm">Resumo do Pedido</h4>
                           {items.map((item) => {
                             const price = item.priceType === 'wholesale' 
                               ? item.product.priceWholesale 
                               : item.product.priceRetail
                             return (
-                              <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between text-sm">
+                              <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between text-xs md:text-sm">
                                 <span className="text-muted-foreground">
                                   {item.quantity}x {item.product.name} ({item.size})
                                 </span>
@@ -249,7 +249,7 @@ export function Cart() {
                               </div>
                             )
                           })}
-                          <div className="border-t border-border pt-3 flex justify-between font-semibold">
+                          <div className="border-t border-border pt-2 md:pt-3 flex justify-between font-semibold text-sm md:text-base">
                             <span>Total</span>
                             <span className="text-[#CFFF04]">{formatPrice(getTotalPrice())}</span>
                           </div>
@@ -257,7 +257,7 @@ export function Cart() {
 
                         <button
                           onClick={() => setShowCheckout(false)}
-                          className="text-sm text-muted-foreground hover:text-foreground underline"
+                          className="text-xs md:text-sm text-muted-foreground hover:text-foreground underline"
                         >
                           Voltar ao carrinho
                         </button>
@@ -268,11 +268,11 @@ export function Cart() {
 
                 {/* Footer */}
                 {items.length > 0 && (
-                  <div className="border-t border-border p-4 space-y-4 bg-card">
+                  <div className="border-t border-border p-3 md:p-4 space-y-3 md:space-y-4 bg-card">
                     {!showCheckout && (
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Total</span>
-                        <span className="text-2xl font-bold text-[#CFFF04]">
+                        <span className="text-sm md:text-base text-muted-foreground">Total</span>
+                        <span className="text-xl md:text-2xl font-bold text-[#CFFF04]">
                           {formatPrice(getTotalPrice())}
                         </span>
                       </div>
@@ -282,7 +282,7 @@ export function Cart() {
                       <Button
                         onClick={handleSendOrder}
                         disabled={!customerName.trim() || !customerPhone.trim() || isLoading}
-                        className="w-full h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-lg font-semibold"
+                        className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold"
                       >
                         {isLoading ? (
                           <motion.div
@@ -292,7 +292,7 @@ export function Cart() {
                           />
                         ) : (
                           <>
-                            <Send className="h-5 w-5 mr-2" />
+                            <Send className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                             Enviar pelo WhatsApp
                           </>
                         )}
@@ -300,7 +300,7 @@ export function Cart() {
                     ) : (
                       <Button
                         onClick={() => setShowCheckout(true)}
-                        className="w-full h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-lg font-semibold"
+                        className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold"
                       >
                         Continuar
                       </Button>
@@ -309,7 +309,7 @@ export function Cart() {
                     {!showCheckout && (
                       <button
                         onClick={clearCart}
-                        className="w-full text-sm text-muted-foreground hover:text-destructive transition-colors"
+                        className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors"
                       >
                         Limpar carrinho
                       </button>

@@ -45,7 +45,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
       whileHover={{ y: -5 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card"
+      className="group relative overflow-hidden rounded-xl md:rounded-2xl border border-border/50 bg-card"
     >
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden">
@@ -59,7 +59,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
         
         {/* Category Badge */}
         <Badge 
-          className="absolute top-3 left-3 bg-[#CFFF04] text-black font-medium hover:bg-[#CFFF04]"
+          className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#CFFF04] text-black font-medium hover:bg-[#CFFF04] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1"
         >
           {product.category}
         </Badge>
@@ -68,30 +68,30 @@ export function ProductCard({ product, index }: ProductCardProps) {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 20 }}
-          className="absolute top-3 right-3"
+          className="absolute top-2 right-2 md:top-3 md:right-3"
         >
-          <Badge variant="secondary" className="bg-black/80 text-[#CFFF04] border border-[#CFFF04]/30">
-            Min. {product.minWholesale} pçs atacado
+          <Badge variant="secondary" className="bg-black/80 text-[#CFFF04] border border-[#CFFF04]/30 text-[9px] md:text-xs">
+            Min. {product.minWholesale} pcs
           </Badge>
         </motion.div>
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-4">
+      <div className="p-3 md:p-4 space-y-3 md:space-y-4">
         <div>
-          <h3 className="font-semibold text-lg text-foreground leading-tight">
+          <h3 className="font-semibold text-sm md:text-lg text-foreground leading-tight">
             {product.name}
           </h3>
-          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+          <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">
             {product.description}
           </p>
         </div>
 
         {/* Price Toggle */}
-        <div className="flex rounded-lg bg-muted/50 p-1">
+        <div className="flex rounded-lg bg-muted/50 p-0.5 md:p-1">
           <button
             onClick={() => setPriceType('retail')}
-            className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 px-2 py-1.5 md:px-3 md:py-2 text-xs md:text-sm font-medium rounded-md transition-all ${
               priceType === 'retail'
                 ? 'bg-[#CFFF04] text-black'
                 : 'text-muted-foreground hover:text-foreground'
@@ -101,7 +101,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
           </button>
           <button
             onClick={() => setPriceType('wholesale')}
-            className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 px-2 py-1.5 md:px-3 md:py-2 text-xs md:text-sm font-medium rounded-md transition-all ${
               priceType === 'wholesale'
                 ? 'bg-[#CFFF04] text-black'
                 : 'text-muted-foreground hover:text-foreground'
@@ -114,22 +114,22 @@ export function ProductCard({ product, index }: ProductCardProps) {
         {/* Price Display */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">
-              {priceType === 'wholesale' ? 'Preço Atacado' : 'Preço Varejo'}
+            <span className="text-[10px] md:text-xs text-muted-foreground">
+              {priceType === 'wholesale' ? 'Preco Atacado' : 'Preco Varejo'}
             </span>
             <motion.span 
               key={currentPrice}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-bold text-[#CFFF04]"
+              className="text-xl md:text-2xl font-bold text-[#CFFF04]"
             >
               R$ {currentPrice.toFixed(2).replace('.', ',')}
             </motion.span>
           </div>
           {priceType === 'retail' && (
             <div className="text-right">
-              <span className="text-xs text-muted-foreground block">No atacado</span>
-              <span className="text-sm text-[#CFFF04]/70">
+              <span className="text-[10px] md:text-xs text-muted-foreground block">No atacado</span>
+              <span className="text-xs md:text-sm text-[#CFFF04]/70">
                 R$ {product.priceWholesale.toFixed(2).replace('.', ',')}
               </span>
             </div>
@@ -138,13 +138,13 @@ export function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Size Selection */}
         <div>
-          <span className="text-xs text-muted-foreground mb-2 block">Tamanho</span>
-          <div className="flex gap-2">
+          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Tamanho</span>
+          <div className="flex gap-1.5 md:gap-2 flex-wrap">
             {product.sizes.map((size) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
+                className={`w-8 h-8 md:w-10 md:h-10 rounded-lg text-xs md:text-sm font-medium transition-all ${
                   selectedSize === size
                     ? 'bg-[#CFFF04] text-black'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
@@ -158,13 +158,13 @@ export function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Color Selection */}
         <div>
-          <span className="text-xs text-muted-foreground mb-2 block">Cor: {selectedColor}</span>
-          <div className="flex gap-2 flex-wrap">
+          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Cor: {selectedColor}</span>
+          <div className="flex gap-1.5 md:gap-2 flex-wrap">
             {product.colors.map((color) => (
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium transition-all ${
                   selectedColor === color
                     ? 'bg-[#CFFF04] text-black'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -178,20 +178,20 @@ export function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Quantity */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">Quantidade</span>
-          <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+          <span className="text-[10px] md:text-xs text-muted-foreground">Quantidade</span>
+          <div className="flex items-center gap-2 md:gap-3 bg-muted rounded-lg p-0.5 md:p-1">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors"
+              className="h-7 w-7 md:h-8 md:w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors"
             >
-              <Minus className="h-4 w-4" />
+              <Minus className="h-3 w-3 md:h-4 md:w-4" />
             </button>
-            <span className="w-8 text-center font-semibold">{quantity}</span>
+            <span className="w-6 md:w-8 text-center font-semibold text-sm md:text-base">{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors"
+              className="h-7 w-7 md:h-8 md:w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-3 w-3 md:h-4 md:w-4" />
             </button>
           </div>
         </div>
@@ -200,7 +200,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
         <motion.div whileTap={{ scale: 0.98 }}>
           <Button
             onClick={handleAddToCart}
-            className={`w-full h-12 text-base font-semibold transition-all ${
+            className={`w-full h-10 md:h-12 text-sm md:text-base font-semibold transition-all ${
               isAdded 
                 ? 'bg-green-500 hover:bg-green-500 text-white' 
                 : 'bg-[#CFFF04] hover:bg-[#b8e600] text-black'
@@ -213,9 +213,9 @@ export function ProductCard({ product, index }: ProductCardProps) {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5 md:gap-2"
                 >
-                  <Check className="h-5 w-5" />
+                  <Check className="h-4 w-4 md:h-5 md:w-5" />
                   Adicionado!
                 </motion.div>
               ) : (
@@ -224,10 +224,11 @@ export function ProductCard({ product, index }: ProductCardProps) {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5 md:gap-2"
                 >
-                  <ShoppingBag className="h-5 w-5" />
-                  Adicionar ao Carrinho
+                  <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="hidden sm:inline">Adicionar ao Carrinho</span>
+                  <span className="sm:hidden">Adicionar</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -236,7 +237,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Subtotal */}
         <div className="text-center pt-2 border-t border-border/50">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-xs md:text-sm text-muted-foreground">
             Subtotal: <span className="text-foreground font-semibold">
               R$ {(currentPrice * quantity).toFixed(2).replace('.', ',')}
             </span>
