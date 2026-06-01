@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useCartStore, CartItem } from '@/lib/store'
+import { useCartStore, type CartItem } from '@/lib/store'
 import { cartPriceType, cartTotal, unitPriceFor, piecesUntilWholesale, type PriceType } from '@/lib/data/cart.helpers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

@@ -10,7 +10,8 @@ export async function setWholesaleThreshold(value: number) {
   if (!user) throw new Error('não autenticado')
   const threshold = Math.max(1, Math.floor(Number(value) || 1))
   const db = createAdminClient()
-  await db.from('store_settings').update({ wholesale_threshold: threshold, updated_at: new Date().toISOString() }).eq('id', 1)
+  const { error } = await db.from('store_settings').update({ wholesale_threshold: threshold, updated_at: new Date().toISOString() }).eq('id', 1)
+  if (error) throw error
   revalidatePath('/painel')
   revalidatePath('/')
 }

@@ -51,7 +51,8 @@ export async function updateProduto(id: string, input: ProdutoInput) {
 export async function setProdutoActive(id: string, active: boolean) {
   await requireUser()
   const db = createAdminClient()
-  await db.from('products').update({ active }).eq('id', id)
+  const { error } = await db.from('products').update({ active }).eq('id', id)
+  if (error) throw error
   revalidatePath('/painel/produtos')
   revalidatePath('/')
 }
