@@ -9,7 +9,7 @@ import type { Product } from './types'
 function product(over: Partial<Product>): Product {
   return {
     id: 'p', code: 'C', name: 'X', category: '', description: '', imageUrl: null,
-    priceCost: 0, priceWholesale: 50, priceRetail: 90, countsForWholesale: true,
+    priceCost: 0, priceWholesale: 50, priceRetail: 90, weightGrams: 0, countsForWholesale: true,
     active: true, sortOrder: 0, ...over,
   }
 }
