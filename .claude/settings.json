@@ -56,7 +56,13 @@
       "Bash(find docs *)",
       "Bash(ls docs *)",
       "Bash(npx vitest *)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(PORT=3939 pnpm dev)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -s -o /tmp/home.html -w \"%{http_code}\" http://localhost:3939/ --max-time 25)",
+      "Bash(curl -s -o /tmp/home2.html -w \"%{http_code}\" http://localhost:3939/ --max-time 25)",
+      "Bash(kill 80950)",
+      "Bash(gh pr create --base main --head feat/painel-fase-1 --title 'Painel de catálogo, peso, envio/pagamento e checkout detalhado' --body ' *)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
