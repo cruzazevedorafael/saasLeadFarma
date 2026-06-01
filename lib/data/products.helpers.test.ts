@@ -5,7 +5,7 @@ import type { ProductWithVariants } from './types'
 
 const p: ProductWithVariants = {
   id: '1', code: 'LEG-001', name: 'Legging', category: 'Leggings', description: '',
-  imageUrl: null, priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9,
+  imageUrl: null, priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9, weightGrams: 250,
   countsForWholesale: true, active: true, sortOrder: 0,
   variants: [
     { id: 'v1', productId: '1', size: 'M', color: 'Preto', stock: 3 },
@@ -32,5 +32,19 @@ describe('isVariantAvailable', () => {
   })
   it('false quando combinação não existe', () => {
     expect(isVariantAvailable(p, 'GG', 'Azul')).toBe(false)
+  })
+})
+
+import { shouldRenderAsButtons } from './products.helpers'
+
+describe('shouldRenderAsButtons', () => {
+  it('false com nenhuma opção', () => {
+    expect(shouldRenderAsButtons([])).toBe(false)
+  })
+  it('false com uma opção (mostra como texto)', () => {
+    expect(shouldRenderAsButtons(['Preto'])).toBe(false)
+  })
+  it('true com duas ou mais opções', () => {
+    expect(shouldRenderAsButtons(['P', 'M'])).toBe(true)
   })
 })

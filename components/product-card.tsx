@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/store'
 import type { ProductWithVariants } from '@/lib/data/types'
-import { sizesOf, colorsOf, isVariantAvailable } from '@/lib/data/products.helpers'
+import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons } from '@/lib/data/products.helpers'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Minus, ShoppingBag, Check } from 'lucide-react'
@@ -86,41 +86,49 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
         {/* Tamanho */}
         <div>
           <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Tamanho</span>
-          <div className="flex gap-1.5 md:gap-2 flex-wrap">
-            {sizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`w-8 h-8 md:w-10 md:h-10 rounded-lg text-xs md:text-sm font-medium transition-all ${
-                  selectedSize === size ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
+          {shouldRenderAsButtons(sizes) ? (
+            <div className="flex gap-1.5 md:gap-2 flex-wrap">
+              {sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-lg text-xs md:text-sm font-medium transition-all ${
+                    selectedSize === size ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className="text-sm md:text-base font-medium text-foreground">{sizes[0] ?? '—'}</span>
+          )}
         </div>
 
         {/* Cor */}
         <div>
-          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Cor: {selectedColor}</span>
-          <div className="flex gap-1.5 md:gap-2 flex-wrap">
-            {colors.map((color) => {
-              const colorOk = isVariantAvailable(product, selectedSize, color)
-              return (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  disabled={!colorOk}
-                  className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium transition-all ${
-                    selectedColor === color ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  } ${!colorOk ? 'opacity-40 line-through cursor-not-allowed' : ''}`}
-                >
-                  {color}
-                </button>
-              )
-            })}
-          </div>
+          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">
+            Cor{!shouldRenderAsButtons(colors) ? `: ${colors[0] ?? '—'}` : `: ${selectedColor}`}
+          </span>
+          {shouldRenderAsButtons(colors) && (
+            <div className="flex gap-1.5 md:gap-2 flex-wrap">
+              {colors.map((color) => {
+                const colorOk = isVariantAvailable(product, selectedSize, color)
+                return (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    disabled={!colorOk}
+                    className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium transition-all ${
+                      selectedColor === color ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    } ${!colorOk ? 'opacity-40 line-through cursor-not-allowed' : ''}`}
+                  >
+                    {color}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Quantidade */}

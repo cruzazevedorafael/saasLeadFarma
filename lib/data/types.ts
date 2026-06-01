@@ -16,6 +16,7 @@ export interface Product {
   priceCost: number
   priceWholesale: number
   priceRetail: number
+  weightGrams: number
   countsForWholesale: boolean
   active: boolean
   sortOrder: number

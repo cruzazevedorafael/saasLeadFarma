@@ -10,8 +10,10 @@ import { ProductCard } from '@/components/product-card'
 import { Cart } from '@/components/cart'
 import { Search } from 'lucide-react'
 import type { ProductWithVariants } from '@/lib/data/types'
+import type { ShippingMethod } from '@/lib/data/shipping'
+import type { PaymentMethod } from '@/lib/data/payment'
 
-export function Catalog({ products, threshold, whatsappNumber }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string }) {
+export function Catalog({ products, threshold, whatsappNumber, shippingMethods, paymentMethods }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[] }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -102,7 +104,7 @@ export function Catalog({ products, threshold, whatsappNumber }: { products: Pro
         </div>
       </section>
 
-      <Cart threshold={threshold} whatsappNumber={whatsappNumber} />
+      <Cart threshold={threshold} whatsappNumber={whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
     </main>
   )
 }

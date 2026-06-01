@@ -14,10 +14,13 @@ function mapItem(r: any): OrderItem {
     quantity: Number(r.quantity ?? 0),
     unitPrice: Number(r.unit_price ?? 0),
     unitCost: Number(r.unit_cost ?? 0),
+    weightGrams: Number(r.weight_grams ?? 0),
   }
 }
 
 function mapOrder(r: any): OrderWithItems {
+  const items: OrderItem[] = (r.order_items ?? []).map(mapItem)
+  const weightTotalGrams = items.reduce((acc, it) => acc + it.weightGrams * it.quantity, 0)
   return {
     id: r.id,
     number: Number(r.number),
@@ -26,10 +29,16 @@ function mapOrder(r: any): OrderWithItems {
     status: r.status,
     priceType: r.price_type,
     total: Number(r.total ?? 0),
+    itemsSubtotal: Number(r.items_subtotal ?? 0),
+    shippingLabel: r.shipping_label ?? '',
+    shippingPrice: Number(r.shipping_price ?? 0),
+    paymentLabel: r.payment_label ?? '',
+    paymentSurcharge: Number(r.payment_surcharge ?? 0),
+    weightTotalGrams,
     createdAt: r.created_at,
     completedAt: r.completed_at ?? null,
     cancelledAt: r.cancelled_at ?? null,
-    items: (r.order_items ?? []).map(mapItem),
+    items,
   }
 }
 

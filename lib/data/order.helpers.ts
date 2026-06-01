@@ -9,6 +9,9 @@ export interface RequestedItem {
   quantity: number
 }
 
+export interface ChosenShipping { label: string; price: number }
+export interface ChosenPayment { label: string; percent: number; fixed: number }
+
 export interface OrderItemRow {
   product_id: string
   variant_id: string | null
@@ -19,18 +22,29 @@ export interface OrderItemRow {
   quantity: number
   unit_price: number
   unit_cost: number
+  weight_grams: number
 }
 
 export interface BuiltOrder {
   priceType: PriceType
+  itemsSubtotal: number
+  shippingLabel: string
+  shippingPrice: number
+  paymentLabel: string
+  paymentSurcharge: number
   total: number
+  weightTotalGrams: number
   items: OrderItemRow[]
 }
+
+const round2 = (n: number) => Math.round(n * 100) / 100
 
 export function buildOrder(
   products: ProductWithVariants[],
   requested: RequestedItem[],
   threshold: number,
+  shipping?: ChosenShipping,
+  payment?: ChosenPayment,
 ): BuiltOrder {
   const byId = new Map(products.map((p) => [p.id, p]))
   const cartItems = requested.map((r) => {
@@ -40,7 +54,7 @@ export function buildOrder(
   })
 
   const priceType = cartPriceType(cartItems, threshold)
-  const total = cartTotal(cartItems, priceType)
+  const itemsSubtotal = round2(cartTotal(cartItems, priceType))
 
   const items: OrderItemRow[] = cartItems.map((ci) => {
     const p = ci.product
@@ -55,8 +69,32 @@ export function buildOrder(
       quantity: ci.quantity,
       unit_price: unitPriceFor(p, priceType),
       unit_cost: p.priceCost,
+      weight_grams: p.weightGrams,
     }
   })
 
-  return { priceType, total, items }
+  const weightTotalGrams = items.reduce((acc, it) => acc + it.weight_grams * it.quantity, 0)
+
+  const shippingLabel = shipping?.label ?? 'A combinar'
+  const shippingPrice = round2(shipping?.price ?? 0)
+
+  const base = itemsSubtotal + shippingPrice
+  const paymentLabel = payment?.label ?? 'A combinar'
+  const paymentSurcharge = payment
+    ? round2(base * (payment.percent / 100) + payment.fixed)
+    : 0
+
+  const total = round2(itemsSubtotal + shippingPrice + paymentSurcharge)
+
+  return {
+    priceType,
+    itemsSubtotal,
+    shippingLabel,
+    shippingPrice,
+    paymentLabel,
+    paymentSurcharge,
+    total,
+    weightTotalGrams,
+    items,
+  }
 }

@@ -33,6 +33,9 @@ export default async function PainelHome() {
 
       <div className="flex gap-3 flex-wrap">
         <Link href="/painel/produtos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Produtos</Link>
+        <Link href="/painel/categorias" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Categorias</Link>
+        <Link href="/painel/envio" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Envio</Link>
+        <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
         <Link href="/painel/financeiro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Financeiro</Link>
       </div>

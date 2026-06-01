@@ -51,7 +51,21 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
       "Bash(git fetch *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
-      "Bash(grep -oE '\"access_token\":\"ey[^\"]{0,6}|\"error[^\"]*\":\"[^\"]*\"')"
+      "Bash(grep -oE '\"access_token\":\"ey[^\"]{0,6}|\"error[^\"]*\":\"[^\"]*\"')",
+      "Bash(git rev-list *)",
+      "Bash(find docs *)",
+      "Bash(ls docs *)",
+      "Bash(npx vitest *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(PORT=3939 pnpm dev)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -s -o /tmp/home.html -w \"%{http_code}\" http://localhost:3939/ --max-time 25)",
+      "Bash(curl -s -o /tmp/home2.html -w \"%{http_code}\" http://localhost:3939/ --max-time 25)",
+      "Bash(kill 80950)",
+      "Bash(gh pr create --base main --head feat/painel-fase-1 --title 'Painel de catálogo, peso, envio/pagamento e checkout detalhado' --body ' *)",
+      "Bash(sed 's/=.*/=<oculto>/' .env.local)",
+      "Bash(grep -iE \"DATABASE_URL|POSTGRES|db\\\\.|pooler|5432|6543|ACCESS_TOKEN|DB_PASS\" .env.local)",
+      "Bash(command -v psql)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"

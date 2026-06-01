@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Switch } from '@/components/ui/switch'
 import { Plus, Trash2 } from 'lucide-react'
 
-export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produto?: ProductWithVariants }) {
+export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'edit'; produto?: ProductWithVariants; categorias: string[] }) {
   const router = useRouter()
   const [imageUrl, setImageUrlState] = useState<string | null>(produto?.imageUrl ?? null)
   const [uploading, setUploading] = useState(false)
@@ -30,12 +30,14 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
       ? {
           code: produto.code, name: produto.name, category: produto.category, description: produto.description,
           priceCost: produto.priceCost, priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
+          weightGrams: produto.weightGrams,
           countsForWholesale: produto.countsForWholesale, active: produto.active, imageUrl: produto.imageUrl,
           variants: produto.variants.map((v) => ({ size: v.size, color: v.color, stock: v.stock })),
         }
       : {
           code: '', name: '', category: '', description: '',
           priceCost: 0, priceWholesale: 0, priceRetail: 0,
+          weightGrams: 0,
           countsForWholesale: true, active: true, imageUrl: null,
           variants: [{ size: '', color: '', stock: 0 }],
         },
@@ -72,7 +74,7 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="container mx-auto p-6 max-w-2xl space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="container mx-auto p-4 md:p-6 max-w-2xl space-y-5">
       <h1 className="text-2xl font-bold">{mode === 'edit' ? 'Editar produto' : 'Novo produto'}</h1>
 
       <div className="space-y-2">
@@ -84,7 +86,7 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <Label htmlFor="code">Código</Label>
+          <Label htmlFor="code">Número/Código</Label>
           <Input id="code" {...register('code')} />
           {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
         </div>
@@ -97,7 +99,16 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
 
       <div className="space-y-1">
         <Label htmlFor="category">Categoria</Label>
-        <Input id="category" {...register('category')} />
+        <select
+          id="category"
+          {...register('category')}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="">Sem categoria</option>
+          {categorias.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-1">
@@ -105,7 +116,7 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
         <Textarea id="description" {...register('description')} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-1">
           <Label htmlFor="priceCost">Custo</Label>
           <Input id="priceCost" type="number" step="0.01" {...register('priceCost', { valueAsNumber: true })} />
@@ -117,6 +128,10 @@ export function ProdutoForm({ mode, produto }: { mode: 'create' | 'edit'; produt
         <div className="space-y-1">
           <Label htmlFor="priceRetail">Varejo</Label>
           <Input id="priceRetail" type="number" step="0.01" {...register('priceRetail', { valueAsNumber: true })} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="weightGrams">Peso (g)</Label>
+          <Input id="weightGrams" type="number" step="1" {...register('weightGrams', { valueAsNumber: true })} />
         </div>
       </div>
 
