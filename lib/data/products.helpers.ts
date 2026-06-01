@@ -1,8 +1,5 @@
+// lib/data/products.helpers.ts
 import type { ProductWithVariants } from './types'
-
-export function priceForQuantity(p: ProductWithVariants, qty: number): number {
-  return qty >= p.minWholesale ? p.priceWholesale : p.priceRetail
-}
 
 export function sizesOf(p: ProductWithVariants): string[] {
   return [...new Set(p.variants.map((v) => v.size))]
