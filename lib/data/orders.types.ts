@@ -13,6 +13,7 @@ export interface OrderItem {
   quantity: number
   unitPrice: number
   unitCost: number
+  weightGrams: number
 }
 
 export interface OrderWithItems {
@@ -23,6 +24,12 @@ export interface OrderWithItems {
   status: OrderStatus
   priceType: OrderPriceType
   total: number
+  itemsSubtotal: number
+  shippingLabel: string
+  shippingPrice: number
+  paymentLabel: string
+  paymentSurcharge: number
+  weightTotalGrams: number
   createdAt: string
   completedAt: string | null
   cancelledAt: string | null
