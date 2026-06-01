@@ -16,7 +16,18 @@
       "Bash(awk -F= '{key=$1; val=substr\\($0, length\\($1\\)+2\\); print NR\": \"key\" = [\"length\\(val\\)\" chars] inicio:\" substr\\(val,1,8\\)}' .env.local)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/painel/login)",
-      "Bash(grep -oE '\"access_token\":\"[^\"]{1,12}|\"token_type\":\"[^\"]*\"|\"error[^\"]*\":\"[^\"]*\"|\"user\":\\\\{\"id\"')"
+      "Bash(grep -oE '\"access_token\":\"[^\"]{1,12}|\"token_type\":\"[^\"]*\"|\"error[^\"]*\":\"[^\"]*\"|\"user\":\\\\{\"id\"')",
+      "Bash(pnpm build *)",
+      "Bash(timeout 15 vercel whoami)",
+      "Bash(vercel whoami *)",
+      "Bash(vercel project *)",
+      "Bash(git merge *)",
+      "Bash(git push *)",
+      "Bash(vercel link *)",
+      "Bash(vercel --prod --yes)",
+      "Bash(curl -s -o /tmp/prod.html -w \"HTTP %{http_code}\\\\n\" -L https://karollamenu.vercel.app/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karollamenu.vercel.app/painel/login)",
+      "Bash(curl -s -o /tmp/plogin.html -w \"HTTP %{http_code}\\\\n\" -L https://karollamenu.vercel.app/painel/login)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
