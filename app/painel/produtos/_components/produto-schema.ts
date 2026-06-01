@@ -16,6 +16,7 @@ export const produtoSchema = z.object({
   priceCost: z.number().min(0),
   priceWholesale: z.number().min(0),
   priceRetail: z.number().min(0),
+  weightGrams: z.number().int().min(0).default(0),
   countsForWholesale: z.boolean().default(true),
   active: z.boolean().default(true),
   variants: z.array(variantSchema).min(1, 'Adicione ao menos uma variação'),

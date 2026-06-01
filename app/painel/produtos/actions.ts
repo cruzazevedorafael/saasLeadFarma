@@ -19,6 +19,7 @@ export async function createProduto(input: ProdutoInput) {
   const { data: prod, error } = await db.from('products').insert({
     code: data.code, name: data.name, category: data.category, description: data.description,
     price_cost: data.priceCost, price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
+    weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null,
   }).select('id').single()
   if (error) throw error
@@ -38,6 +39,7 @@ export async function updateProduto(id: string, input: ProdutoInput) {
   await db.from('products').update({
     code: data.code, name: data.name, category: data.category, description: data.description,
     price_cost: data.priceCost, price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
+    weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null, updated_at: new Date().toISOString(),
   }).eq('id', id)
   await db.from('product_variants').delete().eq('product_id', id)
