@@ -40,7 +40,10 @@
       "Bash(curl -s -I -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0Y2FuYXJ5cmZ6YmVlYWZteWl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjM1NzUsImV4cCI6MjA5NDQzOTU3NX0.ACRNKI77kRGY7qJie5Se2CCol_Zey7Mz8uqYvtBZRbQ' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0Y2FuYXJ5cmZ6YmVlYWZteWl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjM1NzUsImV4cCI6MjA5NDQzOTU3NX0.ACRNKI77kRGY7qJie5Se2CCol_Zey7Mz8uqYvtBZRbQ' -H 'Prefer: count=exact' https://gtcanaryrfzbeeafmyiu.supabase.co/rest/v1/products?select=id)",
       "Bash(curl -s -o /tmp/kf.html -w \"HTTP %{http_code} | tipo: %{content_type}\\\\n\" -L https://karollafit.vercel.app/)",
       "Bash(curl -s -L https://v0-logo-de-fitness.vercel.app/)",
-      "Bash(vercel inspect *)"
+      "Bash(vercel inspect *)",
+      "Bash(curl -s -o /tmp/fab.html -w \"HTTP %{http_code} | tipo: %{content_type}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
+      "Bash(vercel domains *)",
+      "Bash(vercel alias *)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
