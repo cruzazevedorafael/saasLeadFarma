@@ -15,7 +15,8 @@
       "Bash(LC_ALL=C grep -oE \"Atacado \\\\\\(.{0,60}\" /tmp/home2.html)",
       "Bash(awk -F= '{key=$1; val=substr\\($0, length\\($1\\)+2\\); print NR\": \"key\" = [\"length\\(val\\)\" chars] inicio:\" substr\\(val,1,8\\)}' .env.local)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/painel/login)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/painel/login)",
+      "Bash(grep -oE '\"access_token\":\"[^\"]{1,12}|\"token_type\":\"[^\"]*\"|\"error[^\"]*\":\"[^\"]*\"|\"user\":\\\\{\"id\"')"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
