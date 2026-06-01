@@ -27,7 +27,8 @@ export default async function ProdutosPage() {
       {produtos.length === 0 ? (
         <p className="text-muted-foreground">Nenhum produto cadastrado ainda.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border">
+        <>
+        <div className="hidden md:block overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left">
               <tr>
@@ -70,6 +71,31 @@ export default async function ProdutosPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile: cards */}
+        <div className="md:hidden space-y-3">
+          {produtos.map((p) => (
+            <div key={p.id} className="rounded-xl border border-border p-3 flex gap-3">
+              <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-16 w-16 rounded object-cover flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium truncate">{p.name}</span>
+                  <span className="font-mono text-xs text-muted-foreground">{p.code}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{p.category || 'Sem categoria'}</p>
+                <div className="text-sm mt-1">Varejo: {fmt(p.priceRetail)} · Atacado: {fmt(p.priceWholesale)}</div>
+                <div className="text-xs text-muted-foreground">
+                  Estoque: {p.variants.reduce((a, v) => a + v.stock, 0)} · {p.active ? 'Ativo' : 'Inativo'}
+                </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <Link href={`/painel/produtos/${p.id}`} className="text-[#9bbf00] hover:underline">Editar</Link>
+                  <ProdutoActions id={p.id} active={p.active} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        </>
       )}
     </div>
   )
