@@ -16,7 +16,7 @@ export interface Product {
   priceCost: number
   priceWholesale: number
   priceRetail: number
-  minWholesale: number
+  countsForWholesale: boolean
   active: boolean
   sortOrder: number
 }

@@ -10,15 +10,19 @@ describe('mapVariantRow', () => {
 })
 
 describe('mapProductRow', () => {
-  it('mapeia campos e números', () => {
+  it('mapeia campos, números e a flag de atacado', () => {
     const row = {
       id: '1', code: 'LEG-001', name: 'Legging', category: 'Leggings', description: '',
       image_url: null, price_cost: '20.00', price_wholesale: '49.90', price_retail: '89.90',
-      min_wholesale: 6, active: true, sort_order: 0,
+      counts_for_wholesale: true, active: true, sort_order: 0,
     }
     expect(mapProductRow(row)).toMatchObject({
       id: '1', code: 'LEG-001', priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9,
-      minWholesale: 6, imageUrl: null,
+      countsForWholesale: true, imageUrl: null,
     })
+  })
+
+  it('countsForWholesale default true quando ausente', () => {
+    expect(mapProductRow({ id: '2', code: 'X', name: 'Y' }).countsForWholesale).toBe(true)
   })
 })
