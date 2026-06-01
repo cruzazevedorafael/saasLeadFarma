@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { getAdminProduct } from '@/lib/data/products'
+import { getCategories } from '@/lib/data/categories'
 import { ProdutoForm } from '../_components/produto-form'
 
 export default async function EditarProduto({ params }: { params: Promise<{ id: string }> }) {
@@ -11,5 +12,6 @@ export default async function EditarProduto({ params }: { params: Promise<{ id: 
   const { id } = await params
   const produto = await getAdminProduct(id)
   if (!produto) notFound()
-  return <ProdutoForm mode="edit" produto={produto} />
+  const categorias = (await getCategories()).map((c) => c.name)
+  return <ProdutoForm mode="edit" produto={produto} categorias={categorias} />
 }
