@@ -12,6 +12,7 @@ export const produtoSchema = z.object({
   name: z.string().min(1, 'Nome obrigatório'),
   category: z.string().default(''),
   description: z.string().default(''),
+  imageUrl: z.string().nullable().default(null),
   priceCost: z.number().min(0),
   priceWholesale: z.number().min(0),
   priceRetail: z.number().min(0),
