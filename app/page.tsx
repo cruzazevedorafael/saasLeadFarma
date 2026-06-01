@@ -7,7 +7,9 @@ import { getPaymentMethods } from '@/lib/data/payment'
 
 export default async function Home() {
   const [products, settings] = await Promise.all([getPublicProducts(), getStoreSettings()])
-  const shippingMethods = await getShippingMethods(true)
-  const paymentMethods = await getPaymentMethods(true)
+  // Vitrine resiliente: se as tabelas de envio/pagamento ainda não existirem
+  // (migrations não aplicadas), a loja não cai — os seletores só ficam vazios ("A combinar").
+  const shippingMethods = await getShippingMethods(true).catch(() => [])
+  const paymentMethods = await getPaymentMethods(true).catch(() => [])
   return <Catalog products={products} threshold={settings.wholesaleThreshold} whatsappNumber={settings.whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
 }
