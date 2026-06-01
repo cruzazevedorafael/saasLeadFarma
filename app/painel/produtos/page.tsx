@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getAdminProducts } from '@/lib/data/products'
 import { Button } from '@/components/ui/button'
+import { ProdutoActions } from './_components/produto-actions'
 
 export default async function ProdutosPage() {
   const supabase = await createClient()
@@ -59,7 +60,10 @@ export default async function ProdutosPage() {
                   <td className="p-3">{p.countsForWholesale ? 'Sim' : 'Não'}</td>
                   <td className="p-3">{p.active ? 'Sim' : 'Não'}</td>
                   <td className="p-3">
-                    <Link href={`/painel/produtos/${p.id}`} className="text-[#9bbf00] hover:underline">Editar</Link>
+                    <div className="flex items-center gap-3">
+                      <Link href={`/painel/produtos/${p.id}`} className="text-[#9bbf00] hover:underline">Editar</Link>
+                      <ProdutoActions id={p.id} active={p.active} />
+                    </div>
                   </td>
                 </tr>
               ))}
