@@ -13,3 +13,8 @@ export function isVariantAvailable(p: ProductWithVariants, size: string, color: 
   const v = p.variants.find((x) => x.size === size && x.color === color)
   return !!v && v.stock > 0
 }
+
+/** true quando vale mostrar botões de seleção; false → mostrar como texto fixo. */
+export function shouldRenderAsButtons(values: string[]): boolean {
+  return values.length >= 2
+}

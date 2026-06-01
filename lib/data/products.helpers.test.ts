@@ -34,3 +34,17 @@ describe('isVariantAvailable', () => {
     expect(isVariantAvailable(p, 'GG', 'Azul')).toBe(false)
   })
 })
+
+import { shouldRenderAsButtons } from './products.helpers'
+
+describe('shouldRenderAsButtons', () => {
+  it('false com nenhuma opção', () => {
+    expect(shouldRenderAsButtons([])).toBe(false)
+  })
+  it('false com uma opção (mostra como texto)', () => {
+    expect(shouldRenderAsButtons(['Preto'])).toBe(false)
+  })
+  it('true com duas ou mais opções', () => {
+    expect(shouldRenderAsButtons(['P', 'M'])).toBe(true)
+  })
+})
