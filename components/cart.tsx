@@ -10,26 +10,39 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag } from 'lucide-react'
 import { criarPedido } from '@/app/_actions/criar-pedido'
+import type { ShippingMethod } from '@/lib/data/shipping'
+import type { PaymentMethod } from '@/lib/data/payment'
 
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
 
-export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsappNumber: string }) {
+export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethods }: { threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[] }) {
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
+  const [shippingId, setShippingId] = useState<string>('')
+  const [paymentId, setPaymentId] = useState<string>('')
 
   const { items, removeItem, updateQuantity, clearCart, getTotalItems } = useCartStore()
 
   const priceType: PriceType = cartPriceType(items, threshold)
   const total = cartTotal(items, priceType)
+  const round2 = (n: number) => Math.round(n * 100) / 100
+  const selShipping = shippingMethods.find((m) => m.id === shippingId)
+  const selPayment = paymentMethods.find((m) => m.id === paymentId)
+  const subtotal = total
+  const frete = selShipping?.price ?? 0
+  const acrescimo = selPayment ? round2((subtotal + frete) * (selPayment.surchargePercent / 100) + selPayment.surchargeFixed) : 0
+  const totalFinal = round2(subtotal + frete + acrescimo)
+  const pesoTotalG = items.reduce((acc, i) => acc + i.product.weightGrams * i.quantity, 0)
   const faltam = piecesUntilWholesale(items, threshold)
   const totalItems = getTotalItems()
 
   const generateOrderText = () => {
     const date = new Date().toLocaleDateString('pt-BR')
+    const fmtKg = (g: number) => `${(g / 1000).toFixed(3).replace('.', ',')} kg`
     let text = `Data: ${date}\n\n`
     text += `*Cliente:* ${customerName}\n`
     text += `*Telefone:* ${customerPhone}\n\n`
@@ -45,7 +58,11 @@ export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsap
       text += `   Subtotal: *${formatPrice(price * item.quantity)}*\n\n`
     })
     text += `━━━━━━━━━━━━━━━━━━\n`
-    text += `*TOTAL GERAL: ${formatPrice(total)}*\n`
+    text += `*Subtotal:* ${formatPrice(subtotal)}\n`
+    text += `*Peso total:* ${fmtKg(pesoTotalG)}\n`
+    text += `*Envio:* ${selShipping ? `${selShipping.name} (${formatPrice(frete)})` : 'A combinar'}\n`
+    text += `*Pagamento:* ${selPayment ? selPayment.name : 'A combinar'}${acrescimo > 0 ? ` (+${formatPrice(acrescimo)})` : ''}\n`
+    text += `*TOTAL GERAL: ${formatPrice(totalFinal)}*\n`
     text += `━━━━━━━━━━━━━━━━━━\n\n`
     text += `_Pedido enviado pelo Menu Digital KAROLLA FIT_`
     return text
@@ -62,6 +79,8 @@ export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsap
         customerName,
         customerPhone,
         items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
+        shippingMethodId: shippingId || null,
+        paymentMethodId: paymentId || null,
       })
       numeroPedido = r.number
     } catch {
@@ -80,6 +99,8 @@ export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsap
       setIsOpen(false)
       setCustomerName('')
       setCustomerPhone('')
+      setShippingId('')
+      setPaymentId('')
     }, 1000)
   }
 
@@ -186,6 +207,37 @@ export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsap
                           </div>
                         </div>
 
+                        <div className="space-y-3 md:space-y-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-xs md:text-sm">Forma de envio</Label>
+                            <select
+                              value={shippingId}
+                              onChange={(e) => setShippingId(e.target.value)}
+                              className="w-full h-10 md:h-12 rounded-md border border-border bg-muted px-3 text-sm md:text-base"
+                            >
+                              <option value="">A combinar</option>
+                              {shippingMethods.map((m) => (
+                                <option key={m.id} value={m.id}>{m.name} — {formatPrice(m.price)}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs md:text-sm">Forma de pagamento</Label>
+                            <select
+                              value={paymentId}
+                              onChange={(e) => setPaymentId(e.target.value)}
+                              className="w-full h-10 md:h-12 rounded-md border border-border bg-muted px-3 text-sm md:text-base"
+                            >
+                              <option value="">A combinar</option>
+                              {paymentMethods.map((m) => (
+                                <option key={m.id} value={m.id}>
+                                  {m.name}{(m.surchargePercent > 0 || m.surchargeFixed > 0) ? ' (+acréscimo)' : ''}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
                         <div className="rounded-xl bg-muted/50 p-3 md:p-4 space-y-2 md:space-y-3">
                           <h4 className="font-semibold text-xs md:text-sm">Resumo do Pedido ({priceType === 'wholesale' ? 'Atacado' : 'Varejo'})</h4>
                           {items.map((item) => {
@@ -197,9 +249,21 @@ export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsap
                               </div>
                             )
                           })}
-                          <div className="border-t border-border pt-2 md:pt-3 flex justify-between font-semibold text-sm md:text-base">
-                            <span>Total</span>
-                            <span className="text-[#CFFF04]">{formatPrice(total)}</span>
+                          <div className="border-t border-border pt-2 md:pt-3 space-y-1 text-xs md:text-sm">
+                            <div className="flex justify-between text-muted-foreground">
+                              <span>Subtotal</span><span>{formatPrice(subtotal)}</span>
+                            </div>
+                            <div className="flex justify-between text-muted-foreground">
+                              <span>Frete</span><span>{selShipping ? formatPrice(frete) : 'A combinar'}</span>
+                            </div>
+                            {acrescimo > 0 && (
+                              <div className="flex justify-between text-muted-foreground">
+                                <span>Acréscimo</span><span>{formatPrice(acrescimo)}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between font-semibold text-sm md:text-base pt-1">
+                              <span>Total</span><span className="text-[#CFFF04]">{formatPrice(totalFinal)}</span>
+                            </div>
                           </div>
                         </div>
 
