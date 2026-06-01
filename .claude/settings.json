@@ -47,7 +47,8 @@
       "Bash(curl -s -o /tmp/nf.html -w \"HTTP %{http_code} | %{content_type}\\\\n\" -L https://karolla-fabrica.vercel.app/)",
       "Bash(curl -s -o /tmp/ff.html -w \"HTTP %{http_code} | %{content_type}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
       "Bash(curl -s -o /tmp/ff2.html -w \"HTTP %{http_code}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
-      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karolla-fabrica.vercel.app/)"
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karolla-fabrica.vercel.app/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karollafit.projetarcode.com.br/)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
