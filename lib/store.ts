@@ -1,25 +1,15 @@
+// lib/store.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Product } from '@/lib/data/types'
 
-export interface Product {
-  id: string
-  name: string
-  category: string
-  image: string
-  priceRetail: number
-  priceWholesale: number
-  minWholesale: number
-  sizes: string[]
-  colors: string[]
-  description: string
-}
+export type { Product }
 
 export interface CartItem {
   product: Product
   quantity: number
   size: string
   color: string
-  priceType: 'retail' | 'wholesale'
 }
 
 interface CartStore {
@@ -29,7 +19,6 @@ interface CartStore {
   updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
   clearCart: () => void
   getTotalItems: () => number
-  getTotalPrice: () => number
 }
 
 export const useCartStore = create<CartStore>()(
@@ -67,11 +56,6 @@ export const useCartStore = create<CartStore>()(
       },
       clearCart: () => set({ items: [] }),
       getTotalItems: () => get().items.reduce((acc, item) => acc + item.quantity, 0),
-      getTotalPrice: () =>
-        get().items.reduce((acc, item) => {
-          const price = item.priceType === 'wholesale' ? item.product.priceWholesale : item.product.priceRetail
-          return acc + price * item.quantity
-        }, 0),
     }),
     {
       name: 'karolla-cart',
