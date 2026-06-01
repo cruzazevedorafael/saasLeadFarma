@@ -52,7 +52,9 @@
       "Bash(git fetch *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -L https://karollafit.projetarcode.com.br/)",
       "Bash(grep -oE '\"access_token\":\"ey[^\"]{0,6}|\"error[^\"]*\":\"[^\"]*\"')",
-      "Bash(git rev-list *)"
+      "Bash(git rev-list *)",
+      "Bash(find docs *)",
+      "Bash(ls docs *)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
