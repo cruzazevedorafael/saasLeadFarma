@@ -85,6 +85,20 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                     <span>{fmt(it.unitPrice * it.quantity)}</span>
                   </div>
                 ))}
+                <div className="mt-2 pt-2 border-t border-border/60 text-sm space-y-0.5">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Subtotal</span><span>{fmt(o.itemsSubtotal || o.total)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Peso total</span><span>{(o.weightTotalGrams / 1000).toFixed(3).replace('.', ',')} kg</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Envio</span><span>{o.shippingLabel || 'A combinar'}{o.shippingPrice > 0 ? ` — ${fmt(o.shippingPrice)}` : ''}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Pagamento</span><span>{o.paymentLabel || 'A combinar'}{o.paymentSurcharge > 0 ? ` — +${fmt(o.paymentSurcharge)}` : ''}</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
