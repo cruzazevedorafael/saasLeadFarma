@@ -13,6 +13,7 @@ function prod(over: Partial<ProductWithVariants>): ProductWithVariants {
 
 const legging = prod({
   id: 'L', code: 'LEG-001', name: 'Legging', priceWholesale: 50, priceRetail: 90, priceCost: 20,
+  weightGrams: 250,
   countsForWholesale: true,
   variants: [{ id: 'v1', productId: 'L', size: 'M', color: 'Preto', stock: 5 }],
 })
@@ -53,5 +54,39 @@ describe('buildOrder', () => {
 
   it('erro quando o produto não existe', () => {
     expect(() => buildOrder([], [{ productId: 'X', size: 'M', color: 'Preto', quantity: 1 }], 4)).toThrow()
+  })
+})
+
+describe('buildOrder — peso, frete e acréscimo', () => {
+  it('soma o peso total (g) por quantidade', () => {
+    const r = buildOrder([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 3 }], 4)
+    expect(r.weightTotalGrams).toBe(750) // 250 * 3
+    expect(r.items[0].weight_grams).toBe(250)
+  })
+
+  it('sem envio/pagamento: subtotal = total, acréscimo 0', () => {
+    const r = buildOrder([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 2 }], 4)
+    expect(r.itemsSubtotal).toBe(180)
+    expect(r.shippingPrice).toBe(0)
+    expect(r.paymentSurcharge).toBe(0)
+    expect(r.total).toBe(180)
+    expect(r.shippingLabel).toBe('A combinar')
+    expect(r.paymentLabel).toBe('A combinar')
+  })
+
+  it('aplica frete e acréscimo (% sobre subtotal+frete) + fixo', () => {
+    const r = buildOrder(
+      [legging],
+      [{ productId: 'L', size: 'M', color: 'Preto', quantity: 2 }], // subtotal 180
+      4,
+      { label: 'Correios', price: 20 },
+      { label: 'Cartão', percent: 5, fixed: 2 },
+    )
+    expect(r.itemsSubtotal).toBe(180)
+    expect(r.shippingPrice).toBe(20)
+    expect(r.paymentSurcharge).toBe(12) // 200*0.05 + 2
+    expect(r.total).toBe(212)
+    expect(r.shippingLabel).toBe('Correios')
+    expect(r.paymentLabel).toBe('Cartão')
   })
 })
