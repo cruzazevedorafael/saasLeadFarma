@@ -12,7 +12,10 @@
       "Bash(curl -s -o /tmp/home2.html -w \"%{http_code}\" http://localhost:3000/)",
       "Bash(grep -oE \"R\\\\$ \\(89,90|49,90|159,90\\)\" /tmp/home2.html)",
       "Bash(LC_ALL=C grep -oE \"Atacado [^<]{0,40}\" /tmp/home2.html)",
-      "Bash(LC_ALL=C grep -oE \"Atacado \\\\\\(.{0,60}\" /tmp/home2.html)"
+      "Bash(LC_ALL=C grep -oE \"Atacado \\\\\\(.{0,60}\" /tmp/home2.html)",
+      "Bash(awk -F= '{key=$1; val=substr\\($0, length\\($1\\)+2\\); print NR\": \"key\" = [\"length\\(val\\)\" chars] inicio:\" substr\\(val,1,8\\)}' .env.local)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/painel/login)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
