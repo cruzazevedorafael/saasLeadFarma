@@ -15,3 +15,17 @@ export async function setWholesaleThreshold(value: number) {
   revalidatePath('/painel')
   revalidatePath('/')
 }
+
+export async function setStoreContact(storeName: string, whatsappNumber: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('não autenticado')
+  const db = createAdminClient()
+  const { error } = await db
+    .from('store_settings')
+    .update({ store_name: storeName, whatsapp_number: whatsappNumber, updated_at: new Date().toISOString() })
+    .eq('id', 1)
+  if (error) throw error
+  revalidatePath('/painel')
+  revalidatePath('/')
+}
