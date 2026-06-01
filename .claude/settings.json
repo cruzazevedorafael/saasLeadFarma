@@ -54,7 +54,9 @@
       "Bash(grep -oE '\"access_token\":\"ey[^\"]{0,6}|\"error[^\"]*\":\"[^\"]*\"')",
       "Bash(git rev-list *)",
       "Bash(find docs *)",
-      "Bash(ls docs *)"
+      "Bash(ls docs *)",
+      "Bash(npx vitest *)",
+      "Bash(echo \"EXIT:$?\")"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
