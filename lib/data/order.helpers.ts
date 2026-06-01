@@ -1,7 +1,6 @@
 // lib/data/order.helpers.ts
 import { cartPriceType, unitPriceFor, cartTotal, type PriceType } from './cart.helpers'
 import type { ProductWithVariants } from './types'
-import type { CartItem } from '@/lib/store'
 
 export interface RequestedItem {
   productId: string
@@ -34,7 +33,7 @@ export function buildOrder(
   threshold: number,
 ): BuiltOrder {
   const byId = new Map(products.map((p) => [p.id, p]))
-  const cartItems: CartItem[] = requested.map((r) => {
+  const cartItems = requested.map((r) => {
     const p = byId.get(r.productId)
     if (!p) throw new Error(`Produto não encontrado: ${r.productId}`)
     return { product: p, quantity: r.quantity, size: r.size, color: r.color }
