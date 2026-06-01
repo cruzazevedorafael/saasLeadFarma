@@ -9,15 +9,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag } from 'lucide-react'
+import { criarPedido } from '@/app/_actions/criar-pedido'
 
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
 
-export function Cart({ threshold }: { threshold: number }) {
+export function Cart({ threshold, whatsappNumber }: { threshold: number; whatsappNumber: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
 
   const { items, removeItem, updateQuantity, clearCart, getTotalItems } = useCartStore()
 
@@ -28,8 +30,7 @@ export function Cart({ threshold }: { threshold: number }) {
 
   const generateOrderText = () => {
     const date = new Date().toLocaleDateString('pt-BR')
-    let text = `*PEDIDO KAROLLA FIT*\n`
-    text += `Data: ${date}\n\n`
+    let text = `Data: ${date}\n\n`
     text += `*Cliente:* ${customerName}\n`
     text += `*Telefone:* ${customerPhone}\n\n`
     text += `*Tipo de preço:* ${priceType === 'wholesale' ? 'ATACADO' : 'VAREJO'}\n\n`
@@ -50,12 +51,28 @@ export function Cart({ threshold }: { threshold: number }) {
     return text
   }
 
-  const handleSendOrder = () => {
+  const handleSendOrder = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return
     setIsLoading(true)
-    const orderText = generateOrderText()
-    const phoneNumber = '5500000000000' // configurável na Fase 2
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(orderText)}`, '_blank')
+    setAviso(null)
+
+    let numeroPedido: number | null = null
+    try {
+      const r = await criarPedido({
+        customerName,
+        customerPhone,
+        items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
+      })
+      numeroPedido = r.number
+    } catch {
+      setAviso('Pedido enviado pelo WhatsApp, mas não foi registrado no painel. Confira lá depois.')
+    }
+
+    const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
+    const orderText = header + '\n' + generateOrderText()
+    const phone = (whatsappNumber || '').replace(/\D/g, '')
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`, '_blank')
+
     setTimeout(() => {
       setIsLoading(false)
       clearCart()
@@ -201,13 +218,16 @@ export function Cart({ threshold }: { threshold: number }) {
                       </div>
                     )}
                     {showCheckout ? (
-                      <Button onClick={handleSendOrder} disabled={!customerName.trim() || !customerPhone.trim() || isLoading} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
-                        {isLoading ? (
-                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
-                        ) : (
-                          <><Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp</>
-                        )}
-                      </Button>
+                      <>
+                        {aviso && <p className="text-xs text-amber-500">{aviso}</p>}
+                        <Button onClick={handleSendOrder} disabled={!customerName.trim() || !customerPhone.trim() || isLoading} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
+                          {isLoading ? (
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
+                          ) : (
+                            <><Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp</>
+                          )}
+                        </Button>
+                      </>
                     ) : (
                       <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">Continuar</Button>
                     )}

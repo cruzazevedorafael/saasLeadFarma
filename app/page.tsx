@@ -5,5 +5,5 @@ import { getStoreSettings } from '@/lib/data/settings'
 
 export default async function Home() {
   const [products, settings] = await Promise.all([getPublicProducts(), getStoreSettings()])
-  return <Catalog products={products} threshold={settings.wholesaleThreshold} />
+  return <Catalog products={products} threshold={settings.wholesaleThreshold} whatsappNumber={settings.whatsappNumber} />
 }

@@ -11,7 +11,7 @@ import { Cart } from '@/components/cart'
 import { Search } from 'lucide-react'
 import type { ProductWithVariants } from '@/lib/data/types'
 
-export function Catalog({ products, threshold }: { products: ProductWithVariants[]; threshold: number }) {
+export function Catalog({ products, threshold, whatsappNumber }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -102,7 +102,7 @@ export function Catalog({ products, threshold }: { products: ProductWithVariants
         </div>
       </section>
 
-      <Cart threshold={threshold} />
+      <Cart threshold={threshold} whatsappNumber={whatsappNumber} />
     </main>
   )
 }
