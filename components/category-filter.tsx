@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { categories } from '@/lib/products'
-
 interface CategoryFilterProps {
+  categories: string[]
   selectedCategory: string
   onSelectCategory: (category: string) => void
 }
 
-export function CategoryFilter({ selectedCategory, onSelectCategory }: CategoryFilterProps) {
+export function CategoryFilter({ categories, selectedCategory, onSelectCategory }: CategoryFilterProps) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
