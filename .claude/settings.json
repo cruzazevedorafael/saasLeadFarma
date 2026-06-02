@@ -77,7 +77,8 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}  /painel/financeiro \\(esperado 404\\)\\\\n\" \"http://localhost:3000/painel/financeiro\")",
       "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
       "Bash(df -h / /Users)",
-      "Bash(du -sh .next node_modules)"
+      "Bash(du -sh .next node_modules)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|json\\)$\")"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
