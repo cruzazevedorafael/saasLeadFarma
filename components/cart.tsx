@@ -13,7 +13,7 @@ import { criarPedido } from '@/app/_actions/criar-pedido'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
 import { buildOrderPdf, type OrderPdfData } from '@/lib/order-pdf'
-import { shareOrDownloadOrder, downloadFile } from '@/lib/share-file'
+import { downloadFile } from '@/lib/share-file'
 
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
 
@@ -27,7 +27,6 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   const [shippingId, setShippingId] = useState<string>('')
   const [paymentId, setPaymentId] = useState<string>('')
   const [pdf, setPdf] = useState<{ url: string; file: File; number: number | null } | null>(null)
-  const [sharing, setSharing] = useState(false)
 
   const { items, removeItem, updateQuantity, clearCart, getTotalItems } = useCartStore()
 
@@ -97,15 +96,15 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     }
   }
 
-  const handleShare = async () => {
+  const handleShare = () => {
     if (!pdf) return
-    setSharing(true)
+    // Baixa o PDF pro aparelho e abre o WhatsApp JÁ no número da loja.
+    // Na conversa que abre, é só tocar no clipe 📎 → Documentos → escolher o PDF.
+    downloadFile(pdf.file)
+    const phone = (whatsappNumber || '').replace(/\D/g, '')
     const caption = `${pdf.number ? `Pedido #${pdf.number}` : 'Pedido'} — KAROLLA FIT`
-    try {
-      await shareOrDownloadOrder(pdf.file, caption, whatsappNumber)
-    } finally {
-      setSharing(false)
-    }
+    const texto = `${caption}\nBaixei o PDF do pedido — vou anexar aqui na conversa. 📎`
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`, '_blank')
   }
 
   const resetTudo = () => {
@@ -184,7 +183,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                         </div>
                         <h3 className="text-lg md:text-xl font-semibold">Pedido pronto!</h3>
                         <p className="text-xs md:text-sm text-muted-foreground max-w-xs">
-                          Geramos o PDF{pdf.number ? ` do pedido #${pdf.number}` : ''} com as fotos e a logomarca. Toque em <strong>Enviar pelo WhatsApp</strong> para mandar com o arquivo anexado.
+                          Geramos o PDF{pdf.number ? ` do pedido #${pdf.number}` : ''} com as fotos e a logomarca. Ao tocar em <strong>Enviar pelo WhatsApp</strong>, o WhatsApp abre no número da loja e o PDF é baixado — é só tocar no clipe 📎 → Documentos e anexar.
                         </p>
                         <button onClick={() => window.open(pdf.url, '_blank')} className="text-sm text-[#9bbf00] underline">
                           Ver PDF
@@ -308,12 +307,8 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                     {pdf ? (
                       <>
                         {aviso && <p className="text-xs text-amber-500">{aviso}</p>}
-                        <Button onClick={handleShare} disabled={sharing} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
-                          {sharing ? (
-                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
-                          ) : (
-                            <><Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp</>
-                          )}
+                        <Button onClick={handleShare} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
+                          <Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp
                         </Button>
                         <div className="flex gap-2">
                           <Button variant="outline" onClick={() => downloadFile(pdf.file)} className="flex-1 h-10 md:h-12 text-sm">
