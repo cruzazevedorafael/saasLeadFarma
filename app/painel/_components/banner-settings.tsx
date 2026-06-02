@@ -48,9 +48,9 @@ export function BannerSettings({ current }: { current: string }) {
 
   return (
     <div className="max-w-sm space-y-3 rounded-xl border border-border p-4">
-      <Label className="text-sm font-medium">Banner da página inicial</Label>
+      <Label className="text-sm font-medium">Banner de ofertas (página inicial)</Label>
       <p className="text-xs text-muted-foreground">
-        Imagem que aparece abaixo do logo, na página inicial da loja. Deixe sem imagem para não mostrar nada.
+        Imagem do destaque na página inicial — entra no lugar do aviso “Oferta Especial”. Deixe sem imagem para mostrar o aviso padrão.
       </p>
       {preview ? (
         <img src={preview} alt="Banner atual" className="w-full rounded-lg object-cover max-h-40" />
