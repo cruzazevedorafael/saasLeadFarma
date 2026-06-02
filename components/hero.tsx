@@ -47,22 +47,6 @@ export function Hero({ bannerImageUrl }: { bannerImageUrl?: string }) {
             <div className="absolute inset-0 rounded-full bg-[#CFFF04]/30 blur-2xl -z-10" />
           </motion.div>
 
-          {/* Banner trocável pelo painel (abaixo do logo) */}
-          {bannerImageUrl && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mb-4 md:mb-8 w-full max-w-3xl px-1"
-            >
-              <img
-                src={bannerImageUrl}
-                alt="Banner"
-                className="w-full rounded-xl md:rounded-2xl object-cover max-h-48 md:max-h-72"
-              />
-            </motion.div>
-          )}
-
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -109,7 +93,7 @@ export function Hero({ bannerImageUrl }: { bannerImageUrl?: string }) {
             className="mt-6 md:mt-12 w-full max-w-2xl px-1"
           >
             <motion.div
-              animate={{ 
+              animate={{
                 boxShadow: [
                   '0 0 20px rgba(207, 255, 4, 0.3)',
                   '0 0 40px rgba(207, 255, 4, 0.5)',
@@ -119,6 +103,13 @@ export function Hero({ bannerImageUrl }: { bannerImageUrl?: string }) {
               transition={{ repeat: Infinity, duration: 2 }}
               className="relative overflow-hidden rounded-xl md:rounded-2xl bg-gradient-to-r from-[#CFFF04] via-[#e8ff66] to-[#CFFF04] p-[2px]"
             >
+              {bannerImageUrl ? (
+                <img
+                  src={bannerImageUrl}
+                  alt="Oferta"
+                  className="block w-full rounded-[10px] md:rounded-[14px] object-cover"
+                />
+              ) : (
               <div className="relative rounded-xl md:rounded-2xl bg-background/95 backdrop-blur-sm px-4 py-4 md:px-8 md:py-6">
                 {/* Estrelas decorativas */}
                 <motion.span
@@ -168,6 +159,7 @@ export function Hero({ bannerImageUrl }: { bannerImageUrl?: string }) {
                   </p>
                 </div>
               </div>
+              )}
             </motion.div>
           </motion.div>
 
