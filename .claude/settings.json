@@ -78,7 +78,8 @@
       "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
       "Bash(df -h / /Users)",
       "Bash(du -sh .next node_modules)",
-      "Bash(grep -E \"\\\\.\\(ts|tsx|json\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|tsx|json\\)$\")",
+      "Bash(git show *)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
