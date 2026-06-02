@@ -8,6 +8,7 @@ import { logout } from './login/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { BannerSettings } from './_components/banner-settings'
 
 export default async function PainelHome() {
   const supabase = await createClient()
@@ -37,7 +38,6 @@ export default async function PainelHome() {
         <Link href="/painel/envio" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Envio</Link>
         <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
-        <Link href="/painel/financeiro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Financeiro</Link>
       </div>
 
       <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border p-4">
@@ -61,6 +61,8 @@ export default async function PainelHome() {
         </div>
         <Button type="submit">Salvar contato</Button>
       </form>
+
+      <BannerSettings current={settings.bannerImageUrl} />
     </div>
   )
 }

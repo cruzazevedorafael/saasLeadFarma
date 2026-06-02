@@ -6,6 +6,7 @@ export interface StoreSettings {
   whatsappNumber: string
   reservationMinutes: number
   wholesaleThreshold: number
+  bannerImageUrl: string
 }
 
 const FALLBACK: StoreSettings = {
@@ -13,13 +14,14 @@ const FALLBACK: StoreSettings = {
   whatsappNumber: '',
   reservationMinutes: 10,
   wholesaleThreshold: 4,
+  bannerImageUrl: '',
 }
 
 export async function getStoreSettings(): Promise<StoreSettings> {
   const supabase = await createServerClient()
   const { data, error } = await supabase
     .from('store_settings')
-    .select('store_name, whatsapp_number, reservation_minutes, wholesale_threshold')
+    .select('store_name, whatsapp_number, reservation_minutes, wholesale_threshold, banner_image_url')
     .eq('id', 1)
     .single()
   if (error || !data) return FALLBACK
@@ -28,5 +30,6 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     whatsappNumber: data.whatsapp_number ?? FALLBACK.whatsappNumber,
     reservationMinutes: Number(data.reservation_minutes ?? FALLBACK.reservationMinutes),
     wholesaleThreshold: Number(data.wholesale_threshold ?? FALLBACK.wholesaleThreshold),
+    bannerImageUrl: data.banner_image_url ?? FALLBACK.bannerImageUrl,
   }
 }

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 
-export function Hero() {
+export function Hero({ bannerImageUrl }: { bannerImageUrl?: string }) {
   return (
     <section className="relative overflow-hidden py-8 md:py-24">
       {/* Background Elements */}
@@ -46,6 +46,22 @@ export function Hero() {
             {/* Glow effect */}
             <div className="absolute inset-0 rounded-full bg-[#CFFF04]/30 blur-2xl -z-10" />
           </motion.div>
+
+          {/* Banner trocável pelo painel (abaixo do logo) */}
+          {bannerImageUrl && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-4 md:mb-8 w-full max-w-3xl px-1"
+            >
+              <img
+                src={bannerImageUrl}
+                alt="Banner"
+                className="w-full rounded-xl md:rounded-2xl object-cover max-h-48 md:max-h-72"
+              />
+            </motion.div>
+          )}
 
           {/* Title */}
           <motion.h1

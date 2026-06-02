@@ -36,7 +36,6 @@ export default async function ProdutosPage() {
                 <th className="p-3">Código</th>
                 <th className="p-3">Nome</th>
                 <th className="p-3">Categoria</th>
-                <th className="p-3">Custo</th>
                 <th className="p-3">Atacado</th>
                 <th className="p-3">Varejo</th>
                 <th className="p-3">Estoque</th>
@@ -54,7 +53,6 @@ export default async function ProdutosPage() {
                   <td className="p-3 font-mono text-xs">{p.code}</td>
                   <td className="p-3">{p.name}</td>
                   <td className="p-3">{p.category}</td>
-                  <td className="p-3">{fmt(p.priceCost)}</td>
                   <td className="p-3">{fmt(p.priceWholesale)}</td>
                   <td className="p-3">{fmt(p.priceRetail)}</td>
                   <td className="p-3">{p.variants.reduce((a, v) => a + v.stock, 0)}</td>
