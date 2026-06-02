@@ -37,7 +37,6 @@ export default async function PainelHome() {
         <Link href="/painel/envio" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Envio</Link>
         <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
-        <Link href="/painel/financeiro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Financeiro</Link>
       </div>
 
       <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border p-4">

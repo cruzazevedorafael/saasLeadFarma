@@ -29,14 +29,14 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
     defaultValues: produto
       ? {
           code: produto.code, name: produto.name, category: produto.category, description: produto.description,
-          priceCost: produto.priceCost, priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
+          priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
           weightGrams: produto.weightGrams,
           countsForWholesale: produto.countsForWholesale, active: produto.active, imageUrl: produto.imageUrl,
           variants: produto.variants.map((v) => ({ size: v.size, color: v.color, stock: v.stock })),
         }
       : {
           code: '', name: '', category: '', description: '',
-          priceCost: 0, priceWholesale: 0, priceRetail: 0,
+          priceWholesale: 0, priceRetail: 0,
           weightGrams: 0,
           countsForWholesale: true, active: true, imageUrl: null,
           variants: [{ size: '', color: '', stock: 0 }],
@@ -86,7 +86,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <Label htmlFor="code">Número/Código</Label>
+          <Label htmlFor="code">Número/Código (opcional)</Label>
           <Input id="code" {...register('code')} />
           {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
         </div>
@@ -116,11 +116,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
         <Textarea id="description" {...register('description')} />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="priceCost">Custo</Label>
-          <Input id="priceCost" type="number" step="0.01" {...register('priceCost', { valueAsNumber: true })} />
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="space-y-1">
           <Label htmlFor="priceWholesale">Atacado</Label>
           <Input id="priceWholesale" type="number" step="0.01" {...register('priceWholesale', { valueAsNumber: true })} />
@@ -153,7 +149,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label>Variações (tamanho + cor + estoque)</Label>
+          <Label>Variações (tamanho + cor + estoque) — opcional</Label>
           <Button type="button" variant="outline" size="sm" onClick={() => append({ size: '', color: '', stock: 0 })}>
             <Plus className="h-4 w-4 mr-1" /> Adicionar
           </Button>

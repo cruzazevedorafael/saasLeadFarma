@@ -17,7 +17,6 @@ export async function darBaixa(orderId: string): Promise<{ ok: boolean; error?: 
   const { error } = await db.rpc('complete_order', { p_order_id: orderId })
   if (error) return { ok: false, error: error.message }
   revalidatePath('/painel/pedidos')
-  revalidatePath('/painel/financeiro')
   revalidatePath('/')
   return { ok: true }
 }

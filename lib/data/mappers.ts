@@ -8,7 +8,7 @@ export function mapVariantRow(r: any): ProductVariant {
 export function mapProductRow(r: any): Product {
   return {
     id: r.id,
-    code: r.code,
+    code: r.code ?? '',
     name: r.name,
     category: r.category ?? '',
     description: r.description ?? '',

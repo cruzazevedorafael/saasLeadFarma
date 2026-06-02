@@ -17,16 +17,18 @@ export async function createProduto(input: ProdutoInput) {
   const data = produtoSchema.parse(input)
   const db = createAdminClient()
   const { data: prod, error } = await db.from('products').insert({
-    code: data.code, name: data.name, category: data.category, description: data.description,
-    price_cost: data.priceCost, price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
+    code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
+    price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null,
   }).select('id').single()
   if (error) throw error
-  const { error: vErr } = await db.from('product_variants').insert(
-    data.variants.map((v) => ({ product_id: prod.id, size: v.size, color: v.color, stock: v.stock }))
-  )
-  if (vErr) throw vErr
+  if (data.variants.length > 0) {
+    const { error: vErr } = await db.from('product_variants').insert(
+      data.variants.map((v) => ({ product_id: prod.id, size: v.size, color: v.color, stock: v.stock }))
+    )
+    if (vErr) throw vErr
+  }
   revalidatePath('/painel/produtos')
   revalidatePath('/')
   return prod.id as string
@@ -37,15 +39,17 @@ export async function updateProduto(id: string, input: ProdutoInput) {
   const data = produtoSchema.parse(input)
   const db = createAdminClient()
   await db.from('products').update({
-    code: data.code, name: data.name, category: data.category, description: data.description,
-    price_cost: data.priceCost, price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
+    code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
+    price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null, updated_at: new Date().toISOString(),
   }).eq('id', id)
   await db.from('product_variants').delete().eq('product_id', id)
-  await db.from('product_variants').insert(
-    data.variants.map((v) => ({ product_id: id, size: v.size, color: v.color, stock: v.stock }))
-  )
+  if (data.variants.length > 0) {
+    await db.from('product_variants').insert(
+      data.variants.map((v) => ({ product_id: id, size: v.size, color: v.color, stock: v.stock }))
+    )
+  }
   revalidatePath('/painel/produtos')
   revalidatePath('/')
 }

@@ -4,7 +4,7 @@ import { produtoSchema } from './produto-schema'
 
 const valido = {
   code: 'LEG-001', name: 'Legging', category: 'Leggings', description: '',
-  priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9, countsForWholesale: true,
+  priceWholesale: 49.9, priceRetail: 89.9, countsForWholesale: true,
   active: true,
   variants: [{ size: 'M', color: 'Preto', stock: 3 }],
 }
@@ -22,11 +22,14 @@ describe('produtoSchema', () => {
     const parsed = produtoSchema.parse({ ...valido, countsForWholesale: false })
     expect(parsed.countsForWholesale).toBe(false)
   })
-  it('rejeita código vazio', () => {
-    expect(produtoSchema.safeParse({ ...valido, code: '' }).success).toBe(false)
+  it('aceita código vazio (opcional)', () => {
+    expect(produtoSchema.safeParse({ ...valido, code: '' }).success).toBe(true)
   })
-  it('rejeita sem variações', () => {
-    expect(produtoSchema.safeParse({ ...valido, variants: [] }).success).toBe(false)
+  it('aceita sem variações (opcional)', () => {
+    expect(produtoSchema.safeParse({ ...valido, variants: [] }).success).toBe(true)
+  })
+  it('aceita variação sem tamanho e cor (opcionais)', () => {
+    expect(produtoSchema.safeParse({ ...valido, variants: [{ size: '', color: '', stock: 0 }] }).success).toBe(true)
   })
   it('rejeita estoque negativo', () => {
     expect(produtoSchema.safeParse({ ...valido, variants: [{ size: 'M', color: 'Preto', stock: -1 }] }).success).toBe(false)
