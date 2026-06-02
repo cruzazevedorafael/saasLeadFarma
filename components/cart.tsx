@@ -8,10 +8,12 @@ import { cartPriceType, cartTotal, unitPriceFor, piecesUntilWholesale, type Pric
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag } from 'lucide-react'
+import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag, FileText, Download } from 'lucide-react'
 import { criarPedido } from '@/app/_actions/criar-pedido'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
+import { buildOrderPdf, type OrderPdfData } from '@/lib/order-pdf'
+import { shareOrDownloadOrder, downloadFile } from '@/lib/share-file'
 
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
 
@@ -24,6 +26,8 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   const [aviso, setAviso] = useState<string | null>(null)
   const [shippingId, setShippingId] = useState<string>('')
   const [paymentId, setPaymentId] = useState<string>('')
+  const [pdf, setPdf] = useState<{ url: string; file: File; number: number | null } | null>(null)
+  const [sharing, setSharing] = useState(false)
 
   const { items, removeItem, updateQuantity, clearCart, getTotalItems } = useCartStore()
 
@@ -40,35 +44,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   const faltam = piecesUntilWholesale(items, threshold)
   const totalItems = getTotalItems()
 
-  const generateOrderText = () => {
-    const date = new Date().toLocaleDateString('pt-BR')
-    const fmtKg = (g: number) => `${(g / 1000).toFixed(3).replace('.', ',')} kg`
-    let text = `Data: ${date}\n\n`
-    text += `*Cliente:* ${customerName}\n`
-    text += `*Telefone:* ${customerPhone}\n\n`
-    text += `*Tipo de preço:* ${priceType === 'wholesale' ? 'ATACADO' : 'VAREJO'}\n\n`
-    text += `*ITENS DO PEDIDO:*\n`
-    text += `━━━━━━━━━━━━━━━━━━\n\n`
-    items.forEach((item, index) => {
-      const price = unitPriceFor(item.product, priceType)
-      text += `${index + 1}. *${item.product.name}* (${item.product.code})\n`
-      text += `   Tamanho: ${item.size}\n`
-      text += `   Cor: ${item.color}\n`
-      text += `   Qtd: ${item.quantity} x ${formatPrice(price)}\n`
-      text += `   Subtotal: *${formatPrice(price * item.quantity)}*\n\n`
-    })
-    text += `━━━━━━━━━━━━━━━━━━\n`
-    text += `*Subtotal:* ${formatPrice(subtotal)}\n`
-    text += `*Peso total:* ${fmtKg(pesoTotalG)}\n`
-    text += `*Envio:* ${selShipping ? `${selShipping.name} (${formatPrice(frete)})` : 'A combinar'}\n`
-    text += `*Pagamento:* ${selPayment ? selPayment.name : 'A combinar'}${acrescimo > 0 ? ` (+${formatPrice(acrescimo)})` : ''}\n`
-    text += `*TOTAL GERAL: ${formatPrice(totalFinal)}*\n`
-    text += `━━━━━━━━━━━━━━━━━━\n\n`
-    text += `_Pedido enviado pelo Menu Digital KAROLLA FIT_`
-    return text
-  }
-
-  const handleSendOrder = async () => {
+  const handleGenerate = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return
     setIsLoading(true)
     setAviso(null)
@@ -84,24 +60,65 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
       })
       numeroPedido = r.number
     } catch {
-      setAviso('Pedido enviado pelo WhatsApp, mas não foi registrado no painel. Confira lá depois.')
+      setAviso('Não consegui registrar no painel, mas o PDF foi gerado. Confira o painel depois.')
     }
 
-    const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
-    const orderText = header + '\n' + generateOrderText()
-    const phone = (whatsappNumber || '').replace(/\D/g, '')
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`, '_blank')
-
-    setTimeout(() => {
+    try {
+      const data: OrderPdfData = {
+        storeName: 'KAROLLA FIT',
+        logoUrl: '/logo.jpeg',
+        orderNumber: numeroPedido,
+        date: new Date().toLocaleDateString('pt-BR'),
+        customerName,
+        customerPhone,
+        priceType,
+        items: items.map((i) => ({
+          name: i.product.name,
+          code: i.product.code,
+          size: i.size,
+          color: i.color,
+          quantity: i.quantity,
+          unitPrice: unitPriceFor(i.product, priceType),
+          imageUrl: i.product.imageUrl,
+        })),
+        subtotal,
+        weightGrams: pesoTotalG,
+        shippingLabel: selShipping ? `${selShipping.name} (${formatPrice(frete)})` : 'A combinar',
+        paymentLabel: selPayment ? `${selPayment.name}${acrescimo > 0 ? ` (+${formatPrice(acrescimo)})` : ''}` : 'A combinar',
+        total: totalFinal,
+      }
+      const file = await buildOrderPdf(data)
+      const url = URL.createObjectURL(file)
+      setPdf({ url, file, number: numeroPedido })
+    } catch {
+      setAviso('Falha ao gerar o PDF. Tente novamente.')
+    } finally {
       setIsLoading(false)
-      clearCart()
-      setShowCheckout(false)
-      setIsOpen(false)
-      setCustomerName('')
-      setCustomerPhone('')
-      setShippingId('')
-      setPaymentId('')
-    }, 1000)
+    }
+  }
+
+  const handleShare = async () => {
+    if (!pdf) return
+    setSharing(true)
+    const caption = `${pdf.number ? `Pedido #${pdf.number}` : 'Pedido'} — KAROLLA FIT`
+    try {
+      await shareOrDownloadOrder(pdf.file, caption, whatsappNumber)
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  const resetTudo = () => {
+    if (pdf) URL.revokeObjectURL(pdf.url)
+    setPdf(null)
+    clearCart()
+    setShowCheckout(false)
+    setIsOpen(false)
+    setCustomerName('')
+    setCustomerPhone('')
+    setShippingId('')
+    setPaymentId('')
+    setAviso(null)
   }
 
   return (
@@ -160,7 +177,20 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
 
                 <div className="flex-1 overflow-y-auto p-3 md:p-4">
                   <AnimatePresence mode="popLayout">
-                    {!showCheckout ? (
+                    {pdf ? (
+                      <motion.div key="pdf-ready" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center text-center gap-3 py-6">
+                        <div className="rounded-full bg-[#CFFF04]/15 p-4">
+                          <FileText className="h-8 w-8 text-[#9bbf00]" />
+                        </div>
+                        <h3 className="text-lg md:text-xl font-semibold">Pedido pronto!</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground max-w-xs">
+                          Geramos o PDF{pdf.number ? ` do pedido #${pdf.number}` : ''} com as fotos e a logomarca. Toque em <strong>Enviar pelo WhatsApp</strong> para mandar com o arquivo anexado.
+                        </p>
+                        <button onClick={() => window.open(pdf.url, '_blank')} className="text-sm text-[#9bbf00] underline">
+                          Ver PDF
+                        </button>
+                      </motion.div>
+                    ) : !showCheckout ? (
                       <motion.div key="cart-items" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }} className="space-y-3 md:space-y-4">
                         {items.length === 0 ? (
                           <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
@@ -273,30 +303,47 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                   </AnimatePresence>
                 </div>
 
-                {items.length > 0 && (
+                {(items.length > 0 || pdf) && (
                   <div className="border-t border-border p-3 md:p-4 space-y-3 md:space-y-4 bg-card">
-                    {!showCheckout && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm md:text-base text-muted-foreground">Total</span>
-                        <span className="text-xl md:text-2xl font-bold text-[#CFFF04]">{formatPrice(total)}</span>
-                      </div>
-                    )}
-                    {showCheckout ? (
+                    {pdf ? (
                       <>
                         {aviso && <p className="text-xs text-amber-500">{aviso}</p>}
-                        <Button onClick={handleSendOrder} disabled={!customerName.trim() || !customerPhone.trim() || isLoading} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
-                          {isLoading ? (
+                        <Button onClick={handleShare} disabled={sharing} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
+                          {sharing ? (
                             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
                           ) : (
                             <><Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp</>
                           )}
                         </Button>
+                        <div className="flex gap-2">
+                          <Button variant="outline" onClick={() => downloadFile(pdf.file)} className="flex-1 h-10 md:h-12 text-sm">
+                            <Download className="h-4 w-4 mr-1.5" /> Baixar PDF
+                          </Button>
+                          <Button variant="outline" onClick={resetTudo} className="flex-1 h-10 md:h-12 text-sm">
+                            Novo pedido
+                          </Button>
+                        </div>
+                      </>
+                    ) : showCheckout ? (
+                      <>
+                        {aviso && <p className="text-xs text-amber-500">{aviso}</p>}
+                        <Button onClick={handleGenerate} disabled={!customerName.trim() || !customerPhone.trim() || isLoading} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">
+                          {isLoading ? (
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-black/30 border-t-black rounded-full" />
+                          ) : (
+                            <><FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Gerar pedido (PDF)</>
+                          )}
+                        </Button>
                       </>
                     ) : (
-                      <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">Continuar</Button>
-                    )}
-                    {!showCheckout && (
-                      <button onClick={clearCart} className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors">Limpar carrinho</button>
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm md:text-base text-muted-foreground">Total</span>
+                          <span className="text-xl md:text-2xl font-bold text-[#CFFF04]">{formatPrice(total)}</span>
+                        </div>
+                        <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">Continuar</Button>
+                        <button onClick={clearCart} className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors">Limpar carrinho</button>
+                      </>
                     )}
                   </div>
                 )}
