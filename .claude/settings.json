@@ -74,7 +74,8 @@
       "Bash(echo \"=== EXIT tsc: $? ===\")",
       "Bash(npm run *)",
       "Bash(echo \"iniciando... pid $!\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}  /painel/financeiro \\(esperado 404\\)\\\\n\" \"http://localhost:3000/painel/financeiro\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}  /painel/financeiro \\(esperado 404\\)\\\\n\" \"http://localhost:3000/painel/financeiro\")",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
