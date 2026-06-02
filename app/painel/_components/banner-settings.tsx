@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { uploadBannerImage, setBannerImage } from '../settings-actions'
+import { compressImage } from '@/lib/compress-image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +20,8 @@ export function BannerSettings({ current }: { current: string }) {
     setBusy(true)
     setError(null)
     try {
-      const url = await uploadBannerImage(file)
+      const compressed = await compressImage(file)
+      const url = await uploadBannerImage(compressed)
       await setBannerImage(url)
       setPreview(url)
       router.refresh()

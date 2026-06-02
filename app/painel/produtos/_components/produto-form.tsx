@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { produtoSchema, type ProdutoInput } from './produto-schema'
 import { createProduto, updateProduto, uploadProdutoImage } from '../actions'
+import { compressImage } from '@/lib/compress-image'
 import type { ProductWithVariants } from '@/lib/data/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,7 +52,8 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
     setUploading(true)
     setSubmitError(null)
     try {
-      const url = await uploadProdutoImage(file)
+      const compressed = await compressImage(file)
+      const url = await uploadProdutoImage(compressed)
       setImageUrlState(url)
       setValue('imageUrl', url)
     } catch {
