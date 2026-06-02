@@ -48,7 +48,7 @@ export default async function ProdutosPage() {
               {produtos.map((p) => (
                 <tr key={p.id} className="border-t border-border">
                   <td className="p-3">
-                    <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-12 w-12 rounded object-cover" />
+                    <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-20 w-20 rounded-lg object-cover" />
                   </td>
                   <td className="p-3 font-mono text-xs">{p.code}</td>
                   <td className="p-3">{p.name}</td>
@@ -74,7 +74,7 @@ export default async function ProdutosPage() {
         <div className="md:hidden space-y-3">
           {produtos.map((p) => (
             <div key={p.id} className="rounded-xl border border-border p-3 flex gap-3">
-              <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-16 w-16 rounded object-cover flex-shrink-0" />
+              <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-24 w-24 rounded-lg object-cover flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium truncate">{p.name}</span>
