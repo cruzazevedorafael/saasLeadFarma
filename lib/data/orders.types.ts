@@ -14,6 +14,7 @@ export interface OrderItem {
   unitPrice: number
   unitCost: number
   weightGrams: number
+  imageUrl: string | null
 }
 
 export interface OrderWithItems {

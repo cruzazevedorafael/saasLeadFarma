@@ -15,6 +15,7 @@ function mapItem(r: any): OrderItem {
     unitPrice: Number(r.unit_price ?? 0),
     unitCost: Number(r.unit_cost ?? 0),
     weightGrams: Number(r.weight_grams ?? 0),
+    imageUrl: null,
   }
 }
 
@@ -49,4 +50,23 @@ export async function getAdminOrders(status?: OrderStatus): Promise<OrderWithIte
   const { data, error } = await q
   if (error) throw error
   return (data ?? []).map(mapOrder)
+}
+
+// Detalhe de um pedido, com a foto de cada item buscada pelo product_id
+// (o item guarda só o product_id; a foto vem do cadastro atual do produto).
+export async function getAdminOrder(id: string): Promise<OrderWithItems | null> {
+  const db = createAdminClient()
+  const { data, error } = await db.from('orders').select('*, order_items(*)').eq('id', id).single()
+  if (error || !data) return null
+  const order = mapOrder(data)
+  const ids = [...new Set(order.items.map((i) => i.productId).filter((x): x is string => !!x))]
+  if (ids.length > 0) {
+    const { data: prods } = await db.from('products').select('id, image_url').in('id', ids)
+    const fotos = new Map((prods ?? []).map((p: any) => [p.id, (p.image_url ?? null) as string | null]))
+    order.items = order.items.map((it) => ({
+      ...it,
+      imageUrl: it.productId ? fotos.get(it.productId) ?? null : null,
+    }))
+  }
+  return order
 }

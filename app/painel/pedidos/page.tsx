@@ -100,6 +100,9 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   </div>
                 </div>
               </div>
+              <Link href={`/painel/pedidos/${o.id}`} className="inline-block text-sm font-medium text-[#9bbf00] hover:underline">
+                Ver itens e fotos →
+              </Link>
             </div>
           ))}
         </div>
