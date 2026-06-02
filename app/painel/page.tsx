@@ -8,6 +8,7 @@ import { logout } from './login/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { BannerSettings } from './_components/banner-settings'
 
 export default async function PainelHome() {
   const supabase = await createClient()
@@ -60,6 +61,8 @@ export default async function PainelHome() {
         </div>
         <Button type="submit">Salvar contato</Button>
       </form>
+
+      <BannerSettings current={settings.bannerImageUrl} />
     </div>
   )
 }

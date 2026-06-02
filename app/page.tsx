@@ -11,5 +11,5 @@ export default async function Home() {
   // (migrations não aplicadas), a loja não cai — os seletores só ficam vazios ("A combinar").
   const shippingMethods = await getShippingMethods(true).catch(() => [])
   const paymentMethods = await getPaymentMethods(true).catch(() => [])
-  return <Catalog products={products} threshold={settings.wholesaleThreshold} whatsappNumber={settings.whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
+  return <Catalog products={products} threshold={settings.wholesaleThreshold} whatsappNumber={settings.whatsappNumber} bannerImageUrl={settings.bannerImageUrl} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
 }
