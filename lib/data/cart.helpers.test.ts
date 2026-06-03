@@ -10,7 +10,7 @@ function product(over: Partial<Product>): Product {
   return {
     id: 'p', code: 'C', name: 'X', category: '', description: '', imageUrl: null, imageUrls: [],
     priceCost: 0, priceWholesale: 50, priceRetail: 90, weightGrams: 0, countsForWholesale: true,
-    active: true, sortOrder: 0, ...over,
+    onPromo: false, promoPrice: 0, active: true, sortOrder: 0, ...over,
   }
 }
 const mk = (p: Product, quantity: number): CartItem => ({ product: p, quantity, size: 'M', color: 'Preto' })
@@ -56,6 +56,27 @@ describe('unitPriceFor', () => {
   it('escolhe o preço certo', () => {
     expect(unitPriceFor(legging, 'wholesale')).toBe(50)
     expect(unitPriceFor(legging, 'retail')).toBe(90)
+  })
+
+  it('peça em promoção usa o preço promocional em varejo e atacado', () => {
+    const promo = product({ priceWholesale: 50, priceRetail: 90, onPromo: true, promoPrice: 39.9 })
+    expect(unitPriceFor(promo, 'retail')).toBe(39.9)
+    expect(unitPriceFor(promo, 'wholesale')).toBe(39.9)
+  })
+
+  it('promoção ligada mas sem preço (0) cai no preço normal', () => {
+    const promo = product({ priceRetail: 90, onPromo: true, promoPrice: 0 })
+    expect(unitPriceFor(promo, 'retail')).toBe(90)
+  })
+})
+
+describe('cartTotal com promoção', () => {
+  it('soma o promocional mesmo quando o carrinho está no atacado', () => {
+    const promo = product({ id: 'promo', priceWholesale: 50, priceRetail: 90, onPromo: true, promoPrice: 39.9 })
+    const items = [mk(legging, 4), mk(promo, 1)]
+    const type = cartPriceType(items, 4) // 'wholesale' (a peça em promoção continua contando)
+    expect(type).toBe('wholesale')
+    expect(cartTotal(items, type)).toBe(4 * 50 + 1 * 39.9)
   })
 })
 

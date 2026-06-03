@@ -14,9 +14,11 @@ export function cartPriceType(items: CartItem[], threshold: number): PriceType {
 }
 
 export function unitPriceFor(
-  product: { priceWholesale: number; priceRetail: number },
+  product: { priceWholesale: number; priceRetail: number; onPromo?: boolean; promoPrice?: number },
   priceType: PriceType,
 ): number {
+  // Promoção tem preço fixo: vale para varejo e atacado.
+  if (product.onPromo && (product.promoPrice ?? 0) > 0) return product.promoPrice as number
   return priceType === 'wholesale' ? product.priceWholesale : product.priceRetail
 }
 

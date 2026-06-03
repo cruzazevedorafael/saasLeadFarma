@@ -19,6 +19,8 @@ export interface Product {
   priceRetail: number
   weightGrams: number
   countsForWholesale: boolean
+  onPromo: boolean
+  promoPrice: number
   active: boolean
   sortOrder: number
 }

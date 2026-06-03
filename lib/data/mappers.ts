@@ -21,6 +21,8 @@ export function mapProductRow(r: any): Product {
     priceRetail: Number(r.price_retail ?? 0),
     weightGrams: Number(r.weight_grams ?? 0),
     countsForWholesale: r.counts_for_wholesale ?? true,
+    onPromo: r.on_promo ?? false,
+    promoPrice: Number(r.promo_price ?? 0),
     active: r.active ?? true,
     sortOrder: Number(r.sort_order ?? 0),
   }

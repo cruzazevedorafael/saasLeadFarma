@@ -21,6 +21,7 @@ export async function createProduto(input: ProdutoInput) {
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active,
+    on_promo: data.onPromo, promo_price: data.onPromo ? data.promoPrice : null,
     image_url: data.imageUrls[0] ?? data.imageUrl ?? null,
     image_urls: data.imageUrls,
   }).select('id').single()
@@ -45,6 +46,7 @@ export async function updateProduto(id: string, input: ProdutoInput) {
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active,
+    on_promo: data.onPromo, promo_price: data.onPromo ? data.promoPrice : null,
     image_url: data.imageUrls[0] ?? data.imageUrl ?? null,
     image_urls: data.imageUrls,
     updated_at: new Date().toISOString(),
