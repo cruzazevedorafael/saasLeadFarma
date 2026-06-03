@@ -81,7 +81,7 @@ alter table public.orders
 
 -- ---------- 0012: várias fotos + estoque real nas views ----------
 alter table public.products
-  add column image_urls text[] not null default '{}';
+  add column if not exists image_urls text[] not null default '{}';
 
 create or replace view public.public_products
   with (security_invoker = false) as
@@ -91,9 +91,11 @@ create or replace view public.public_products
   from public.products
   where active = true;
 
+-- `available` permanece na mesma posição; `stock` entra no fim
+-- (create or replace view só permite acrescentar colunas no final).
 create or replace view public.public_product_variants
   with (security_invoker = false) as
-  select id, product_id, size, color, stock, (stock > 0) as available
+  select id, product_id, size, color, (stock > 0) as available, stock
   from public.product_variants;
 
 grant select on public.public_products to anon;
