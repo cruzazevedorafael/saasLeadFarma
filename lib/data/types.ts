@@ -13,6 +13,7 @@ export interface Product {
   category: string
   description: string
   imageUrl: string | null
+  imageUrls: string[]
   priceCost: number
   priceWholesale: number
   priceRetail: number
