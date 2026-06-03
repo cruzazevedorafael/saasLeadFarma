@@ -81,7 +81,8 @@
       "Bash(grep -E \"\\\\.\\(ts|tsx|json\\)$\")",
       "Bash(git show *)",
       "Bash(sed -n '1,40p' lib/data/order.helpers.test.ts)",
-      "Bash(sed -n '1,40p' lib/data/cart.helpers.test.ts)"
+      "Bash(sed -n '1,40p' lib/data/cart.helpers.test.ts)",
+      "Bash(git pull *)"
     ],
     "additionalDirectories": [
       "/Users/wesllei.gatti/Desktop/REPOSITORIOS/APPS PROJETAR/KAROLLA FIT MENU/app/painel/produtos"
