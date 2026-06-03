@@ -75,7 +75,7 @@ export function PromoCarousel({ products, threshold }: { products: ProductWithVa
           {products.map((product, index) => (
             <div
               key={product.id}
-              className="min-w-0 flex-[0_0_78%] sm:flex-[0_0_50%] lg:flex-[0_0_33%] xl:flex-[0_0_25%]"
+              className="min-w-0 flex-[0_0_44%] sm:flex-[0_0_44%] lg:flex-[0_0_28%] xl:flex-[0_0_22%]"
             >
               <ProductCard product={product} index={index} threshold={threshold} />
             </div>
