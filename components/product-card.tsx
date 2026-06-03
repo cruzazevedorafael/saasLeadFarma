@@ -74,11 +74,11 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
 
         {/* Preços (informativos — a regra acontece no carrinho) */}
         {isPromo ? (
-          <div className="flex items-center justify-between gap-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-3 py-2 md:px-4 md:py-3 shadow-md shadow-red-600/30">
-            <span className="flex items-center gap-1.5 text-white font-semibold text-[11px] md:text-sm uppercase tracking-wide">
-              <Flame className="h-4 w-4 md:h-5 md:w-5" /> Promoção
+          <div className="flex flex-col items-start gap-0.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-2.5 py-2 shadow-md shadow-red-600/30 md:flex-row md:items-center md:justify-between md:gap-2 md:px-4 md:py-3">
+            <span className="flex items-center gap-1 text-white font-semibold text-[10px] md:text-sm uppercase tracking-wide leading-none">
+              <Flame className="h-3.5 w-3.5 md:h-5 md:w-5 shrink-0" /> Promoção
             </span>
-            <span className="text-xl md:text-2xl font-extrabold text-white">{fmt(product.promoPrice)}</span>
+            <span className="text-lg md:text-2xl font-extrabold text-white whitespace-nowrap leading-tight">{fmt(product.promoPrice)}</span>
           </div>
         ) : (
           <div className="flex items-end justify-between">
