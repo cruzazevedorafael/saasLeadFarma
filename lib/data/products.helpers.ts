@@ -22,3 +22,18 @@ export function isVariantAvailable(p: ProductWithVariants, size: string, color: 
 export function shouldRenderAsButtons(values: string[]): boolean {
   return values.length >= 2
 }
+
+/** true quando o produto está efetivamente em promoção (flag ligada e preço > 0). */
+export function isPromoActive(p: { onPromo: boolean; promoPrice: number }): boolean {
+  return p.onPromo && p.promoPrice > 0
+}
+
+/**
+ * Retorna nova lista com os produtos em promoção primeiro, preservando a ordem
+ * original dentro de cada grupo (sort estável).
+ */
+export function sortPromoFirst<T extends { onPromo: boolean; promoPrice: number }>(produtos: T[]): T[] {
+  const promo = produtos.filter(isPromoActive)
+  const resto = produtos.filter((p) => !isPromoActive(p))
+  return [...promo, ...resto]
+}

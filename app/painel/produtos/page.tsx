@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getAdminProducts } from '@/lib/data/products'
+import { sortPromoFirst, isPromoActive } from '@/lib/data/products.helpers'
 import { Button } from '@/components/ui/button'
 import { ProdutoActions } from './_components/produto-actions'
 
@@ -11,7 +12,7 @@ export default async function ProdutosPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/painel/login')
 
-  const produtos = await getAdminProducts()
+  const produtos = sortPromoFirst(await getAdminProducts())
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   return (
@@ -51,7 +52,14 @@ export default async function ProdutosPage() {
                     <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-20 w-20 rounded-lg object-cover" />
                   </td>
                   <td className="p-3 font-mono text-xs">{p.code}</td>
-                  <td className="p-3">{p.name}</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <span>{p.name}</span>
+                      {isPromoActive(p) && (
+                        <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-semibold text-white">🔥 Promoção</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="p-3">{p.category}</td>
                   <td className="p-3">{fmt(p.priceWholesale)}</td>
                   <td className="p-3">{fmt(p.priceRetail)}</td>
@@ -80,6 +88,9 @@ export default async function ProdutosPage() {
                   <span className="font-medium truncate">{p.name}</span>
                   <span className="font-mono text-xs text-muted-foreground">{p.code}</span>
                 </div>
+                {isPromoActive(p) && (
+                  <span className="mt-1 inline-block rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-semibold text-white">🔥 Promoção</span>
+                )}
                 <p className="text-xs text-muted-foreground">{p.category || 'Sem categoria'}</p>
                 <div className="text-sm mt-1">Varejo: {fmt(p.priceRetail)} · Atacado: {fmt(p.priceWholesale)}</div>
                 <div className="text-xs text-muted-foreground">
