@@ -13,6 +13,7 @@ export const produtoSchema = z.object({
   category: z.string().default(''),
   description: z.string().default(''),
   imageUrl: z.string().nullable().default(null),
+  imageUrls: z.array(z.string()).max(5, 'Máximo de 5 fotos').default([]),
   priceWholesale: z.number().min(0),
   priceRetail: z.number().min(0),
   weightGrams: z.number().int().min(0).default(0),

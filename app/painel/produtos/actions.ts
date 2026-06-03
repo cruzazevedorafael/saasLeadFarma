@@ -20,7 +20,9 @@ export async function createProduto(input: ProdutoInput) {
     code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
-    counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null,
+    counts_for_wholesale: data.countsForWholesale, active: data.active,
+    image_url: data.imageUrls[0] ?? data.imageUrl ?? null,
+    image_urls: data.imageUrls,
   }).select('id').single()
   if (error) throw error
   if (data.variants.length > 0) {
@@ -42,7 +44,10 @@ export async function updateProduto(id: string, input: ProdutoInput) {
     code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
-    counts_for_wholesale: data.countsForWholesale, active: data.active, image_url: data.imageUrl ?? null, updated_at: new Date().toISOString(),
+    counts_for_wholesale: data.countsForWholesale, active: data.active,
+    image_url: data.imageUrls[0] ?? data.imageUrl ?? null,
+    image_urls: data.imageUrls,
+    updated_at: new Date().toISOString(),
   }).eq('id', id)
   await db.from('product_variants').delete().eq('product_id', id)
   if (data.variants.length > 0) {
