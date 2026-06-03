@@ -1,6 +1,6 @@
 // lib/data/products.helpers.test.ts
 import { describe, it, expect } from 'vitest'
-import { sizesOf, colorsOf, isVariantAvailable } from './products.helpers'
+import { sizesOf, colorsOf, isVariantAvailable, stockOf } from './products.helpers'
 import type { ProductWithVariants } from './types'
 
 const p: ProductWithVariants = {
@@ -32,6 +32,19 @@ describe('isVariantAvailable', () => {
   })
   it('false quando combinação não existe', () => {
     expect(isVariantAvailable(p, 'GG', 'Azul')).toBe(false)
+  })
+})
+
+describe('stockOf', () => {
+  it('retorna o estoque da variação', () => {
+    expect(stockOf(p, 'M', 'Preto')).toBe(3)
+    expect(stockOf(p, 'M', 'Rosa')).toBe(5)
+  })
+  it('retorna 0 quando estoque zerado', () => {
+    expect(stockOf(p, 'G', 'Preto')).toBe(0)
+  })
+  it('retorna 0 quando a combinação não existe', () => {
+    expect(stockOf(p, 'GG', 'Azul')).toBe(0)
   })
 })
 
