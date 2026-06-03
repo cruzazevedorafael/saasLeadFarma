@@ -35,6 +35,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           code: produto.code, name: produto.name, category: produto.category, description: produto.description,
           priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
           weightGrams: produto.weightGrams,
+          onPromo: produto.onPromo, promoPrice: produto.promoPrice,
           countsForWholesale: produto.countsForWholesale, active: produto.active, imageUrl: produto.imageUrl,
           imageUrls: produto.imageUrls?.length ? produto.imageUrls : produto.imageUrl ? [produto.imageUrl] : [],
           variants: produto.variants.map((v) => ({ size: v.size, color: v.color, stock: v.stock })),
@@ -43,6 +44,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           code: '', name: '', category: '', description: '',
           priceWholesale: 0, priceRetail: 0,
           weightGrams: 0,
+          onPromo: false, promoPrice: 0,
           countsForWholesale: true, active: true, imageUrl: null, imageUrls: [],
           variants: [{ size: '', color: '', stock: 0 }],
         },
@@ -174,6 +176,25 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           <Label htmlFor="weightGrams">Peso (g)</Label>
           <Input id="weightGrams" type="number" step="1" {...register('weightGrams', { valueAsNumber: true })} />
         </div>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="onPromo"
+            checked={watch('onPromo')}
+            onCheckedChange={(v) => setValue('onPromo', v)}
+          />
+          <Label htmlFor="onPromo" className="text-sm">Em promoção (destaca a peça no catálogo)</Label>
+        </div>
+        {watch('onPromo') && (
+          <div className="space-y-1">
+            <Label htmlFor="promoPrice">Preço promocional (R$)</Label>
+            <Input id="promoPrice" type="number" step="0.01" className="max-w-[12rem]" {...register('promoPrice', { valueAsNumber: true })} />
+            <p className="text-xs text-muted-foreground">O cliente vê só este preço, no balão de promoção (vale também no atacado).</p>
+            {errors.promoPrice && <p className="text-xs text-destructive">{errors.promoPrice.message}</p>}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">

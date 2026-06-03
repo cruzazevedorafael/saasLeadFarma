@@ -37,4 +37,15 @@ describe('produtoSchema', () => {
   it('rejeita preço negativo', () => {
     expect(produtoSchema.safeParse({ ...valido, priceRetail: -5 }).success).toBe(false)
   })
+  it('onPromo/promoPrice default: false e 0', () => {
+    const parsed = produtoSchema.parse(valido)
+    expect(parsed.onPromo).toBe(false)
+    expect(parsed.promoPrice).toBe(0)
+  })
+  it('aceita promoção com preço promocional > 0', () => {
+    expect(produtoSchema.safeParse({ ...valido, onPromo: true, promoPrice: 39.9 }).success).toBe(true)
+  })
+  it('rejeita promoção sem preço promocional', () => {
+    expect(produtoSchema.safeParse({ ...valido, onPromo: true, promoPrice: 0 }).success).toBe(false)
+  })
 })

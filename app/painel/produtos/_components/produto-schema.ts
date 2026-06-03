@@ -18,8 +18,13 @@ export const produtoSchema = z.object({
   priceRetail: z.number().min(0),
   weightGrams: z.number().int().min(0).default(0),
   countsForWholesale: z.boolean().default(true),
+  onPromo: z.boolean().default(false),
+  promoPrice: z.number().min(0).default(0),
   active: z.boolean().default(true),
   variants: z.array(variantSchema).default([]),
+}).refine((d) => !d.onPromo || d.promoPrice > 0, {
+  message: 'Informe o preço promocional (maior que zero)',
+  path: ['promoPrice'],
 })
 
 export type ProdutoInput = z.infer<typeof produtoSchema>

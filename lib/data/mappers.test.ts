@@ -39,4 +39,14 @@ describe('mapProductRow', () => {
   it('image_urls vira [] quando não há nada', () => {
     expect(mapProductRow({ id: '5', code: 'A', name: 'B' }).imageUrls).toEqual([])
   })
+
+  it('mapeia promoção quando presente', () => {
+    expect(mapProductRow({ id: '6', code: 'A', name: 'B', on_promo: true, promo_price: '39.90' }))
+      .toMatchObject({ onPromo: true, promoPrice: 39.9 })
+  })
+
+  it('promoção default: onPromo false e promoPrice 0', () => {
+    expect(mapProductRow({ id: '7', code: 'A', name: 'B' }))
+      .toMatchObject({ onPromo: false, promoPrice: 0 })
+  })
 })

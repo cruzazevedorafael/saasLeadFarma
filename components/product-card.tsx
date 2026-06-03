@@ -9,7 +9,7 @@ import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons, stockOf }
 import { ProductImages } from '@/components/product-images'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, ShoppingBag, Check } from 'lucide-react'
+import { Plus, Minus, ShoppingBag, Check, Flame } from 'lucide-react'
 
 interface ProductCardProps {
   product: ProductWithVariants
@@ -28,6 +28,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
   const available = isVariantAvailable(product, selectedSize, selectedColor)
   const stock = stockOf(product, selectedSize, selectedColor)
+  const isPromo = product.onPromo && product.promoPrice > 0
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   useEffect(() => {
@@ -68,31 +69,40 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
             <h3 className="font-semibold text-sm md:text-lg text-foreground leading-tight">{product.name}</h3>
           </div>
           <span className="text-[10px] md:text-xs text-muted-foreground">Cód: {product.code}</span>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1">{product.description}</p>
         </div>
 
         {/* Preços (informativos — a regra acontece no carrinho) */}
-        <div className="flex items-end justify-between">
-          <div className="flex flex-col">
-            <span className="text-[10px] md:text-xs text-muted-foreground">Varejo</span>
-            <span className="text-xl md:text-2xl font-bold text-foreground">{fmt(product.priceRetail)}</span>
+        {isPromo ? (
+          <div className="flex items-center justify-between gap-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-3 py-2 md:px-4 md:py-3 shadow-md shadow-red-600/30">
+            <span className="flex items-center gap-1.5 text-white font-semibold text-[11px] md:text-sm uppercase tracking-wide">
+              <Flame className="h-4 w-4 md:h-5 md:w-5" /> Promoção
+            </span>
+            <span className="text-xl md:text-2xl font-extrabold text-white">{fmt(product.promoPrice)}</span>
           </div>
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] md:text-xs text-muted-foreground">Atacado ({threshold}+ peças)</span>
-            <span className="text-lg md:text-xl font-bold text-[#CFFF04]">{fmt(product.priceWholesale)}</span>
+        ) : (
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col">
+              <span className="text-[10px] md:text-xs text-muted-foreground">Varejo</span>
+              <span className="text-xl md:text-2xl font-bold text-foreground">{fmt(product.priceRetail)}</span>
+            </div>
+            <div className="flex flex-col text-right">
+              <span className="text-[10px] md:text-xs text-muted-foreground">Atacado ({threshold}+ peças)</span>
+              <span className="text-lg md:text-xl font-bold text-[#CFFF04]">{fmt(product.priceWholesale)}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Tamanho */}
         <div>
           <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Tamanho</span>
-          {shouldRenderAsButtons(sizes) ? (
+          {sizes.length > 0 ? (
             <div className="flex gap-1.5 md:gap-2 flex-wrap">
               {sizes.map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`w-8 h-8 md:w-10 md:h-10 rounded-lg text-xs md:text-sm font-medium transition-all ${
+                  className={`min-w-8 h-8 px-2 md:min-w-10 md:h-10 md:px-3 rounded-lg text-xs md:text-sm font-medium transition-all ${
                     selectedSize === size ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                   }`}
                 >
@@ -101,7 +111,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
               ))}
             </div>
           ) : (
-            <span className="text-sm md:text-base font-medium text-foreground">{sizes[0] ?? '—'}</span>
+            <span className="text-sm md:text-base font-medium text-foreground">—</span>
           )}
         </div>
 

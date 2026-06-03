@@ -101,6 +101,23 @@ create or replace view public.public_product_variants
 grant select on public.public_products to anon;
 grant select on public.public_product_variants to anon;
 
+-- ---------- 0013: promoção (flag + preço promocional) ----------
+alter table public.products
+  add column if not exists on_promo boolean not null default false;
+alter table public.products
+  add column if not exists promo_price numeric;
+
+create or replace view public.public_products
+  with (security_invoker = false) as
+  select id, code, name, category, description, image_url,
+         price_wholesale, price_retail, min_wholesale, sort_order,
+         counts_for_wholesale, weight_grams, image_urls,
+         on_promo, promo_price
+  from public.products
+  where active = true;
+
+grant select on public.public_products to anon;
+
 -- ============================================================
 -- FIM. Se rodou sem erro, está tudo pronto. Pode mergear o PR.
 -- ============================================================
