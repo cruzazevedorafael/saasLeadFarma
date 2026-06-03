@@ -10,6 +10,7 @@ export interface CartItem {
   quantity: number
   size: string
   color: string
+  maxStock?: number
 }
 
 interface CartStore {
@@ -32,7 +33,12 @@ export const useCartStore = create<CartStore>()(
           )
           if (existingIndex >= 0) {
             const newItems = [...state.items]
-            newItems[existingIndex].quantity += item.quantity
+            const teto = item.maxStock ?? newItems[existingIndex].maxStock ?? Infinity
+            newItems[existingIndex] = {
+              ...newItems[existingIndex],
+              quantity: Math.min(teto, newItems[existingIndex].quantity + item.quantity),
+              maxStock: item.maxStock ?? newItems[existingIndex].maxStock,
+            }
             return { items: newItems }
           }
           return { items: [...state.items, item] }
