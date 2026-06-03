@@ -48,7 +48,7 @@ describe('stockOf', () => {
   })
 })
 
-import { shouldRenderAsButtons } from './products.helpers'
+import { shouldRenderAsButtons, isPromoActive, sortPromoFirst } from './products.helpers'
 
 describe('shouldRenderAsButtons', () => {
   it('false com nenhuma opção', () => {
@@ -59,5 +59,38 @@ describe('shouldRenderAsButtons', () => {
   })
   it('true com duas ou mais opções', () => {
     expect(shouldRenderAsButtons(['P', 'M'])).toBe(true)
+  })
+})
+
+describe('isPromoActive', () => {
+  it('true quando onPromo e preço > 0', () => {
+    expect(isPromoActive({ onPromo: true, promoPrice: 39.9 })).toBe(true)
+  })
+  it('false quando onPromo mas preço 0', () => {
+    expect(isPromoActive({ onPromo: true, promoPrice: 0 })).toBe(false)
+  })
+  it('false quando não está em promoção', () => {
+    expect(isPromoActive({ onPromo: false, promoPrice: 39.9 })).toBe(false)
+  })
+})
+
+describe('sortPromoFirst', () => {
+  const a = { id: 'a', onPromo: false, promoPrice: 0 }
+  const b = { id: 'b', onPromo: true, promoPrice: 50 }
+  const c = { id: 'c', onPromo: false, promoPrice: 0 }
+  const d = { id: 'd', onPromo: true, promoPrice: 30 }
+
+  it('coloca as promoções primeiro', () => {
+    expect(sortPromoFirst([a, b, c, d]).map((p) => p.id)).toEqual(['b', 'd', 'a', 'c'])
+  })
+  it('mantém a ordem estável dentro de cada grupo', () => {
+    expect(sortPromoFirst([a, c, b]).map((p) => p.id)).toEqual(['b', 'a', 'c'])
+  })
+  it('lista sem promoção fica inalterada', () => {
+    expect(sortPromoFirst([a, c]).map((p) => p.id)).toEqual(['a', 'c'])
+  })
+  it('promoção ligada sem preço não sobe', () => {
+    const semPreco = { id: 'x', onPromo: true, promoPrice: 0 }
+    expect(sortPromoFirst([a, semPreco, b]).map((p) => p.id)).toEqual(['b', 'a', 'x'])
   })
 })

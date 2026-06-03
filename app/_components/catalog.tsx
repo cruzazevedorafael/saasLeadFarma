@@ -7,7 +7,9 @@ import { Header } from '@/components/header'
 import { Hero } from '@/components/hero'
 import { CategoryFilter } from '@/components/category-filter'
 import { ProductCard } from '@/components/product-card'
+import { PromoCarousel } from '@/components/promo-carousel'
 import { Cart } from '@/components/cart'
+import { isPromoActive } from '@/lib/data/products.helpers'
 import { Search } from 'lucide-react'
 import type { ProductWithVariants } from '@/lib/data/types'
 import type { ShippingMethod } from '@/lib/data/shipping'
@@ -21,6 +23,8 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
     () => ['Todos', ...new Set(products.map((p) => p.category).filter(Boolean))],
     [products],
   )
+
+  const promoProducts = useMemo(() => products.filter(isPromoActive), [products])
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -36,6 +40,8 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
     <main className="min-h-screen bg-background">
       <Header />
       <Hero bannerImageUrl={bannerImageUrl} />
+
+      <PromoCarousel products={promoProducts} threshold={threshold} />
 
       <section className="sticky top-14 md:top-20 z-30 bg-background/80 backdrop-blur-xl border-b border-border/40 py-3 md:py-4">
         <div className="container mx-auto px-3 md:px-4 space-y-3 md:space-y-4">
