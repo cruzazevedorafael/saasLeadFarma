@@ -331,7 +331,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                           {isLoading ? (
                             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-black/30 border-t-black rounded-full" />
                           ) : (
-                            <><FileText className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Gerar pedido (PDF)</>
+                            <><Send className="h-4 w-4 md:h-5 md:w-5 mr-2" /> Enviar pelo WhatsApp</>
                           )}
                         </Button>
                       </>
@@ -364,6 +364,7 @@ function CartItemCard({ item, index, priceType, onRemove, onUpdateQuantity }: {
   onUpdateQuantity: (qty: number) => void
 }) {
   const price = unitPriceFor(item.product, priceType)
+  const max = item.maxStock ?? Infinity
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -100 }} transition={{ delay: index * 0.05 }} className="flex gap-3 rounded-xl bg-muted/30 p-3 border border-border/50">
@@ -385,7 +386,11 @@ function CartItemCard({ item, index, priceType, onRemove, onUpdateQuantity }: {
               <Minus className="h-3 w-3" />
             </button>
             <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
-            <button onClick={() => onUpdateQuantity(item.quantity + 1)} className="h-6 w-6 rounded flex items-center justify-center hover:bg-muted transition-colors">
+            <button
+              onClick={() => onUpdateQuantity(Math.min(max, item.quantity + 1))}
+              disabled={item.quantity >= max}
+              className="h-6 w-6 rounded flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-40"
+            >
               <Plus className="h-3 w-3" />
             </button>
           </div>

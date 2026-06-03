@@ -25,4 +25,18 @@ describe('mapProductRow', () => {
   it('countsForWholesale default true quando ausente', () => {
     expect(mapProductRow({ id: '2', code: 'X', name: 'Y' }).countsForWholesale).toBe(true)
   })
+
+  it('mapeia image_urls quando presente', () => {
+    expect(mapProductRow({ id: '3', code: 'A', name: 'B', image_urls: ['x.jpg', 'y.jpg'] }).imageUrls)
+      .toEqual(['x.jpg', 'y.jpg'])
+  })
+
+  it('image_urls cai para [image_url] quando lista vazia', () => {
+    expect(mapProductRow({ id: '4', code: 'A', name: 'B', image_url: 'capa.jpg', image_urls: [] }).imageUrls)
+      .toEqual(['capa.jpg'])
+  })
+
+  it('image_urls vira [] quando não há nada', () => {
+    expect(mapProductRow({ id: '5', code: 'A', name: 'B' }).imageUrls).toEqual([])
+  })
 })

@@ -79,6 +79,28 @@ alter table public.orders
   add column payment_label text not null default '',
   add column payment_surcharge numeric(10,2) not null default 0;
 
+-- ---------- 0012: várias fotos + estoque real nas views ----------
+alter table public.products
+  add column if not exists image_urls text[] not null default '{}';
+
+create or replace view public.public_products
+  with (security_invoker = false) as
+  select id, code, name, category, description, image_url,
+         price_wholesale, price_retail, min_wholesale, sort_order,
+         counts_for_wholesale, weight_grams, image_urls
+  from public.products
+  where active = true;
+
+-- `available` permanece na mesma posição; `stock` entra no fim
+-- (create or replace view só permite acrescentar colunas no final).
+create or replace view public.public_product_variants
+  with (security_invoker = false) as
+  select id, product_id, size, color, (stock > 0) as available, stock
+  from public.product_variants;
+
+grant select on public.public_products to anon;
+grant select on public.public_product_variants to anon;
+
 -- ============================================================
 -- FIM. Se rodou sem erro, está tudo pronto. Pode mergear o PR.
 -- ============================================================

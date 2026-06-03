@@ -98,3 +98,16 @@ export function buildOrder(
     items,
   }
 }
+
+export function validateStock(products: ProductWithVariants[], requested: RequestedItem[]): void {
+  const byId = new Map(products.map((p) => [p.id, p]))
+  for (const r of requested) {
+    const p = byId.get(r.productId)
+    if (!p) throw new Error(`Produto não encontrado: ${r.productId}`)
+    const variant = p.variants.find((v) => v.size === r.size && v.color === r.color)
+    const stock = variant?.stock ?? 0
+    if (r.quantity > stock) {
+      throw new Error(`Estoque insuficiente para ${p.name} (${r.size}/${r.color}). Restam ${stock}.`)
+    }
+  }
+}

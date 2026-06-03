@@ -1,11 +1,11 @@
 // lib/data/order.helpers.test.ts
 import { describe, it, expect } from 'vitest'
-import { buildOrder } from './order.helpers'
+import { buildOrder, validateStock } from './order.helpers'
 import type { ProductWithVariants } from './types'
 
 function prod(over: Partial<ProductWithVariants>): ProductWithVariants {
   return {
-    id: 'p', code: 'C', name: 'X', category: '', description: '', imageUrl: null,
+    id: 'p', code: 'C', name: 'X', category: '', description: '', imageUrl: null, imageUrls: [],
     priceCost: 0, priceWholesale: 50, priceRetail: 90, weightGrams: 0, countsForWholesale: true,
     active: true, sortOrder: 0, variants: [], ...over,
   }
@@ -54,6 +54,20 @@ describe('buildOrder', () => {
 
   it('erro quando o produto não existe', () => {
     expect(() => buildOrder([], [{ productId: 'X', size: 'M', color: 'Preto', quantity: 1 }], 4)).toThrow()
+  })
+})
+
+describe('validateStock', () => {
+  it('passa quando a quantidade cabe no estoque', () => {
+    expect(() => validateStock([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 5 }])).not.toThrow()
+  })
+  it('lança quando passa do estoque', () => {
+    expect(() => validateStock([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 6 }]))
+      .toThrow(/Estoque insuficiente/)
+  })
+  it('lança quando a variação não existe', () => {
+    expect(() => validateStock([legging], [{ productId: 'L', size: 'GG', color: 'Azul', quantity: 1 }]))
+      .toThrow(/Estoque insuficiente/)
   })
 })
 

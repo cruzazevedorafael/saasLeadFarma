@@ -3,7 +3,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStoreSettings } from '@/lib/data/settings'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
-import { buildOrder, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
+import { buildOrder, validateStock, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
 import type { ProductWithVariants } from '@/lib/data/types'
 
 export interface CriarPedidoInput {
@@ -35,6 +35,8 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
     ...mapProductRow(p),
     variants: (vrows ?? []).filter((v) => v.product_id === p.id).map(mapVariantRow),
   }))
+
+  validateStock(products, input.items)
 
   // resolve envio/pagamento a partir do banco (não confia em valores do cliente)
   let shipping: ChosenShipping | undefined

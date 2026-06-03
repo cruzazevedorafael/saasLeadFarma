@@ -25,8 +25,8 @@ export async function getPublicProducts(): Promise<ProductWithVariants[]> {
     ...mapProductRow({ ...p, price_cost: 0, active: true }),
     variants: variants
       .filter((v) => v.product_id === p.id)
-      // a view pública expõe `available`; convertendo p/ stock binário (1/0) nesta fase
-      .map((v) => mapVariantRow({ ...v, stock: v.available ? 1 : 0 })),
+      // a view pública agora expõe o estoque real
+      .map((v) => mapVariantRow(v)),
   }))
 }
 

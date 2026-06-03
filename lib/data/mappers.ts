@@ -13,6 +13,9 @@ export function mapProductRow(r: any): Product {
     category: r.category ?? '',
     description: r.description ?? '',
     imageUrl: r.image_url ?? null,
+    imageUrls: Array.isArray(r.image_urls) && r.image_urls.length > 0
+      ? (r.image_urls as string[])
+      : (r.image_url ? [r.image_url] : []),
     priceCost: Number(r.price_cost ?? 0),
     priceWholesale: Number(r.price_wholesale ?? 0),
     priceRetail: Number(r.price_retail ?? 0),

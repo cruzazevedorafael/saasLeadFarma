@@ -1,12 +1,12 @@
 // components/product-card.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
 import { useCartStore } from '@/lib/store'
 import type { ProductWithVariants } from '@/lib/data/types'
-import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons } from '@/lib/data/products.helpers'
+import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons, stockOf } from '@/lib/data/products.helpers'
+import { ProductImages } from '@/components/product-images'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Minus, ShoppingBag, Check } from 'lucide-react'
@@ -27,11 +27,16 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
 
   const addItem = useCartStore((state) => state.addItem)
   const available = isVariantAvailable(product, selectedSize, selectedColor)
+  const stock = stockOf(product, selectedSize, selectedColor)
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
+
+  useEffect(() => {
+    setQuantity((q) => Math.min(Math.max(1, q), Math.max(1, stock)))
+  }, [stock])
 
   const handleAddToCart = () => {
     if (!available) return
-    addItem({ product, quantity, size: selectedSize, color: selectedColor })
+    addItem({ product, quantity, size: selectedSize, color: selectedColor, maxStock: stock })
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
   }
@@ -45,12 +50,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
       className="group relative overflow-hidden rounded-xl md:rounded-2xl border border-border/50 bg-card"
     >
       <div className="relative aspect-[4/5] overflow-hidden">
-        <Image
-          src={product.imageUrl ?? '/placeholder.svg'}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+        <ProductImages images={product.imageUrls} alt={product.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         <Badge className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#CFFF04] text-black font-medium hover:bg-[#CFFF04] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1">
           {product.category}
@@ -133,13 +133,22 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
 
         {/* Quantidade */}
         <div className="flex items-center justify-between">
-          <span className="text-[10px] md:text-xs text-muted-foreground">Quantidade</span>
+          <span className="text-[10px] md:text-xs text-muted-foreground">
+            Quantidade
+            {stock > 0 && stock <= 5 && (
+              <span className="ml-1.5 text-amber-400">só restam {stock}</span>
+            )}
+          </span>
           <div className="flex items-center gap-2 md:gap-3 bg-muted rounded-lg p-0.5 md:p-1">
             <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="h-7 w-7 md:h-8 md:w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors">
               <Minus className="h-3 w-3 md:h-4 md:w-4" />
             </button>
             <span className="w-6 md:w-8 text-center font-semibold text-sm md:text-base">{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)} className="h-7 w-7 md:h-8 md:w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors">
+            <button
+              onClick={() => setQuantity(Math.min(stock, quantity + 1))}
+              disabled={quantity >= stock}
+              className="h-7 w-7 md:h-8 md:w-8 rounded-md flex items-center justify-center hover:bg-background transition-colors disabled:opacity-40"
+            >
               <Plus className="h-3 w-3 md:h-4 md:w-4" />
             </button>
           </div>
