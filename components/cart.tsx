@@ -199,14 +199,14 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                             <Label htmlFor="name" className="text-xs md:text-sm">Seu Nome</Label>
                             <div className="relative">
                               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input id="name" placeholder="Digite seu nome" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
+                              <Input id="name" name="name" autoComplete="name" placeholder="Digite seu nome" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
                             </div>
                           </div>
                           <div className="space-y-1.5 md:space-y-2">
                             <Label htmlFor="phone" className="text-xs md:text-sm">Seu Telefone</Label>
                             <div className="relative">
                               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input id="phone" placeholder="(00) 00000-0000" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
+                              <Input id="phone" name="tel" type="tel" inputMode="tel" autoComplete="tel" placeholder="(00) 00000-0000" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
                             </div>
                           </div>
                         </div>
