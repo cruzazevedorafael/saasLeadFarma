@@ -89,7 +89,11 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
 
     const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
     const orderText = header + '\n' + generateOrderText()
-    const phone = (whatsappNumber || '').replace(/\D/g, '')
+    // Garante o código do país: wa.me exige o número internacional completo.
+    // Número brasileiro sem país tem 10-11 dígitos (DDD + número); com o 55
+    // fica com 12-13. Se vier curto, prefixa o 55.
+    const digits = (whatsappNumber || '').replace(/\D/g, '')
+    const phone = digits.length >= 12 ? digits : `55${digits}`
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`, '_blank')
 
     setTimeout(() => {
