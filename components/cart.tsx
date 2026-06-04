@@ -73,6 +73,11 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     setIsLoading(true)
     setAviso(null)
 
+    // Abre a aba JÁ no clique (antes do await). Se abrir depois do await, o
+    // navegador do celular bloqueia por não ser mais "gesto do usuário" — era
+    // por isso que o WhatsApp não abria.
+    const waWindow = window.open('', '_blank')
+
     let numeroPedido: number | null = null
     try {
       const r = await criarPedido({
@@ -94,7 +99,13 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     // fica com 12-13. Se vier curto, prefixa o 55.
     const digits = (whatsappNumber || '').replace(/\D/g, '')
     const phone = digits.length >= 12 ? digits : `55${digits}`
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`, '_blank')
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`
+    if (waWindow) {
+      waWindow.location.href = url
+    } else {
+      // Se mesmo assim o navegador bloqueou a aba, navega na própria página.
+      window.location.href = url
+    }
 
     setTimeout(() => {
       setIsLoading(false)
