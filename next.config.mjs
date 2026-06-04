@@ -14,6 +14,21 @@ const nextConfig = {
       bodySizeLimit: '8mb',
     },
   },
+  async headers() {
+    return [
+      {
+        // Páginas HTML sempre revalidam: assim, depois de cada deploy, os
+        // clientes pegam a versão nova logo (sem ficar presos em cache antigo,
+        // que era o que mostrava "convidar para o WhatsApp" da versão velha).
+        // Os arquivos com hash em /_next/static ficam de fora e seguem
+        // cacheáveis pra sempre (não mudam sem mudar o nome).
+        source: '/((?!_next/static|_next/image).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, must-revalidate' },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig
