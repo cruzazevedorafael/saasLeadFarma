@@ -68,43 +68,37 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     return text
   }
 
-  const handleSendOrder = async () => {
+  const handleSendOrder = () => {
     if (!customerName.trim() || !customerPhone.trim()) return
     setIsLoading(true)
     setAviso(null)
 
-    // Abre a aba JÁ no clique (antes do await). Se abrir depois do await, o
-    // navegador do celular bloqueia por não ser mais "gesto do usuário" — era
-    // por isso que o WhatsApp não abria.
-    const waWindow = window.open('', '_blank')
-
-    let numeroPedido: number | null = null
-    try {
-      const r = await criarPedido({
-        customerName,
-        customerPhone,
-        items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
-        shippingMethodId: shippingId || null,
-        paymentMethodId: paymentId || null,
-      })
-      numeroPedido = r.number
-    } catch {
-      setAviso('Pedido enviado pelo WhatsApp, mas não foi registrado no painel. Confira lá depois.')
-    }
-
-    const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
-    const orderText = header + '\n' + generateOrderText()
-    // Garante o código do país: wa.me exige o número internacional completo.
+    const orderText = '*PEDIDO KAROLLA FIT*\n' + generateOrderText()
+    // Garante o código do país: o link exige o número internacional completo.
     // Número brasileiro sem país tem 10-11 dígitos (DDD + número); com o 55
     // fica com 12-13. Se vier curto, prefixa o 55.
     const digits = (whatsappNumber || '').replace(/\D/g, '')
     const phone = digits.length >= 12 ? digits : `55${digits}`
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(orderText)}`
-    if (waWindow) {
-      waWindow.location.href = url
+    const enc = encodeURIComponent(orderText)
+
+    // Registra o pedido no painel em segundo plano. NÃO usamos await: o
+    // WhatsApp precisa abrir no mesmo clique, senão o navegador do celular
+    // bloqueia. O pedido segue sendo salvo (com número) no painel.
+    criarPedido({
+      customerName,
+      customerPhone,
+      items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
+      shippingMethodId: shippingId || null,
+      paymentMethodId: paymentId || null,
+    }).catch(() => {})
+
+    // Abre DIRETO no WhatsApp, no mesmo clique. No celular usa o link nativo
+    // (cai no app, sem a página intermediária); no computador abre o Web.
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent)
+    if (isMobile) {
+      window.location.href = `whatsapp://send?phone=${phone}&text=${enc}`
     } else {
-      // Se mesmo assim o navegador bloqueou a aba, navega na própria página.
-      window.location.href = url
+      window.open(`https://wa.me/${phone}?text=${enc}`, '_blank')
     }
 
     setTimeout(() => {
