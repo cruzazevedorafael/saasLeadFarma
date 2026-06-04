@@ -15,6 +15,27 @@ import type { PaymentMethod } from '@/lib/data/payment'
 
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`
 
+// Normaliza um número brasileiro para o formato do WhatsApp: 55 + DDD + número,
+// só dígitos. Tira zeros à esquerda (interurbano) e não duplica o 55.
+const toWhatsappNumber = (raw: string) => {
+  const d = (raw || '').replace(/\D/g, '').replace(/^0+/, '')
+  // já tem o país (55 + 10/11 dígitos = 12/13)? mantém.
+  if (d.startsWith('55') && d.length >= 12) return d
+  // senão é DDD + número (10-11 dígitos) → prefixa o 55.
+  return `55${d}`
+}
+
+// Versão bonita pra mostrar no texto: +55 (DDD) 9XXXX-XXXX
+const prettyBrPhone = (raw: string) => {
+  const d = toWhatsappNumber(raw)
+  const ddd = d.slice(2, 4)
+  const rest = d.slice(4)
+  const num = rest.length === 9 ? `${rest.slice(0, 5)}-${rest.slice(5)}`
+    : rest.length === 8 ? `${rest.slice(0, 4)}-${rest.slice(4)}`
+    : rest
+  return `+55 (${ddd}) ${num}`.trim()
+}
+
 export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethods }: { threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[] }) {
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
@@ -45,7 +66,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     const fmtKg = (g: number) => `${(g / 1000).toFixed(3).replace('.', ',')} kg`
     let text = `Data: ${date}\n\n`
     text += `*Cliente:* ${customerName}\n`
-    text += `*Telefone:* ${customerPhone}\n\n`
+    text += `*Telefone:* ${prettyBrPhone(customerPhone)}\n\n`
     text += `*Tipo de preço:* ${priceType === 'wholesale' ? 'ATACADO' : 'VAREJO'}\n\n`
     text += `*ITENS DO PEDIDO:*\n`
     text += `━━━━━━━━━━━━━━━━━━\n\n`
@@ -91,22 +112,22 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
 
     const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
     const orderText = header + '\n' + generateOrderText()
-    // Garante o código do país: o link exige o número internacional completo.
-    // Número brasileiro sem país tem 10-11 dígitos (DDD + número); com o 55
-    // fica com 12-13. Se vier curto, prefixa o 55.
-    const digits = (whatsappNumber || '').replace(/\D/g, '')
-    const phone = digits.length >= 12 ? digits : `55${digits}`
+    // Número da loja sempre com o código do país (55), senão o WhatsApp acha
+    // que a loja "não tem WhatsApp" e oferece convidar.
+    const phone = toWhatsappNumber(whatsappNumber)
     const enc = encodeURIComponent(orderText)
 
-    // Abre DIRETO no WhatsApp. No celular, navegar pro link nativo cai no app
-    // (sem a página intermediária) e, por ser navegação da própria página, não
-    // é bloqueado mesmo vindo depois de registrar o pedido.
+    // Usa o link oficial wa.me: ele faz a busca correta do número e abre a
+    // conversa mesmo se a loja não estiver nos contatos do cliente (o link
+    // nativo whatsapp:// mostrava "convidar" nesse caso). No celular, navegar
+    // na própria página evita tanto o bloqueio quanto a tela intermediária.
+    const waUrl = `https://wa.me/${phone}?text=${enc}`
     const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent)
     if (isMobile) {
-      window.location.href = `whatsapp://send?phone=${phone}&text=${enc}`
+      window.location.href = waUrl
     } else {
-      const w = window.open(`https://wa.me/${phone}?text=${enc}`, '_blank')
-      if (!w) window.location.href = `https://wa.me/${phone}?text=${enc}`
+      const w = window.open(waUrl, '_blank')
+      if (!w) window.location.href = waUrl
     }
 
     setTimeout(() => {
