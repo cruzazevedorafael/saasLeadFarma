@@ -68,12 +68,29 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     return text
   }
 
-  const handleSendOrder = () => {
+  const handleSendOrder = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return
     setIsLoading(true)
     setAviso(null)
 
-    const orderText = '*PEDIDO KAROLLA FIT*\n' + generateOrderText()
+    // Registra o pedido no painel primeiro pra pegar o número e colocá-lo no
+    // topo do texto (e o painel saber de quem é cada pedido).
+    let numeroPedido: number | null = null
+    try {
+      const r = await criarPedido({
+        customerName,
+        customerPhone,
+        items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
+        shippingMethodId: shippingId || null,
+        paymentMethodId: paymentId || null,
+      })
+      numeroPedido = r.number
+    } catch {
+      setAviso('Pedido enviado pelo WhatsApp, mas não foi registrado no painel. Confira lá depois.')
+    }
+
+    const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
+    const orderText = header + '\n' + generateOrderText()
     // Garante o código do país: o link exige o número internacional completo.
     // Número brasileiro sem país tem 10-11 dígitos (DDD + número); com o 55
     // fica com 12-13. Se vier curto, prefixa o 55.
@@ -81,24 +98,15 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     const phone = digits.length >= 12 ? digits : `55${digits}`
     const enc = encodeURIComponent(orderText)
 
-    // Registra o pedido no painel em segundo plano. NÃO usamos await: o
-    // WhatsApp precisa abrir no mesmo clique, senão o navegador do celular
-    // bloqueia. O pedido segue sendo salvo (com número) no painel.
-    criarPedido({
-      customerName,
-      customerPhone,
-      items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
-      shippingMethodId: shippingId || null,
-      paymentMethodId: paymentId || null,
-    }).catch(() => {})
-
-    // Abre DIRETO no WhatsApp, no mesmo clique. No celular usa o link nativo
-    // (cai no app, sem a página intermediária); no computador abre o Web.
+    // Abre DIRETO no WhatsApp. No celular, navegar pro link nativo cai no app
+    // (sem a página intermediária) e, por ser navegação da própria página, não
+    // é bloqueado mesmo vindo depois de registrar o pedido.
     const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent)
     if (isMobile) {
       window.location.href = `whatsapp://send?phone=${phone}&text=${enc}`
     } else {
-      window.open(`https://wa.me/${phone}?text=${enc}`, '_blank')
+      const w = window.open(`https://wa.me/${phone}?text=${enc}`, '_blank')
+      if (!w) window.location.href = `https://wa.me/${phone}?text=${enc}`
     }
 
     setTimeout(() => {
