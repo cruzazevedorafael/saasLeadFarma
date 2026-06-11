@@ -7,6 +7,7 @@ let productRows: any[] = []
 let variantRows: any[] = []
 let productsError: any = null
 let orderInsertError: any = null
+let insertedOrders: any[] = []
 
 function fakeDb() {
   return {
@@ -22,7 +23,10 @@ function fakeDb() {
       }
       if (table === 'orders') {
         return {
-          insert: () => ({ select: () => ({ single: async () => ({ data: { id: 'o1', number: 7 }, error: orderInsertError }) }) }),
+          insert: (row: any) => {
+            insertedOrders.push(row)
+            return { select: () => ({ single: async () => ({ data: { id: 'o1', number: 7 }, error: orderInsertError }) }) }
+          },
           delete: () => ({ eq: async () => ({ error: null }) }),
         }
       }
@@ -58,18 +62,25 @@ beforeEach(() => {
   variantRows = [variante]
   productsError = null
   orderInsertError = null
+  insertedOrders = []
 })
 
 describe('criarPedido', () => {
-  it('sucesso: retorna ok true com o número do pedido', async () => {
+  it('sucesso: retorna ok true com o número do pedido e sem aviso de estoque', async () => {
     const r = await criarPedido(pedido(2))
-    expect(r).toMatchObject({ ok: true, number: 7, priceType: 'retail' })
+    expect(r).toMatchObject({ ok: true, number: 7, priceType: 'retail', stockWarning: null })
   })
 
-  it('estoque insuficiente: retorna ok false com a mensagem, sem lançar', async () => {
+  it('estoque insuficiente: registra o pedido mesmo assim, com o aviso gravado e devolvido', async () => {
     const r = await criarPedido(pedido(9))
-    expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.error).toContain('Estoque insuficiente')
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(r.number).toBe(7)
+      expect(r.stockWarning).toContain('Estoque insuficiente')
+      expect(r.stockWarning).toContain('Legging (M/Preto)')
+    }
+    expect(insertedOrders).toHaveLength(1)
+    expect(insertedOrders[0].stock_warning).toContain('Estoque insuficiente')
   })
 
   it('produto que não existe mais: retorna ok false, sem lançar', async () => {
@@ -77,7 +88,7 @@ describe('criarPedido', () => {
     variantRows = []
     const r = await criarPedido(pedido(1))
     expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.error).toContain('não encontrado')
+    if (!r.ok) expect(r.error).toContain('não está mais no catálogo')
   })
 
   it('erro de banco: retorna ok false com mensagem amigável, sem lançar', async () => {

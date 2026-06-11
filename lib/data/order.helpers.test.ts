@@ -1,6 +1,6 @@
 // lib/data/order.helpers.test.ts
 import { describe, it, expect } from 'vitest'
-import { buildOrder, validateStock } from './order.helpers'
+import { buildOrder, validateStock, stockShortages } from './order.helpers'
 import type { ProductWithVariants } from './types'
 
 function prod(over: Partial<ProductWithVariants>): ProductWithVariants {
@@ -68,6 +68,23 @@ describe('validateStock', () => {
   it('lança quando a variação não existe', () => {
     expect(() => validateStock([legging], [{ productId: 'L', size: 'GG', color: 'Azul', quantity: 1 }]))
       .toThrow(/Estoque insuficiente/)
+  })
+})
+
+describe('stockShortages', () => {
+  it('vazio quando tudo cabe no estoque', () => {
+    expect(stockShortages([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 5 }])).toEqual([])
+  })
+  it('lista o que passou do estoque, sem lançar', () => {
+    const r = stockShortages([legging], [{ productId: 'L', size: 'M', color: 'Preto', quantity: 8 }])
+    expect(r).toEqual([{ name: 'Legging', size: 'M', color: 'Preto', requested: 8, stock: 5 }])
+  })
+  it('variação que não existe conta como estoque 0', () => {
+    const r = stockShortages([legging], [{ productId: 'L', size: 'GG', color: 'Azul', quantity: 1 }])
+    expect(r).toEqual([{ name: 'Legging', size: 'GG', color: 'Azul', requested: 1, stock: 0 }])
+  })
+  it('produto que não existe é ignorado (tratado separadamente)', () => {
+    expect(stockShortages([], [{ productId: 'X', size: 'M', color: 'Preto', quantity: 1 }])).toEqual([])
   })
 })
 

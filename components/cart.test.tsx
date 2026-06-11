@@ -48,11 +48,11 @@ afterEach(() => {
 
 describe('Cart - envio do pedido', () => {
   it('registro falhou (ok false): mostra o erro, NÃO abre o WhatsApp e mantém o carrinho', async () => {
-    criarPedidoMock.mockResolvedValue({ ok: false, error: 'Estoque insuficiente para Legging (M/Preto). Restam 1.' })
+    criarPedidoMock.mockResolvedValue({ ok: false, error: 'Não foi possível registrar o pedido. Verifique sua internet e tente de novo.' })
     preencherCheckoutEEnviar()
 
     await waitFor(() => {
-      expect(screen.getByText(/Estoque insuficiente para Legging/)).toBeInTheDocument()
+      expect(screen.getByText(/Não foi possível registrar/)).toBeInTheDocument()
     })
     expect(openSpy).not.toHaveBeenCalled()
 
@@ -75,12 +75,26 @@ describe('Cart - envio do pedido', () => {
   })
 
   it('registro ok: abre o WhatsApp com o número do pedido no texto', async () => {
-    criarPedidoMock.mockResolvedValue({ ok: true, number: 42, total: 180, priceType: 'retail' })
+    criarPedidoMock.mockResolvedValue({ ok: true, number: 42, total: 180, priceType: 'retail', stockWarning: null })
     preencherCheckoutEEnviar()
 
     await waitFor(() => expect(openSpy).toHaveBeenCalledTimes(1))
     const url = String(openSpy.mock.calls[0][0])
     expect(url).toContain('https://wa.me/5511999999999')
     expect(url).toContain(encodeURIComponent('PEDIDO #42'))
+  })
+
+  it('registro ok com estoque insuficiente: abre o WhatsApp com o aviso no texto', async () => {
+    criarPedidoMock.mockResolvedValue({
+      ok: true, number: 43, total: 180, priceType: 'retail',
+      stockWarning: 'Estoque insuficiente: Legging (M/Preto) — pedido 2, restam 1',
+    })
+    preencherCheckoutEEnviar()
+
+    await waitFor(() => expect(openSpy).toHaveBeenCalledTimes(1))
+    const url = String(openSpy.mock.calls[0][0])
+    expect(url).toContain(encodeURIComponent('PEDIDO #43'))
+    expect(url).toContain(encodeURIComponent('Estoque insuficiente: Legging (M/Preto)'))
+    expect(url).toContain(encodeURIComponent('ATENÇÃO'))
   })
 })

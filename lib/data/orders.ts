@@ -35,6 +35,7 @@ function mapOrder(r: any): OrderWithItems {
     shippingPrice: Number(r.shipping_price ?? 0),
     paymentLabel: r.payment_label ?? '',
     paymentSurcharge: Number(r.payment_surcharge ?? 0),
+    stockWarning: r.stock_warning ?? null,
     weightTotalGrams,
     createdAt: r.created_at,
     completedAt: r.completed_at ?? null,

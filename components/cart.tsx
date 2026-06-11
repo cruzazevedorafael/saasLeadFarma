@@ -98,6 +98,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     // aqui e mostra o motivo — abrir o WhatsApp mesmo assim criava pedido que
     // chegava na loja mas não existia no painel.
     let numeroPedido: number
+    let avisoEstoque: string | null = null
     try {
       const r = await criarPedido({
         customerName,
@@ -112,6 +113,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
         return
       }
       numeroPedido = r.number
+      avisoEstoque = r.stockWarning
     } catch {
       setAviso('Não foi possível registrar o pedido. Verifique sua internet e toque em enviar de novo.')
       setIsLoading(false)
@@ -119,7 +121,10 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     }
 
     const header = `*PEDIDO #${numeroPedido} — KAROLLA FIT*`
-    const orderText = header + '\n' + generateOrderText()
+    let orderText = header + '\n' + generateOrderText()
+    if (avisoEstoque) {
+      orderText += `\n\n⚠️ *ATENÇÃO:* ${avisoEstoque}. A loja vai entrar em contato pra combinar.`
+    }
     // Número da loja sempre com o código do país (55), senão o WhatsApp acha
     // que a loja "não tem WhatsApp" e oferece convidar.
     const phone = toWhatsappNumber(whatsappNumber)

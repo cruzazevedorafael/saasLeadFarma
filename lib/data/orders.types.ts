@@ -30,6 +30,7 @@ export interface OrderWithItems {
   shippingPrice: number
   paymentLabel: string
   paymentSurcharge: number
+  stockWarning: string | null
   weightTotalGrams: number
   createdAt: string
   completedAt: string | null

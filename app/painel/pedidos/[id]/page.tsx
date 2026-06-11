@@ -36,6 +36,12 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
         </div>
       </div>
 
+      {o.stockWarning && (
+        <p className="rounded-lg bg-amber-500/15 text-amber-600 text-sm font-medium px-3 py-2">
+          ⚠️ {o.stockWarning} — entre em contato com o cliente pra combinar.
+        </p>
+      )}
+
       {/* Cliente */}
       <div className="rounded-xl border border-border p-4 space-y-1">
         <h2 className="font-semibold text-sm mb-1">Cliente</h2>
