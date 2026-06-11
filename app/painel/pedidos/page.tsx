@@ -53,6 +53,11 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
         <div className="space-y-3">
           {pedidos.map((o) => (
             <div key={o.id} className="rounded-xl border border-border p-4 space-y-3">
+              {o.stockWarning && (
+                <p className="rounded-lg bg-amber-500/15 text-amber-600 text-sm font-medium px-3 py-2">
+                  ⚠️ {o.stockWarning} — entre em contato com o cliente pra combinar.
+                </p>
+              )}
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStoreSettings } from '@/lib/data/settings'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
-import { buildOrder, validateStock, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
+import { buildOrder, stockShortages, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
 import type { ProductWithVariants } from '@/lib/data/types'
 
 export interface CriarPedidoInput {
@@ -14,14 +14,26 @@ export interface CriarPedidoInput {
   paymentMethodId?: string | null
 }
 
-export interface CriarPedidoResult {
-  number: number
-  total: number
-  priceType: 'retail' | 'wholesale'
-}
+// Erros esperados (produto removido, banco fora) voltam como { ok: false } com
+// mensagem própria — em produção o Next mascara mensagens de erro lançadas em
+// server actions, então lançar deixaria o cliente sem saber o motivo.
+// Estoque insuficiente NÃO bloqueia: o pedido é registrado com o aviso em
+// stockWarning e a loja resolve com o cliente.
+export type CriarPedidoResult =
+  | { ok: true; number: number; total: number; priceType: 'retail' | 'wholesale'; stockWarning: string | null }
+  | { ok: false; error: string }
 
 export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
-  if (!input.items?.length) throw new Error('Carrinho vazio')
+  try {
+    return await registrarPedido(input)
+  } catch (e) {
+    console.error('[criarPedido] falha ao registrar pedido:', e)
+    return { ok: false, error: 'Não foi possível registrar o pedido. Verifique sua internet e tente de novo.' }
+  }
+}
+
+async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
+  if (!input.items?.length) return { ok: false, error: 'Carrinho vazio' }
 
   const db = createAdminClient()
   const ids = [...new Set(input.items.map((i) => i.productId))]
@@ -36,7 +48,17 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
     variants: (vrows ?? []).filter((v) => v.product_id === p.id).map(mapVariantRow),
   }))
 
-  validateStock(products, input.items)
+  // Sem o cadastro do produto não dá pra montar o item (carrinho antigo no
+  // celular do cliente apontando pra produto apagado): aí sim bloqueia.
+  const existentes = new Set(products.map((p) => p.id))
+  if (input.items.some((i) => !existentes.has(i.productId))) {
+    return { ok: false, error: 'Um dos produtos do carrinho não está mais no catálogo. Atualize a página e monte o carrinho de novo.' }
+  }
+
+  const faltas = stockShortages(products, input.items)
+  const stockWarning = faltas.length
+    ? `Estoque insuficiente: ${faltas.map((f) => `${f.name} (${f.size}/${f.color}) — pedido ${f.requested}, restam ${f.stock}`).join('; ')}`
+    : null
 
   // resolve envio/pagamento a partir do banco (não confia em valores do cliente)
   let shipping: ChosenShipping | undefined
@@ -66,6 +88,7 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
       payment_label: built.paymentLabel,
       payment_surcharge: built.paymentSurcharge,
       total: built.total,
+      stock_warning: stockWarning,
     })
     .select('id, number')
     .single()
@@ -78,5 +101,5 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
     throw iErr
   }
 
-  return { number: order.number as number, total: built.total, priceType: built.priceType }
+  return { ok: true, number: order.number as number, total: built.total, priceType: built.priceType, stockWarning }
 }

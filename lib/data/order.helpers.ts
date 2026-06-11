@@ -99,6 +99,32 @@ export function buildOrder(
   }
 }
 
+export interface StockShortage {
+  name: string
+  size: string
+  color: string
+  requested: number
+  stock: number
+}
+
+// Versão que não lança: lista o que passou do estoque pro pedido ser
+// registrado mesmo assim, com aviso. Produto inexistente fica de fora —
+// quem chama decide o que fazer (não dá pra montar o item sem o cadastro).
+export function stockShortages(products: ProductWithVariants[], requested: RequestedItem[]): StockShortage[] {
+  const byId = new Map(products.map((p) => [p.id, p]))
+  const faltas: StockShortage[] = []
+  for (const r of requested) {
+    const p = byId.get(r.productId)
+    if (!p) continue
+    const variant = p.variants.find((v) => v.size === r.size && v.color === r.color)
+    const stock = variant?.stock ?? 0
+    if (r.quantity > stock) {
+      faltas.push({ name: p.name, size: r.size, color: r.color, requested: r.quantity, stock })
+    }
+  }
+  return faltas
+}
+
 export function validateStock(products: ProductWithVariants[], requested: RequestedItem[]): void {
   const byId = new Map(products.map((p) => [p.id, p]))
   for (const r of requested) {
