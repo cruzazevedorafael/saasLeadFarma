@@ -14,14 +14,24 @@ export interface CriarPedidoInput {
   paymentMethodId?: string | null
 }
 
-export interface CriarPedidoResult {
-  number: number
-  total: number
-  priceType: 'retail' | 'wholesale'
-}
+// Erros esperados (estoque, produto removido) voltam como { ok: false } com a
+// mensagem original — em produção o Next mascara mensagens de erro lançadas em
+// server actions, então lançar deixaria o cliente sem saber o motivo.
+export type CriarPedidoResult =
+  | { ok: true; number: number; total: number; priceType: 'retail' | 'wholesale' }
+  | { ok: false; error: string }
 
 export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
-  if (!input.items?.length) throw new Error('Carrinho vazio')
+  try {
+    return await registrarPedido(input)
+  } catch (e) {
+    console.error('[criarPedido] falha ao registrar pedido:', e)
+    return { ok: false, error: 'Não foi possível registrar o pedido. Verifique sua internet e tente de novo.' }
+  }
+}
+
+async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
+  if (!input.items?.length) return { ok: false, error: 'Carrinho vazio' }
 
   const db = createAdminClient()
   const ids = [...new Set(input.items.map((i) => i.productId))]
@@ -36,7 +46,11 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
     variants: (vrows ?? []).filter((v) => v.product_id === p.id).map(mapVariantRow),
   }))
 
-  validateStock(products, input.items)
+  try {
+    validateStock(products, input.items)
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Estoque indisponível' }
+  }
 
   // resolve envio/pagamento a partir do banco (não confia em valores do cliente)
   let shipping: ChosenShipping | undefined
@@ -78,5 +92,5 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
     throw iErr
   }
 
-  return { number: order.number as number, total: built.total, priceType: built.priceType }
+  return { ok: true, number: order.number as number, total: built.total, priceType: built.priceType }
 }

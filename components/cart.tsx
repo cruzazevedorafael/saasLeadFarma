@@ -94,9 +94,10 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     setIsLoading(true)
     setAviso(null)
 
-    // Registra o pedido no painel primeiro pra pegar o número e colocá-lo no
-    // topo do texto (e o painel saber de quem é cada pedido).
-    let numeroPedido: number | null = null
+    // Registra o pedido no painel ANTES de abrir o WhatsApp. Se falhar, para
+    // aqui e mostra o motivo — abrir o WhatsApp mesmo assim criava pedido que
+    // chegava na loja mas não existia no painel.
+    let numeroPedido: number
     try {
       const r = await criarPedido({
         customerName,
@@ -105,12 +106,19 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
         shippingMethodId: shippingId || null,
         paymentMethodId: paymentId || null,
       })
+      if (!r.ok) {
+        setAviso(r.error)
+        setIsLoading(false)
+        return
+      }
       numeroPedido = r.number
     } catch {
-      setAviso('Pedido enviado pelo WhatsApp, mas não foi registrado no painel. Confira lá depois.')
+      setAviso('Não foi possível registrar o pedido. Verifique sua internet e toque em enviar de novo.')
+      setIsLoading(false)
+      return
     }
 
-    const header = numeroPedido ? `*PEDIDO #${numeroPedido} — KAROLLA FIT*` : '*PEDIDO KAROLLA FIT*'
+    const header = `*PEDIDO #${numeroPedido} — KAROLLA FIT*`
     const orderText = header + '\n' + generateOrderText()
     // Número da loja sempre com o código do país (55), senão o WhatsApp acha
     // que a loja "não tem WhatsApp" e oferece convidar.
