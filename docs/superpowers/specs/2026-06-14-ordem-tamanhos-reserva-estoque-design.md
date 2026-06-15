@@ -68,6 +68,13 @@ Fluxo final:
 | Loja clica "Dar baixa" (confirma venda) | não mexe (já saiu) | `completed` |
 | Loja clica "Cancelar" | volta pro estoque | `cancelled` |
 
+**Pré-requisito (constraint):** a coluna `product_variants.stock` tinha
+`check (stock >= 0)` (migration 0001). Como a regra agora permite estoque
+negativo (sinal de venda além do físico, e reserva simétrica com o cancelamento),
+a migration **remove essa constraint** antes de tudo
+(`drop constraint if exists product_variants_stock_check`). Sem isso, reservar a
+última peça numa corrida levantaria erro e bloquearia o pedido.
+
 **Funções SQL (atômicas, `security definer`, só `service_role`):**
 
 - **`reserve_order(p_order_id uuid)`** — nova. Faz o loop dos `order_items` com

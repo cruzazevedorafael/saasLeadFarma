@@ -151,6 +151,10 @@ Criar `supabase/migrations/0015_reserva_estoque.sql` com o conteúdo:
 -- A partir daqui: pedido criado => estoque já sai (pending = reservado).
 -- "Dar baixa" (complete_order) só confirma a venda; "Cancelar" (cancel_order) devolve.
 
+-- 0) O estoque passa a poder ficar negativo (sinal de venda além do físico).
+-- Sem isso, reservar a última peça numa corrida levantaria erro e bloquearia o pedido.
+alter table public.product_variants drop constraint if exists product_variants_stock_check;
+
 -- 1) Reserva: desconta o estoque dos itens do pedido. Permite negativo (não bloqueia).
 create or replace function public.reserve_order(p_order_id uuid)
 returns void
