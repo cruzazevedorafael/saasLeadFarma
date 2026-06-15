@@ -24,12 +24,10 @@ export async function darBaixa(orderId: string): Promise<{ ok: boolean; error?: 
 export async function cancelarPedido(orderId: string): Promise<{ ok: boolean; error?: string }> {
   await requireUser()
   const db = createAdminClient()
-  const { error } = await db
-    .from('orders')
-    .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-    .eq('id', orderId)
-    .neq('status', 'completed')
+  // Devolve as peças ao estoque e marca como cancelado, atômico no banco.
+  const { error } = await db.rpc('cancel_order', { p_order_id: orderId })
   if (error) return { ok: false, error: error.message }
   revalidatePath('/painel/pedidos')
+  revalidatePath('/')
   return { ok: true }
 }
