@@ -18,6 +18,43 @@ describe('sizesOf / colorsOf', () => {
   it('lista tamanhos distintos', () => {
     expect(sizesOf(p)).toEqual(['M', 'G'])
   })
+
+  it('ordena os tamanhos por P, M, G, GG mesmo vindo embaralhado', () => {
+    const prod: ProductWithVariants = {
+      ...p,
+      variants: [
+        { id: 'a', productId: '1', size: 'GG', color: 'Preto', stock: 1 },
+        { id: 'b', productId: '1', size: 'P', color: 'Preto', stock: 1 },
+        { id: 'c', productId: '1', size: 'G', color: 'Preto', stock: 1 },
+        { id: 'd', productId: '1', size: 'M', color: 'Preto', stock: 1 },
+      ],
+    }
+    expect(sizesOf(prod)).toEqual(['P', 'M', 'G', 'GG'])
+  })
+
+  it('tamanhos numéricos em ordem crescente, depois das letras', () => {
+    const prod: ProductWithVariants = {
+      ...p,
+      variants: [
+        { id: 'a', productId: '1', size: '40', color: 'Preto', stock: 1 },
+        { id: 'b', productId: '1', size: 'M', color: 'Preto', stock: 1 },
+        { id: 'c', productId: '1', size: '38', color: 'Preto', stock: 1 },
+      ],
+    }
+    expect(sizesOf(prod)).toEqual(['M', '38', '40'])
+  })
+
+  it('tamanho desconhecido vai pro fim', () => {
+    const prod: ProductWithVariants = {
+      ...p,
+      variants: [
+        { id: 'a', productId: '1', size: 'Único', color: 'Preto', stock: 1 },
+        { id: 'b', productId: '1', size: 'G', color: 'Preto', stock: 1 },
+      ],
+    }
+    expect(sizesOf(prod)).toEqual(['G', 'Único'])
+  })
+
   it('lista cores distintas', () => {
     expect(colorsOf(p)).toEqual(['Preto', 'Rosa'])
   })

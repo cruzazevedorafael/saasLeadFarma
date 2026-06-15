@@ -1,8 +1,31 @@
 // lib/data/products.helpers.ts
 import type { ProductWithVariants } from './types'
 
+// Ordem canônica das letras. Tamanhos numéricos entram depois (crescente);
+// qualquer outro valor vai pro fim, em ordem alfabética.
+const SIZE_ORDER = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'XGG', 'G1', 'G2', 'G3']
+
+// Chave de ordenação em 3 níveis: [tier, número, texto].
+// tier 0 = letra conhecida (ordena pelo índice), 1 = numérico, 2 = outro.
+function sizeKey(size: string): [number, number, string] {
+  const u = size.trim().toUpperCase()
+  const known = SIZE_ORDER.indexOf(u)
+  if (known !== -1) return [0, known, '']
+  const n = Number(u)
+  if (u !== '' && !Number.isNaN(n)) return [1, n, '']
+  return [2, 0, u]
+}
+
+function compareSizes(a: string, b: string): number {
+  const [ta, na, sa] = sizeKey(a)
+  const [tb, nb, sb] = sizeKey(b)
+  if (ta !== tb) return ta - tb
+  if (na !== nb) return na - nb
+  return sa.localeCompare(sb)
+}
+
 export function sizesOf(p: ProductWithVariants): string[] {
-  return [...new Set(p.variants.map((v) => v.size))]
+  return [...new Set(p.variants.map((v) => v.size))].sort(compareSizes)
 }
 
 export function colorsOf(p: ProductWithVariants): string[] {
