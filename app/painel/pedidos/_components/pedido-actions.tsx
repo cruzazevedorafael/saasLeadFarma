@@ -40,7 +40,7 @@ export function PedidoActions({ orderId }: { orderId: string }) {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Cancelar este pedido?</AlertDialogTitle>
-              <AlertDialogDescription>O pedido fica marcado como cancelado. Não mexe no estoque.</AlertDialogDescription>
+              <AlertDialogDescription>O pedido é cancelado e as peças voltam para o estoque.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Voltar</AlertDialogCancel>

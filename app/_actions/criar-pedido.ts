@@ -101,5 +101,13 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
     throw iErr
   }
 
+  // Reserva o estoque (desconta as peças). Pode ficar negativo — não bloqueia,
+  // o stockWarning acima já avisa a loja. Se a reserva falhar, desfaz o pedido.
+  const { error: rErr } = await db.rpc('reserve_order', { p_order_id: order.id })
+  if (rErr) {
+    await db.from('orders').delete().eq('id', order.id)
+    throw rErr
+  }
+
   return { ok: true, number: order.number as number, total: built.total, priceType: built.priceType, stockWarning }
 }
