@@ -8,6 +8,8 @@ let variantRows: any[] = []
 let productsError: any = null
 let orderInsertError: any = null
 let insertedOrders: any[] = []
+let rpcError: any = null
+let deletedOrderIds: string[] = []
 
 function fakeDb() {
   return {
@@ -27,7 +29,7 @@ function fakeDb() {
             insertedOrders.push(row)
             return { select: () => ({ single: async () => ({ data: { id: 'o1', number: 7 }, error: orderInsertError }) }) }
           },
-          delete: () => ({ eq: async () => ({ error: null }) }),
+          delete: () => ({ eq: async (_col: string, id: string) => { deletedOrderIds.push(id); return { error: null } } }),
         }
       }
       if (table === 'order_items') {
@@ -35,6 +37,7 @@ function fakeDb() {
       }
       throw new Error(`tabela inesperada no teste: ${table}`)
     },
+    async rpc(_name: string, _params: any) { return { error: rpcError } },
   }
 }
 
@@ -63,6 +66,8 @@ beforeEach(() => {
   productsError = null
   orderInsertError = null
   insertedOrders = []
+  rpcError = null
+  deletedOrderIds = []
 })
 
 describe('criarPedido', () => {
@@ -97,5 +102,19 @@ describe('criarPedido', () => {
     const r = await criarPedido(pedido(1))
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.error).toContain('Não foi possível registrar')
+  })
+
+  it('reserva o estoque após criar o pedido (chama o rpc sem erro)', async () => {
+    const r = await criarPedido(pedido(2))
+    expect(r.ok).toBe(true)
+    expect(deletedOrderIds).toHaveLength(0)
+  })
+
+  it('falha na reserva: apaga o pedido e retorna ok false', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    rpcError = { message: 'falha na reserva' }
+    const r = await criarPedido(pedido(2))
+    expect(r.ok).toBe(false)
+    expect(deletedOrderIds).toEqual(['o1'])
   })
 })
