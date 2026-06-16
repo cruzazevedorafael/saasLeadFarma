@@ -1,7 +1,7 @@
 // components/cart.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore, type CartItem } from '@/lib/store'
 import { cartPriceType, cartTotal, unitPriceFor, piecesUntilWholesale, type PriceType } from '@/lib/data/cart.helpers'
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag } from 'lucide-react'
 import { criarPedido } from '@/app/_actions/criar-pedido'
+import { reservarItem, liberarItem, liberarCarrinho } from '@/app/_actions/reserva-carrinho'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
 
@@ -46,7 +47,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   const [shippingId, setShippingId] = useState<string>('')
   const [paymentId, setPaymentId] = useState<string>('')
 
-  const { items, removeItem, updateQuantity, clearCart, getTotalItems } = useCartStore()
+  const { items, removeItem, updateQuantity, clearCart, getTotalItems, ensureCartId } = useCartStore()
 
   const priceType: PriceType = cartPriceType(items, threshold)
   const total = cartTotal(items, priceType)
@@ -60,6 +61,44 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   const pesoTotalG = items.reduce((acc, i) => acc + i.product.weightGrams * i.quantity, 0)
   const faltam = piecesUntilWholesale(items, threshold)
   const totalItems = getTotalItems()
+
+  // Ao abrir a página com carrinho salvo, renova as reservas (30 min) e ajusta o
+  // que não está mais disponível. Roda uma vez no mount.
+  useEffect(() => {
+    const cartId = ensureCartId()
+    useCartStore.getState().items.forEach(async (i) => {
+      if (!i.variantId) return
+      const granted = await reservarItem(cartId, i.variantId, i.quantity)
+      if (granted <= 0) {
+        removeItem(i.product.id, i.size, i.color)
+      } else if (granted < i.quantity) {
+        updateQuantity(i.product.id, i.size, i.color, granted)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleRemove = (item: CartItem) => {
+    const cartId = ensureCartId()
+    removeItem(item.product.id, item.size, item.color)
+    if (item.variantId) liberarItem(cartId, item.variantId)
+  }
+
+  const handleUpdateQuantity = async (item: CartItem, novaQtd: number) => {
+    const cartId = ensureCartId()
+    if (!item.variantId) {
+      updateQuantity(item.product.id, item.size, item.color, novaQtd)
+      return
+    }
+    const granted = await reservarItem(cartId, item.variantId, novaQtd)
+    updateQuantity(item.product.id, item.size, item.color, Math.min(novaQtd, Math.max(0, granted)))
+  }
+
+  const handleClearCart = () => {
+    const cartId = ensureCartId()
+    clearCart()
+    liberarCarrinho(cartId)
+  }
 
   const generateOrderText = () => {
     const date = new Date().toLocaleDateString('pt-BR')
@@ -106,6 +145,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
         items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
         shippingMethodId: shippingId || null,
         paymentMethodId: paymentId || null,
+        cartId: ensureCartId(),
       })
       if (!r.ok) {
         setAviso(r.error)
@@ -228,8 +268,8 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                               item={item}
                               index={index}
                               priceType={priceType}
-                              onRemove={() => removeItem(item.product.id, item.size, item.color)}
-                              onUpdateQuantity={(qty) => updateQuantity(item.product.id, item.size, item.color, qty)}
+                              onRemove={() => handleRemove(item)}
+                              onUpdateQuantity={(qty) => handleUpdateQuantity(item, qty)}
                             />
                           ))
                         )}
@@ -344,7 +384,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                           <span className="text-xl md:text-2xl font-bold text-[#CFFF04]">{formatPrice(total)}</span>
                         </div>
                         <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">Continuar</Button>
-                        <button onClick={clearCart} className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors">Limpar carrinho</button>
+                        <button onClick={handleClearCart} className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors">Limpar carrinho</button>
                       </>
                     )}
                   </div>

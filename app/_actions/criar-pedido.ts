@@ -12,6 +12,7 @@ export interface CriarPedidoInput {
   items: RequestedItem[]
   shippingMethodId?: string | null
   paymentMethodId?: string | null
+  cartId?: string | null
 }
 
 // Erros esperados (produto removido, banco fora) voltam como { ok: false } com
@@ -107,6 +108,14 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
   if (rErr) {
     await db.from('orders').delete().eq('id', order.id)
     throw rErr
+  }
+
+  // Já baixamos o estoque de verdade; solta as reservas de carrinho desse cliente
+  // pra não descontar duas vezes. Falha aqui não derruba o pedido (a reserva
+  // expira sozinha em 30 min).
+  if (input.cartId) {
+    const { error: lErr } = await db.rpc('liberar_carrinho', { p_cart_id: input.cartId })
+    if (lErr) console.error('[criarPedido] falha ao liberar carrinho:', lErr)
   }
 
   return { ok: true, number: order.number as number, total: built.total, priceType: built.priceType, stockWarning }

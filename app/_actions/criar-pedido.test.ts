@@ -10,6 +10,7 @@ let orderInsertError: any = null
 let insertedOrders: any[] = []
 let rpcError: any = null
 let deletedOrderIds: string[] = []
+let rpcCalls: { name: string; params: any }[] = []
 
 function fakeDb() {
   return {
@@ -37,7 +38,10 @@ function fakeDb() {
       }
       throw new Error(`tabela inesperada no teste: ${table}`)
     },
-    async rpc(_name: string, _params: any) { return { error: rpcError } },
+    async rpc(name: string, params: any) {
+      rpcCalls.push({ name, params })
+      return { error: rpcError }
+    },
   }
 }
 
@@ -68,6 +72,7 @@ beforeEach(() => {
   insertedOrders = []
   rpcError = null
   deletedOrderIds = []
+  rpcCalls = []
 })
 
 describe('criarPedido', () => {
@@ -116,5 +121,17 @@ describe('criarPedido', () => {
     const r = await criarPedido(pedido(2))
     expect(r.ok).toBe(false)
     expect(deletedOrderIds).toEqual(['o1'])
+  })
+
+  it('com cartId: libera o carrinho após reservar o estoque', async () => {
+    const r = await criarPedido({ ...pedido(2), cartId: 'cart-9' })
+    expect(r.ok).toBe(true)
+    expect(rpcCalls.map((c) => c.name)).toEqual(['reserve_order', 'liberar_carrinho'])
+    expect(rpcCalls[1].params).toEqual({ p_cart_id: 'cart-9' })
+  })
+
+  it('sem cartId: não chama liberar_carrinho', async () => {
+    await criarPedido(pedido(2))
+    expect(rpcCalls.map((c) => c.name)).toEqual(['reserve_order'])
   })
 })

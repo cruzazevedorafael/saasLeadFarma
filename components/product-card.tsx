@@ -10,6 +10,8 @@ import { ProductImages } from '@/components/product-images'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Minus, ShoppingBag, Check, Flame } from 'lucide-react'
+import { reservarItem } from '@/app/_actions/reserva-carrinho'
+import { addableFromGrant } from '@/lib/data/reserva.helpers'
 
 interface ProductCardProps {
   product: ProductWithVariants
@@ -24,6 +26,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0] ?? '')
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
 
   const addItem = useCartStore((state) => state.addItem)
   const available = isVariantAvailable(product, selectedSize, selectedColor)
@@ -35,9 +38,28 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
     setQuantity((q) => Math.min(Math.max(1, q), Math.max(1, stock)))
   }, [stock])
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!available) return
-    addItem({ product, quantity, size: selectedSize, color: selectedColor, maxStock: stock })
+    setAviso(null)
+    const variant = product.variants.find((v) => v.size === selectedSize && v.color === selectedColor)
+    const store = useCartStore.getState()
+    const cartId = store.ensureCartId()
+    const jaNoCarrinho = store.items.find(
+      (i) => i.product.id === product.id && i.size === selectedSize && i.color === selectedColor
+    )?.quantity ?? 0
+    const desejado = jaNoCarrinho + quantity
+
+    // Reserva no servidor. Sem variant (catálogo antigo) não dá pra reservar:
+    // segue o fluxo antigo e o pedido final cobre o estoque.
+    const granted = variant ? await reservarItem(cartId, variant.id, desejado) : desejado
+    const podeAdicionar = addableFromGrant(granted, jaNoCarrinho)
+    if (podeAdicionar <= 0) {
+      setAviso('Essa peça acabou de ser reservada. Tente outra cor/tamanho.')
+      return
+    }
+
+    addItem({ product, quantity: podeAdicionar, size: selectedSize, color: selectedColor, variantId: variant?.id, maxStock: stock })
+    if (granted < desejado) setAviso(`Só sobraram ${granted} no estoque.`)
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
   }
@@ -189,6 +211,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
             </AnimatePresence>
           </Button>
         </motion.div>
+        {aviso && <p className="text-xs text-amber-500 mt-2">{aviso}</p>}
       </div>
     </motion.div>
   )

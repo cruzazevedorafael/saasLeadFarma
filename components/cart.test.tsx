@@ -9,6 +9,12 @@ vi.mock('@/app/_actions/criar-pedido', () => ({ criarPedido: vi.fn() }))
 import { criarPedido } from '@/app/_actions/criar-pedido'
 const criarPedidoMock = vi.mocked(criarPedido)
 
+vi.mock('@/app/_actions/reserva-carrinho', () => ({
+  reservarItem: vi.fn(async () => 99),
+  liberarItem: vi.fn(async () => {}),
+  liberarCarrinho: vi.fn(async () => {}),
+}))
+
 // jsdom não implementa matchMedia (framer-motion consulta pra reduced motion)
 if (!window.matchMedia) {
   window.matchMedia = ((query: string) => ({
