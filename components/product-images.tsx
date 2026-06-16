@@ -2,8 +2,28 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Image from 'next/image'
 import useEmblaCarousel from 'embla-carousel-react'
+
+function ProductImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  const [currentSrc, setCurrentSrc] = useState(src)
+
+  useEffect(() => {
+    setCurrentSrc(src)
+  }, [src])
+
+  return (
+    <img
+      src={currentSrc}
+      alt={alt}
+      className={`absolute inset-0 h-full w-full ${className}`}
+      loading="lazy"
+      decoding="async"
+      onError={() => {
+        if (currentSrc !== '/placeholder.svg') setCurrentSrc('/placeholder.svg')
+      }}
+    />
+  )
+}
 
 export function ProductImages({ images, alt }: { images: string[]; alt: string }) {
   const list = images.length > 0 ? images : ['/placeholder.svg']
@@ -31,10 +51,9 @@ export function ProductImages({ images, alt }: { images: string[]; alt: string }
 
   if (list.length < 2) {
     return (
-      <Image
+      <ProductImage
         src={list[0]}
         alt={alt}
-        fill
         className="object-cover transition-transform duration-500 group-hover:scale-110"
       />
     )
@@ -46,7 +65,7 @@ export function ProductImages({ images, alt }: { images: string[]; alt: string }
         <div className="flex h-full">
           {list.map((src, i) => (
             <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
-              <Image src={src} alt={alt} fill className="object-cover" />
+              <ProductImage src={src} alt={alt} className="object-cover" />
             </div>
           ))}
         </div>
