@@ -44,7 +44,7 @@ begin
     return 0;
   end if;
 
-  select coalesce(sum(quantity), 0) into v_others
+  select coalesce(sum(quantity), 0)::int into v_others
   from public.cart_reservations
   where variant_id = p_variant_id and cart_id <> p_cart_id and expires_at > now();
 
@@ -93,16 +93,17 @@ revoke all on function public.liberar_carrinho(uuid) from public, anon;
 grant execute on function public.liberar_carrinho(uuid) to service_role;
 
 -- View pública de variações: estoque JÁ descontado das reservas ativas.
--- Mantém as mesmas colunas/tipos (id, product_id, size, color, available, stock)
--- pra não quebrar quem consome (create or replace view exige isso).
+-- Mantém as mesmas colunas/tipos (id, product_id, size, color, available, stock).
+-- O ::int é obrigatório: sum() devolve bigint, e create or replace view não
+-- deixa mudar o tipo da coluna `stock` (que era int na 0012).
 create or replace view public.public_product_variants
   with (security_invoker = false) as
   select pv.id, pv.product_id, pv.size, pv.color,
          ((pv.stock - coalesce(r.reserved, 0)) > 0) as available,
-         greatest(pv.stock - coalesce(r.reserved, 0), 0) as stock
+         greatest(pv.stock - coalesce(r.reserved, 0), 0)::int as stock
   from public.product_variants pv
   left join (
-    select variant_id, sum(quantity) as reserved
+    select variant_id, sum(quantity)::int as reserved
     from public.cart_reservations
     where expires_at > now()
     group by variant_id
