@@ -10,11 +10,14 @@ export interface CartItem {
   quantity: number
   size: string
   color: string
+  variantId?: string
   maxStock?: number
 }
 
 interface CartStore {
   items: CartItem[]
+  cartId: string
+  ensureCartId: () => string
   addItem: (item: CartItem) => void
   removeItem: (productId: string, size: string, color: string) => void
   updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
@@ -26,6 +29,15 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      cartId: '',
+      ensureCartId: () => {
+        let id = get().cartId
+        if (!id) {
+          id = crypto.randomUUID()
+          set({ cartId: id })
+        }
+        return id
+      },
       addItem: (item) => {
         set((state) => {
           const existingIndex = state.items.findIndex(
