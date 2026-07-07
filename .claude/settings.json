@@ -36,8 +36,6 @@
       "Bash(vercel env *)",
       "Bash(curl -s -o /tmp/v0.html -w \"HTTP %{http_code}\\\\n\" -L https://v0-logo-de-fitness.vercel.app/)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -L https://karollamenu.vercel.app/)",
-      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bXNqZml6eXJpY2VudnVuZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMjA0MzYsImV4cCI6MjA5NTg5NjQzNn0.5oRxjZMZiBqzUSeozh5Ic8a1_QXDQPT2cu-3q23TBpE' https://mymsjfizyricenvunggk.supabase.co/rest/v1/)",
-      "Bash(curl -s -I -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bXNqZml6eXJpY2VudnVuZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMjA0MzYsImV4cCI6MjA5NTg5NjQzNn0.5oRxjZMZiBqzUSeozh5Ic8a1_QXDQPT2cu-3q23TBpE' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bXNqZml6eXJpY2VudnVuZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMjA0MzYsImV4cCI6MjA5NTg5NjQzNn0.5oRxjZMZiBqzUSeozh5Ic8a1_QXDQPT2cu-3q23TBpE' -H 'Prefer: count=exact' https://mymsjfizyricenvunggk.supabase.co/rest/v1/products?select=id)",
       "Bash(curl -s -o /tmp/kf.html -w \"HTTP %{http_code} | tipo: %{content_type}\\\\n\" -L https://karollafit.vercel.app/)",
       "Bash(curl -s -L https://v0-logo-de-fitness.vercel.app/)",
       "Bash(vercel inspect *)",
