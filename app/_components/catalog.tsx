@@ -13,7 +13,7 @@ import type { ProductWithVariants } from '@/lib/data/types'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
 
-export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, shippingMethods, paymentMethods }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[] }) {
+export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -34,8 +34,8 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
 
   return (
     <main className="min-h-screen bg-background">
-      <Header />
-      <Hero bannerImageUrl={bannerImageUrl} />
+      <Header storeName={storeName} logoUrl={logoUrl} />
+      <Hero bannerImageUrl={bannerImageUrl} storeName={storeName} logoUrl={logoUrl} />
 
       <section className="sticky top-14 md:top-20 z-30 bg-background/80 backdrop-blur-xl border-b border-border/40 py-3 md:py-4">
         <div className="container mx-auto px-3 md:px-4 space-y-3 md:space-y-4">
@@ -52,7 +52,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
                 placeholder="Buscar produtos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-full bg-muted border border-border/50 text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#CFFF04]/50 focus:border-[#CFFF04]/50 transition-all"
+                className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-full bg-muted border border-border/50 text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/50 focus:border-[#F97316]/50 transition-all"
               />
             </div>
           </motion.div>
@@ -74,7 +74,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
               produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
             </p>
             {selectedCategory !== 'Todos' && (
-              <button onClick={() => setSelectedCategory('Todos')} className="text-xs md:text-sm text-[#CFFF04] hover:underline">
+              <button onClick={() => setSelectedCategory('Todos')} className="text-xs md:text-sm text-[#F97316] hover:underline">
                 Ver todos
               </button>
             )}
@@ -95,7 +95,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
               <p className="text-xs md:text-sm text-muted-foreground mt-1">Tente buscar por outro termo ou categoria</p>
               <button
                 onClick={() => { setSearchQuery(''); setSelectedCategory('Todos') }}
-                className="mt-4 text-xs md:text-sm text-[#CFFF04] hover:underline"
+                className="mt-4 text-xs md:text-sm text-[#F97316] hover:underline"
               >
                 Limpar filtros
               </button>
@@ -104,7 +104,12 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
         </div>
       </section>
 
-      <Cart threshold={threshold} whatsappNumber={whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
+      <Cart threshold={threshold} whatsappNumber={whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} pharmacyId={pharmacyId} storeName={storeName} />
+
+      <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
+        <span className="opacity-70">powered by</span>{' '}
+        <span className="font-semibold text-[#F97316]">LeadFarma</span>
+      </footer>
     </main>
   )
 }

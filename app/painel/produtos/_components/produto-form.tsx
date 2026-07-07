@@ -108,7 +108,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
               <div key={url} className="relative">
                 <img src={url} alt="" className="h-24 w-24 rounded-lg object-cover" />
                 {i === 0 && (
-                  <span className="absolute left-1 top-1 rounded bg-[#CFFF04] px-1 text-[10px] font-medium text-black">capa</span>
+                  <span className="absolute left-1 top-1 rounded bg-[#F97316] px-1 text-[10px] font-medium text-black">capa</span>
                 )}
                 <button
                   type="button"

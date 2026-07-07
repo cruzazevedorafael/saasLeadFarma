@@ -39,7 +39,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
             key={x.key}
             href={`/painel/pedidos?f=${x.key}`}
             className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-              x.key === filtro.key ? 'bg-[#CFFF04] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              x.key === filtro.key ? 'bg-[#F97316] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
             {x.label}
@@ -63,7 +63,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   <div className="flex items-center gap-2">
                     <span className="font-bold">#{o.number}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
-                      o.priceType === 'wholesale' ? 'bg-[#CFFF04]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'
+                      o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'
                     }`}>{o.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
                       o.status === 'pending' ? 'bg-amber-500/15 text-amber-500'

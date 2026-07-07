@@ -30,7 +30,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
         <div className="flex items-center gap-2 flex-wrap mt-1">
           <h1 className="text-2xl font-bold">Pedido #{o.number}</h1>
           <span className={`text-xs px-2 py-0.5 rounded ${statusClass}`}>{statusLabel}</span>
-          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-[#CFFF04]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'}`}>
+          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'}`}>
             {o.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}
           </span>
         </div>

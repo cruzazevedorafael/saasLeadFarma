@@ -1,5 +1,5 @@
 // lib/data/payment.ts
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 export interface PaymentMethod {
   id: string
@@ -10,6 +10,7 @@ export interface PaymentMethod {
   sortOrder: number
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function map(r: any): PaymentMethod {
   return {
     id: r.id, name: r.name,
@@ -19,11 +20,25 @@ function map(r: any): PaymentMethod {
   }
 }
 
+// PAINEL: client autenticado → RLS isola pela farmácia do usuário.
 export async function getPaymentMethods(activeOnly = false): Promise<PaymentMethod[]> {
-  const db = createAdminClient()
-  let q = db.from('payment_methods').select('*').order('sort_order', { ascending: true })
+  const supabase = await createServerClient()
+  let q = supabase.from('payment_methods').select('*').order('sort_order', { ascending: true })
   if (activeOnly) q = q.eq('active', true)
   const { data, error } = await q
+  if (error) throw error
+  return (data ?? []).map(map)
+}
+
+// PÚBLICO (anon): formas ativas de UMA farmácia (catálogo).
+export async function getPublicPaymentMethods(pharmacyId: string): Promise<PaymentMethod[]> {
+  const supabase = await createServerClient()
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .select('*')
+    .eq('pharmacy_id', pharmacyId)
+    .eq('active', true)
+    .order('sort_order', { ascending: true })
   if (error) throw error
   return (data ?? []).map(map)
 }

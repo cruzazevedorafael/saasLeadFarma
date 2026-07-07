@@ -9,7 +9,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <form action={login} className="w-full max-w-sm space-y-4 rounded-2xl border border-border bg-card p-6">
-        <h1 className="text-xl font-bold text-center">Painel Karolla Fit</h1>
+        <h1 className="text-xl font-bold text-center">Lead<span className="text-[#F97316]">Farma</span></h1>
+        <p className="text-center text-xs text-muted-foreground -mt-2">Acesso ao painel</p>
         {erro && <p className="text-sm text-destructive text-center">E-mail ou senha inválidos.</p>}
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>

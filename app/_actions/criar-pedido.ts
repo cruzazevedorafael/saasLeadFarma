@@ -1,12 +1,13 @@
 // app/_actions/criar-pedido.ts
 'use server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getStoreSettings } from '@/lib/data/settings'
+import { getPharmacyById } from '@/lib/data/pharmacy'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
 import { buildOrder, stockShortages, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
 import type { ProductWithVariants } from '@/lib/data/types'
 
 export interface CriarPedidoInput {
+  pharmacyId: string
   customerName: string
   customerPhone: string
   items: RequestedItem[]
@@ -36,12 +37,14 @@ export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoR
 async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
   if (!input.items?.length) return { ok: false, error: 'Carrinho vazio' }
 
+  if (!input.pharmacyId) return { ok: false, error: 'Farmácia não identificada.' }
   const db = createAdminClient()
   const ids = [...new Set(input.items.map((i) => i.productId))]
 
-  const { data: prows, error } = await db.from('products').select('*').in('id', ids)
+  // Todas as leituras/escritas são presas à farmácia do catálogo (input.pharmacyId).
+  const { data: prows, error } = await db.from('products').select('*').eq('pharmacy_id', input.pharmacyId).in('id', ids)
   if (error) throw error
-  const { data: vrows, error: vErr } = await db.from('product_variants').select('*').in('product_id', ids)
+  const { data: vrows, error: vErr } = await db.from('product_variants').select('*').eq('pharmacy_id', input.pharmacyId).in('product_id', ids)
   if (vErr) throw vErr
 
   const products: ProductWithVariants[] = (prows ?? []).map((p) => ({
@@ -64,21 +67,23 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
   // resolve envio/pagamento a partir do banco (não confia em valores do cliente)
   let shipping: ChosenShipping | undefined
   if (input.shippingMethodId) {
-    const { data: s } = await db.from('shipping_methods').select('name, price').eq('id', input.shippingMethodId).single()
+    const { data: s } = await db.from('shipping_methods').select('name, price').eq('id', input.shippingMethodId).eq('pharmacy_id', input.pharmacyId).single()
     if (s) shipping = { label: s.name, price: Number(s.price ?? 0) }
   }
   let payment: ChosenPayment | undefined
   if (input.paymentMethodId) {
-    const { data: pm } = await db.from('payment_methods').select('name, surcharge_percent, surcharge_fixed').eq('id', input.paymentMethodId).single()
+    const { data: pm } = await db.from('payment_methods').select('name, surcharge_percent, surcharge_fixed').eq('id', input.paymentMethodId).eq('pharmacy_id', input.pharmacyId).single()
     if (pm) payment = { label: pm.name, percent: Number(pm.surcharge_percent ?? 0), fixed: Number(pm.surcharge_fixed ?? 0) }
   }
 
-  const settings = await getStoreSettings()
-  const built = buildOrder(products, input.items, settings.wholesaleThreshold, shipping, payment)
+  const pharmacy = await getPharmacyById(input.pharmacyId)
+  const threshold = pharmacy?.wholesaleThreshold ?? 4
+  const built = buildOrder(products, input.items, threshold, shipping, payment)
 
   const { data: order, error: oErr } = await db
     .from('orders')
     .insert({
+      pharmacy_id: input.pharmacyId,
       customer_name: input.customerName,
       customer_phone: input.customerPhone,
       status: 'pending',
@@ -95,7 +100,7 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
     .single()
   if (oErr) throw oErr
 
-  const itemRows = built.items.map((it) => ({ ...it, order_id: order.id }))
+  const itemRows = built.items.map((it) => ({ ...it, order_id: order.id, pharmacy_id: input.pharmacyId }))
   const { error: iErr } = await db.from('order_items').insert(itemRows)
   if (iErr) {
     await db.from('orders').delete().eq('id', order.id)

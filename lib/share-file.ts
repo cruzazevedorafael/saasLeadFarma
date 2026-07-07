@@ -16,7 +16,7 @@ export async function shareOrDownloadOrder(
 
   if (nav.canShare && nav.share && nav.canShare({ files: [file] })) {
     try {
-      await nav.share({ files: [file], text: caption, title: 'Pedido KAROLLA FIT' })
+      await nav.share({ files: [file], text: caption, title: 'Pedido' })
       return 'shared'
     } catch (err) {
       if ((err as DOMException)?.name === 'AbortError') return 'cancelled'

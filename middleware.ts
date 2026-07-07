@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request })
+  const response = NextResponse.next({ request })
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,10 +19,57 @@ export async function middleware(request: NextRequest) {
       },
     }
   )
-  await supabase.auth.getUser()
+
+  const path = request.nextUrl.pathname
+  const isLogin = path === '/painel/login'
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const redirectTo = (to: string) => NextResponse.redirect(new URL(to, request.url))
+
+  // Não logado
+  if (!user) {
+    if (path.startsWith('/gestao')) return redirectTo('/painel/login')
+    if (path.startsWith('/painel') && !isLogin) return redirectTo('/painel/login')
+    return response
+  }
+
+  // Logado: descobre papel
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, pharmacy_id')
+    .eq('id', user.id)
+    .single()
+  const role = profile?.role as 'superadmin' | 'pharmacy_admin' | undefined
+
+  // Área de gestão: só super-admin
+  if (path.startsWith('/gestao')) {
+    if (role !== 'superadmin') return redirectTo('/painel')
+    return response
+  }
+
+  // Área do painel da farmácia
+  if (path.startsWith('/painel')) {
+    if (role === 'superadmin') return redirectTo('/gestao')
+    if (role !== 'pharmacy_admin') {
+      if (!isLogin) return redirectTo('/painel/login')
+      return response
+    }
+    // pharmacy_admin logado tentando abrir a tela de login → manda pro painel
+    if (isLogin) return redirectTo('/painel')
+    // gate de onboarding
+    if (path !== '/painel/cadastro' && profile?.pharmacy_id) {
+      const { data: ph } = await supabase
+        .from('pharmacies')
+        .select('onboarding_completed')
+        .eq('id', profile.pharmacy_id)
+        .single()
+      if (ph && !ph.onboarding_completed) return redirectTo('/painel/cadastro')
+    }
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/painel/:path*'],
+  matcher: ['/painel/:path*', '/gestao/:path*'],
 }

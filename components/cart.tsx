@@ -37,7 +37,7 @@ const prettyBrPhone = (raw: string) => {
   return `+55 (${ddd}) ${num}`.trim()
 }
 
-export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethods }: { threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[] }) {
+export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethods, pharmacyId, storeName }: { threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
   const [customerName, setCustomerName] = useState('')
@@ -124,7 +124,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     text += `*Pagamento:* ${selPayment ? selPayment.name : 'A combinar'}${acrescimo > 0 ? ` (+${formatPrice(acrescimo)})` : ''}\n`
     text += `*TOTAL GERAL: ${formatPrice(totalFinal)}*\n`
     text += `━━━━━━━━━━━━━━━━━━\n\n`
-    text += `_Pedido enviado pelo Menu Digital KAROLLA FIT_`
+    text += `_Pedido enviado pelo catálogo ${storeName} · LeadFarma_`
     return text
   }
 
@@ -140,6 +140,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     let avisoEstoque: string | null = null
     try {
       const r = await criarPedido({
+        pharmacyId,
         customerName,
         customerPhone,
         items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
@@ -160,7 +161,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
       return
     }
 
-    const header = `*PEDIDO #${numeroPedido} — KAROLLA FIT*`
+    const header = `*PEDIDO #${numeroPedido} — ${storeName.toUpperCase()}*`
     let orderText = header + '\n' + generateOrderText()
     if (avisoEstoque) {
       orderText += `\n\n⚠️ *ATENÇÃO:* ${avisoEstoque}. A loja vai entrar em contato pra combinar.`
@@ -199,7 +200,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     <>
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-1.5 md:gap-2 rounded-full bg-[#CFFF04] px-4 py-3 md:px-6 md:py-4 text-black font-semibold shadow-lg shadow-[#CFFF04]/20"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-1.5 md:gap-2 rounded-full bg-[#F97316] px-4 py-3 md:px-6 md:py-4 text-black font-semibold shadow-lg shadow-[#F97316]/20"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ y: 100, opacity: 0 }}
@@ -209,7 +210,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
         <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
         <span className="text-sm md:text-base">Carrinho</span>
         {totalItems > 0 && (
-          <motion.span key={totalItems} initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-black text-[#CFFF04] text-xs md:text-sm">
+          <motion.span key={totalItems} initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-black text-[#F97316] text-xs md:text-sm">
             {totalItems}
           </motion.span>
         )}
@@ -227,8 +228,8 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between border-b border-border p-3 md:p-4">
                   <div className="flex items-center gap-2 md:gap-3">
-                    <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-[#CFFF04]/10">
-                      <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 text-[#CFFF04]" />
+                    <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-[#F97316]/10">
+                      <ShoppingCart className="h-4 w-4 md:h-5 md:w-5 text-[#F97316]" />
                     </div>
                     <div>
                       <h2 className="text-base md:text-lg font-semibold">Seu Carrinho</h2>
@@ -241,7 +242,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                 </div>
 
                 {items.length > 0 && (
-                  <div className={`flex items-center gap-2 px-3 md:px-4 py-2 text-xs md:text-sm border-b border-border ${priceType === 'wholesale' ? 'bg-[#CFFF04]/15 text-[#CFFF04]' : 'bg-muted/40 text-muted-foreground'}`}>
+                  <div className={`flex items-center gap-2 px-3 md:px-4 py-2 text-xs md:text-sm border-b border-border ${priceType === 'wholesale' ? 'bg-[#F97316]/15 text-[#F97316]' : 'bg-muted/40 text-muted-foreground'}`}>
                     <Tag className="h-4 w-4" />
                     {priceType === 'wholesale'
                       ? '✓ Preço de atacado aplicado'
@@ -353,7 +354,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                               </div>
                             )}
                             <div className="flex justify-between font-semibold text-sm md:text-base pt-1">
-                              <span>Total</span><span className="text-[#CFFF04]">{formatPrice(totalFinal)}</span>
+                              <span>Total</span><span className="text-[#F97316]">{formatPrice(totalFinal)}</span>
                             </div>
                           </div>
                         </div>
@@ -381,9 +382,9 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                       <>
                         <div className="flex items-center justify-between">
                           <span className="text-sm md:text-base text-muted-foreground">Total</span>
-                          <span className="text-xl md:text-2xl font-bold text-[#CFFF04]">{formatPrice(total)}</span>
+                          <span className="text-xl md:text-2xl font-bold text-[#F97316]">{formatPrice(total)}</span>
                         </div>
-                        <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#CFFF04] hover:bg-[#b8e600] text-black text-base md:text-lg font-semibold">Continuar</Button>
+                        <Button onClick={() => setShowCheckout(true)} className="w-full h-12 md:h-14 bg-[#F97316] hover:bg-[#ea6a04] text-black text-base md:text-lg font-semibold">Continuar</Button>
                         <button onClick={handleClearCart} className="w-full text-xs md:text-sm text-muted-foreground hover:text-destructive transition-colors">Limpar carrinho</button>
                       </>
                     )}
@@ -436,7 +437,7 @@ function CartItemCard({ item, index, priceType, onRemove, onUpdateQuantity }: {
               <Plus className="h-3 w-3" />
             </button>
           </div>
-          <span className="font-semibold text-[#CFFF04]">{formatPrice(price * item.quantity)}</span>
+          <span className="font-semibold text-[#F97316]">{formatPrice(price * item.quantity)}</span>
         </div>
       </div>
       <button onClick={onRemove} className="self-start p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">

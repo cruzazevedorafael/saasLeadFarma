@@ -1,21 +1,16 @@
 // app/painel/pagamento/actions.ts
 'use server'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { revalidatePath } from 'next/cache'
 
-async function requireUser() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('não autenticado')
-}
-
 export async function createPayment(name: string, percent: number, fixed: number) {
-  await requireUser()
+  const pharmacyId = await getCurrentPharmacyId()
   const nome = name.trim()
   if (!nome) throw new Error('Nome obrigatório')
   const db = createAdminClient()
   const { error } = await db.from('payment_methods').insert({
+    pharmacy_id: pharmacyId,
     name: nome,
     surcharge_percent: Math.max(0, percent || 0),
     surcharge_fixed: Math.max(0, fixed || 0),
@@ -25,7 +20,7 @@ export async function createPayment(name: string, percent: number, fixed: number
 }
 
 export async function updatePayment(id: string, name: string, percent: number, fixed: number, active: boolean) {
-  await requireUser()
+  const pharmacyId = await getCurrentPharmacyId()
   const nome = name.trim()
   if (!nome) throw new Error('Nome obrigatório')
   const db = createAdminClient()
@@ -35,15 +30,15 @@ export async function updatePayment(id: string, name: string, percent: number, f
     surcharge_fixed: Math.max(0, fixed || 0),
     active,
     updated_at: new Date().toISOString(),
-  }).eq('id', id)
+  }).eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
   revalidatePath('/painel/pagamento'); revalidatePath('/')
 }
 
 export async function deletePayment(id: string) {
-  await requireUser()
+  const pharmacyId = await getCurrentPharmacyId()
   const db = createAdminClient()
-  const { error } = await db.from('payment_methods').delete().eq('id', id)
+  const { error } = await db.from('payment_methods').delete().eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
   revalidatePath('/painel/pagamento'); revalidatePath('/')
 }

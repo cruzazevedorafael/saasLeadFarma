@@ -1,7 +1,6 @@
 // app/painel/page.tsx
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getStoreSettings } from '@/lib/data/settings'
 import { setWholesaleThreshold, setStoreContact } from './settings-actions'
 import { logout } from './login/actions'
@@ -11,9 +10,7 @@ import { Label } from '@/components/ui/label'
 import { BannerSettings } from './_components/banner-settings'
 
 export default async function PainelHome() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/painel/login')
+  await requirePharmacyAdmin()
   const settings = await getStoreSettings()
 
   async function salvarLimite(formData: FormData) {
@@ -28,7 +25,10 @@ export default async function PainelHome() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Painel Karolla Fit</h1>
+        <div>
+          <h1 className="text-2xl font-bold">{settings.storeName}</h1>
+          <p className="text-xs text-muted-foreground">Painel · <span className="text-[#F97316] font-medium">LeadFarma</span></p>
+        </div>
         <form action={logout}><Button variant="outline" type="submit">Sair</Button></form>
       </div>
 
@@ -38,6 +38,7 @@ export default async function PainelHome() {
         <Link href="/painel/envio" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Envio</Link>
         <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
+        <Link href="/painel/cadastro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Dados da farmácia</Link>
       </div>
 
       <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border p-4">

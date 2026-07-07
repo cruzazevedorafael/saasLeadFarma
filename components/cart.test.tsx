@@ -34,7 +34,7 @@ let openSpy: ReturnType<typeof vi.spyOn>
 
 function preencherCheckoutEEnviar() {
   useCartStore.setState({ items: [{ product: legging, quantity: 2, size: 'M', color: 'Preto', maxStock: 5 }] })
-  render(<Cart threshold={4} whatsappNumber="11 99999-9999" shippingMethods={[]} paymentMethods={[]} />)
+  render(<Cart threshold={4} whatsappNumber="11 99999-9999" shippingMethods={[]} paymentMethods={[]} pharmacyId="ph1" storeName="Farmácia Teste" />)
   fireEvent.click(screen.getByText('Carrinho'))
   fireEvent.click(screen.getByText('Continuar'))
   fireEvent.change(screen.getByPlaceholderText('Digite seu nome'), { target: { value: 'Maria' } })

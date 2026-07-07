@@ -77,7 +77,7 @@ export function ProductImages({ images, alt }: { images: string[]; alt: string }
             type="button"
             onClick={() => emblaApi?.scrollTo(i)}
             aria-label={`Foto ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all ${i === selected ? 'w-4 bg-[#CFFF04]' : 'w-1.5 bg-white/60'}`}
+            className={`h-1.5 rounded-full transition-all ${i === selected ? 'w-4 bg-[#F97316]' : 'w-1.5 bg-white/60'}`}
           />
         ))}
       </div>

@@ -16,10 +16,10 @@ function fakeDb() {
   return {
     from(table: string) {
       if (table === 'products') {
-        return { select: () => ({ in: async () => ({ data: productRows, error: productsError }) }) }
+        return { select: () => ({ eq: () => ({ in: async () => ({ data: productRows, error: productsError }) }) }) }
       }
       if (table === 'product_variants') {
-        return { select: () => ({ in: async () => ({ data: variantRows, error: null }) }) }
+        return { select: () => ({ eq: () => ({ in: async () => ({ data: variantRows, error: null }) }) }) }
       }
       if (table === 'shipping_methods' || table === 'payment_methods') {
         return { select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }) }) }) }
@@ -46,10 +46,8 @@ function fakeDb() {
 }
 
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: () => fakeDb() }))
-vi.mock('@/lib/data/settings', () => ({
-  getStoreSettings: async () => ({
-    storeName: 'Karolla Fit', whatsappNumber: '', reservationMinutes: 10, wholesaleThreshold: 4, bannerImageUrl: '',
-  }),
+vi.mock('@/lib/data/pharmacy', () => ({
+  getPharmacyById: async () => ({ id: 'ph1', wholesaleThreshold: 4, nomeExibicao: 'Farmácia Teste', whatsappNumber: '' }),
 }))
 
 const legging = {
@@ -59,6 +57,7 @@ const legging = {
 const variante = { id: 'v1', product_id: 'L', size: 'M', color: 'Preto', stock: 5 }
 
 const pedido = (quantity: number) => ({
+  pharmacyId: 'ph1',
   customerName: 'Maria',
   customerPhone: '11988887777',
   items: [{ productId: 'L', size: 'M', color: 'Preto', quantity }],

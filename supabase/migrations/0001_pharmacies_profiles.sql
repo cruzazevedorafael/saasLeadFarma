@@ -28,6 +28,7 @@ create table public.pharmacies (
   -- operação
   whatsapp_number text not null default '',
   banner_image_url text,
+  wholesale_threshold int not null default 4,
   -- plataforma
   status text not null default 'active' check (status in ('active','suspended')),
   onboarding_completed boolean not null default false,

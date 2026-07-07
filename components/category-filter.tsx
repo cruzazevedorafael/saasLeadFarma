@@ -28,7 +28,7 @@ export function CategoryFilter({ categories, selectedCategory, onSelectCategory 
             whileTap={{ scale: 0.95 }}
             className={`px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
               selectedCategory === category
-                ? 'bg-[#CFFF04] text-black'
+                ? 'bg-[#F97316] text-black'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
             }`}
           >

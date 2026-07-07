@@ -1,15 +1,35 @@
-// app/page.tsx
-import { Catalog } from './_components/catalog'
-import { getPublicProducts } from '@/lib/data/products'
-import { getStoreSettings } from '@/lib/data/settings'
-import { getShippingMethods } from '@/lib/data/shipping'
-import { getPaymentMethods } from '@/lib/data/payment'
+// app/page.tsx — landing institucional simples do LeadFarma.
+// O catálogo de cada farmácia vive em /f/[slug]; o painel em /painel; a gestão em /gestao.
+import Link from 'next/link'
 
-export default async function Home() {
-  const [products, settings] = await Promise.all([getPublicProducts(), getStoreSettings()])
-  // Vitrine resiliente: se as tabelas de envio/pagamento ainda não existirem
-  // (migrations não aplicadas), a loja não cai — os seletores só ficam vazios ("A combinar").
-  const shippingMethods = await getShippingMethods(true).catch(() => [])
-  const paymentMethods = await getPaymentMethods(true).catch(() => [])
-  return <Catalog products={products} threshold={settings.wholesaleThreshold} whatsappNumber={settings.whatsappNumber} bannerImageUrl={settings.bannerImageUrl} shippingMethods={shippingMethods} paymentMethods={paymentMethods} />
+export const metadata = {
+  title: 'LeadFarma — Catálogo online para farmácias',
+  description: 'A sua farmácia com catálogo digital e pedidos pelo WhatsApp.',
+}
+
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
+      <div className="max-w-xl space-y-6">
+        <div className="mx-auto h-16 w-16 rounded-2xl bg-[#F97316] flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-[#F97316]/30">
+          L
+        </div>
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+          Lead<span className="text-[#F97316]">Farma</span>
+        </h1>
+        <p className="text-base md:text-lg text-muted-foreground">
+          Catálogo online para farmácias. Sua farmácia monta o catálogo, o cliente pede pelo WhatsApp —
+          rápido, simples e com a sua marca.
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <Link
+            href="/painel/login"
+            className="rounded-full bg-[#F97316] px-6 py-3 font-semibold text-white hover:opacity-90 transition"
+          >
+            Acessar painel
+          </Link>
+        </div>
+      </div>
+    </main>
+  )
 }

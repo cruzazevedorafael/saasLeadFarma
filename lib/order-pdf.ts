@@ -91,7 +91,7 @@ export async function buildOrderPdf(data: OrderPdfData): Promise<File> {
   }
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(18)
-  doc.text(data.storeName || 'KAROLLA FIT', margin + 26, y + 10)
+  doc.text(data.storeName || 'LeadFarma', margin + 26, y + 10)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   doc.text(data.orderNumber ? `Pedido #${data.orderNumber}` : 'Pedido', pageW - margin, y + 6, { align: 'right' })
@@ -202,9 +202,9 @@ export async function buildOrderPdf(data: OrderPdfData): Promise<File> {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8)
   doc.setTextColor(150)
-  doc.text('Pedido gerado pelo Menu Digital KAROLLA FIT', pageW / 2, pageH - 10, { align: 'center' })
+  doc.text('Pedido gerado pelo catalogo LeadFarma', pageW / 2, pageH - 10, { align: 'center' })
 
   const blob = doc.output('blob')
-  const filename = `pedido-${data.orderNumber ?? 'karolla-fit'}.pdf`
+  const filename = `pedido-${data.orderNumber ?? 'pedido'}.pdf`
   return new File([blob], filename, { type: 'application/pdf' })
 }
