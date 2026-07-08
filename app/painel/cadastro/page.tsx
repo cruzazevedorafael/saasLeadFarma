@@ -31,7 +31,7 @@ export default async function CadastroPage() {
         <p className="text-sm text-muted-foreground">
           {ph.onboardingCompleted
             ? 'Atualize os dados cadastrais da sua farmácia.'
-            : 'Só o nome e o WhatsApp são obrigatórios para começar. O resto (CNPJ, endereço, farmacêutico) você preenche quando quiser — é usado nos comprovantes.'}
+            : 'Preencha os dados da sua farmácia (aparecem nos comprovantes). Se faltar algo, a tela avisa exatamente qual campo. O número é opcional.'}
         </p>
       </div>
       <CadastroForm initial={initial} />

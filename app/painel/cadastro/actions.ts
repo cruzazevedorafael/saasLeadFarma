@@ -4,26 +4,25 @@ import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { updatePharmacy } from '@/lib/data/pharmacy'
 import { revalidatePath } from 'next/cache'
 
-// Onboarding leve: só o ESSENCIAL é obrigatório (nome + WhatsApp). O resto é
-// opcional e pode ser preenchido depois (é usado nos comprovantes, mas não deve
-// impedir a farmácia de começar a usar).
-const opcional = z.string().trim().optional().default('')
-
+// Campos do cadastro da farmácia. Todos importantes (vão nos comprovantes), com
+// mensagem clara por campo — se faltar algum, o usuário vê exatamente qual.
+// 'numero' é opcional (endereços "S/N"). O consentimento de gravar funciona pela
+// sessão do usuário (não depende de chave secreta).
 export const cadastroSchema = z.object({
   nomeFantasia: z.string().trim().min(2, 'Informe o nome da farmácia'),
   whatsappNumber: z.string().trim().min(10, 'Informe o WhatsApp com DDD (ex.: 5511999998888)'),
-  razaoSocial: opcional,
-  cnpj: opcional,
-  cep: opcional,
-  logradouro: opcional,
-  numero: opcional,
-  bairro: opcional,
-  cidade: opcional,
-  uf: opcional,
-  telefone: opcional,
-  email: opcional,
-  farmaceuticoResponsavel: opcional,
-  crf: opcional,
+  razaoSocial: z.string().trim().min(2, 'Informe a razão social'),
+  cnpj: z.string().trim().min(11, 'Informe o CNPJ'),
+  cep: z.string().trim().min(8, 'Informe o CEP'),
+  logradouro: z.string().trim().min(2, 'Informe o logradouro (rua/avenida)'),
+  numero: z.string().trim().optional().default(''),
+  bairro: z.string().trim().min(2, 'Informe o bairro'),
+  cidade: z.string().trim().min(2, 'Informe a cidade'),
+  uf: z.string().trim().length(2, 'Informe a UF (2 letras, ex.: SP)'),
+  telefone: z.string().trim().min(8, 'Informe o telefone'),
+  email: z.string().trim().email('Informe um e-mail válido'),
+  farmaceuticoResponsavel: z.string().trim().min(2, 'Informe o farmacêutico responsável'),
+  crf: z.string().trim().min(2, 'Informe o CRF'),
 })
 export type CadastroInput = z.infer<typeof cadastroSchema>
 

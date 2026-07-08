@@ -10,22 +10,20 @@ import { Label } from '@/components/ui/label'
 type Field = { key: keyof CadastroInput; label: string; placeholder?: string; className?: string; required?: boolean }
 
 const FIELDS: Field[] = [
-  // Essencial (obrigatório) — só o necessário pra começar a usar
   { key: 'nomeFantasia', label: 'Nome da farmácia (aparece pro cliente)', className: 'sm:col-span-2', required: true },
   { key: 'whatsappNumber', label: 'WhatsApp que recebe os pedidos (com DDD)', placeholder: '5511999998888', className: 'sm:col-span-2', required: true },
-  // Opcional — pode preencher depois (usado nos comprovantes)
-  { key: 'razaoSocial', label: 'Razão social', className: 'sm:col-span-2' },
-  { key: 'cnpj', label: 'CNPJ', placeholder: '00.000.000/0000-00' },
-  { key: 'crf', label: 'CRF (farmacêutico)' },
-  { key: 'farmaceuticoResponsavel', label: 'Farmacêutico responsável', className: 'sm:col-span-2' },
-  { key: 'cep', label: 'CEP', placeholder: '00000-000' },
-  { key: 'logradouro', label: 'Logradouro', className: 'sm:col-span-2' },
+  { key: 'razaoSocial', label: 'Razão social', className: 'sm:col-span-2', required: true },
+  { key: 'cnpj', label: 'CNPJ', placeholder: '00.000.000/0000-00', required: true },
+  { key: 'crf', label: 'CRF (farmacêutico)', required: true },
+  { key: 'farmaceuticoResponsavel', label: 'Farmacêutico responsável', className: 'sm:col-span-2', required: true },
+  { key: 'cep', label: 'CEP', placeholder: '00000-000', required: true },
+  { key: 'logradouro', label: 'Logradouro', className: 'sm:col-span-2', required: true },
   { key: 'numero', label: 'Número' },
-  { key: 'bairro', label: 'Bairro' },
-  { key: 'cidade', label: 'Cidade' },
-  { key: 'uf', label: 'UF', placeholder: 'SP' },
-  { key: 'telefone', label: 'Telefone' },
-  { key: 'email', label: 'E-mail' },
+  { key: 'bairro', label: 'Bairro', required: true },
+  { key: 'cidade', label: 'Cidade', required: true },
+  { key: 'uf', label: 'UF', placeholder: 'SP', required: true },
+  { key: 'telefone', label: 'Telefone', required: true },
+  { key: 'email', label: 'E-mail', required: true },
 ]
 
 export function CadastroForm({ initial }: { initial: Partial<CadastroInput> }) {
@@ -71,7 +69,6 @@ export function CadastroForm({ initial }: { initial: Partial<CadastroInput> }) {
             value={values[f.key]}
             placeholder={f.placeholder}
             onChange={(e) => set(f.key, e.target.value)}
-            required={f.required}
           />
         </div>
       ))}
