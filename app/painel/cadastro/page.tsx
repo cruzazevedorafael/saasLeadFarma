@@ -31,7 +31,7 @@ export default async function CadastroPage() {
         <p className="text-sm text-muted-foreground">
           {ph.onboardingCompleted
             ? 'Atualize os dados cadastrais da sua farmácia.'
-            : 'Preencha os dados da sua farmácia para começar a usar o LeadFarma. Todos os campos são obrigatórios.'}
+            : 'Só o nome e o WhatsApp são obrigatórios para começar. O resto (CNPJ, endereço, farmacêutico) você preenche quando quiser — é usado nos comprovantes.'}
         </p>
       </div>
       <CadastroForm initial={initial} />

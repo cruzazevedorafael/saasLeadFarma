@@ -4,21 +4,26 @@ import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { updatePharmacy } from '@/lib/data/pharmacy'
 import { revalidatePath } from 'next/cache'
 
+// Onboarding leve: só o ESSENCIAL é obrigatório (nome + WhatsApp). O resto é
+// opcional e pode ser preenchido depois (é usado nos comprovantes, mas não deve
+// impedir a farmácia de começar a usar).
+const opcional = z.string().trim().optional().default('')
+
 export const cadastroSchema = z.object({
-  razaoSocial: z.string().trim().min(2, 'Informe a razão social'),
-  nomeFantasia: z.string().trim().min(2, 'Informe o nome fantasia'),
-  cnpj: z.string().trim().min(11, 'CNPJ inválido'),
-  cep: z.string().trim().min(8, 'CEP inválido'),
-  logradouro: z.string().trim().min(2, 'Informe o logradouro'),
-  numero: z.string().trim().min(1, 'Informe o número'),
-  bairro: z.string().trim().min(2, 'Informe o bairro'),
-  cidade: z.string().trim().min(2, 'Informe a cidade'),
-  uf: z.string().trim().length(2, 'UF deve ter 2 letras'),
-  telefone: z.string().trim().min(8, 'Telefone inválido'),
-  email: z.string().trim().email('E-mail inválido'),
-  farmaceuticoResponsavel: z.string().trim().min(2, 'Informe o farmacêutico responsável'),
-  crf: z.string().trim().min(2, 'Informe o CRF'),
-  whatsappNumber: z.string().trim().min(10, 'WhatsApp inválido (com DDD)'),
+  nomeFantasia: z.string().trim().min(2, 'Informe o nome da farmácia'),
+  whatsappNumber: z.string().trim().min(10, 'Informe o WhatsApp com DDD (ex.: 5511999998888)'),
+  razaoSocial: opcional,
+  cnpj: opcional,
+  cep: opcional,
+  logradouro: opcional,
+  numero: opcional,
+  bairro: opcional,
+  cidade: opcional,
+  uf: opcional,
+  telefone: opcional,
+  email: opcional,
+  farmaceuticoResponsavel: opcional,
+  crf: opcional,
 })
 export type CadastroInput = z.infer<typeof cadastroSchema>
 
