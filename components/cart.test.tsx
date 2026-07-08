@@ -15,6 +15,8 @@ vi.mock('@/app/_actions/reserva-carrinho', () => ({
   liberarCarrinho: vi.fn(async () => {}),
 }))
 
+vi.mock('@/app/_actions/buscar-cliente', () => ({ buscarClientePorCpf: vi.fn(async () => null) }))
+
 // jsdom não implementa matchMedia (framer-motion consulta pra reduced motion)
 if (!window.matchMedia) {
   window.matchMedia = ((query: string) => ({
@@ -37,8 +39,15 @@ function preencherCheckoutEEnviar() {
   render(<Cart threshold={4} whatsappNumber="11 99999-9999" shippingMethods={[]} paymentMethods={[]} pharmacyId="ph1" storeName="Farmácia Teste" />)
   fireEvent.click(screen.getByText('Carrinho'))
   fireEvent.click(screen.getByText('Continuar'))
-  fireEvent.change(screen.getByPlaceholderText('Digite seu nome'), { target: { value: 'Maria' } })
+  fireEvent.change(screen.getByPlaceholderText('Seu nome'), { target: { value: 'Maria' } })
+  fireEvent.change(screen.getByPlaceholderText('000.000.000-00'), { target: { value: '52998224725' } })
   fireEvent.change(screen.getByPlaceholderText('(00) 00000-0000'), { target: { value: '11988887777' } })
+  fireEvent.change(screen.getByPlaceholderText('00000-000'), { target: { value: '01001000' } })
+  fireEvent.change(screen.getByPlaceholderText('Rua, avenida...'), { target: { value: 'Praça da Sé' } })
+  fireEvent.change(screen.getByPlaceholderText('Bairro'), { target: { value: 'Sé' } })
+  fireEvent.change(screen.getByPlaceholderText('Cidade'), { target: { value: 'São Paulo' } })
+  fireEvent.change(screen.getByPlaceholderText('UF'), { target: { value: 'SP' } })
+  fireEvent.click(screen.getByRole('checkbox'))
   fireEvent.click(screen.getByRole('button', { name: /Enviar pelo WhatsApp/i }))
 }
 

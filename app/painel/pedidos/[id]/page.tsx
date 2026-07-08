@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { getAdminOrder } from '@/lib/data/orders'
 import { PedidoActions } from '../_components/pedido-actions'
 
+import { formatCpf } from '@/lib/cpf'
+
 const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 const dataHora = (s: string | null) => (s ? new Date(s).toLocaleString('pt-BR') : null)
 
@@ -30,8 +32,8 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
         <div className="flex items-center gap-2 flex-wrap mt-1">
           <h1 className="text-2xl font-bold">Pedido #{o.number}</h1>
           <span className={`text-xs px-2 py-0.5 rounded ${statusClass}`}>{statusLabel}</span>
-          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'}`}>
-            {o.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}
+          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#F97316]' : 'bg-muted text-muted-foreground'}`}>
+            {o.priceType === 'wholesale' ? 'Por quantidade' : 'Unitário'}
           </span>
         </div>
       </div>
@@ -46,11 +48,23 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
       <div className="rounded-xl border border-border p-4 space-y-1">
         <h2 className="font-semibold text-sm mb-1">Cliente</h2>
         <p className="text-sm">{o.customerName || 'Sem nome'}</p>
+        {o.customerCpf && <p className="text-xs text-muted-foreground font-mono">CPF: {formatCpf(o.customerCpf)}</p>}
         <a
           href={`https://wa.me/${o.customerPhone.replace(/\D/g, '')}`}
           target="_blank" rel="noopener noreferrer"
           className="text-sm text-[#25D366] hover:underline"
         >{o.customerPhone || 'sem telefone'}</a>
+        {(o.customerLogradouro || o.customerCidade) && (
+          <p className="text-sm pt-1">
+            <span className="text-muted-foreground">Entrega: </span>
+            {[
+              o.customerLogradouro && `${o.customerLogradouro}${o.customerNumero ? `, ${o.customerNumero}` : ''}`,
+              o.customerComplemento, o.customerBairro,
+              (o.customerCidade || o.customerUf) && `${o.customerCidade}${o.customerUf ? `/${o.customerUf}` : ''}`,
+              o.customerCep && `CEP ${o.customerCep}`,
+            ].filter(Boolean).join(' · ')}
+          </p>
+        )}
         <div className="text-xs text-muted-foreground pt-1 space-y-0.5">
           <p>Criado em {dataHora(o.createdAt)}</p>
           {o.completedAt && <p>Baixado em {dataHora(o.completedAt)}</p>}
@@ -72,13 +86,13 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
               <p className="font-medium text-sm">{it.productName || 'Produto'}</p>
               {it.productCode && <p className="text-xs text-muted-foreground">Código: {it.productCode}</p>}
               <div className="flex gap-2 mt-1 flex-wrap">
-                <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Tam: {it.size || '-'}</span>
-                <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Cor: {it.color || '-'}</span>
+                {it.size && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Apres.: {it.size}</span>}
+                {it.color && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Dosagem: {it.color}</span>}
               </div>
               <p className="text-sm mt-1 text-muted-foreground">{it.quantity} x {fmt(it.unitPrice)}</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-[#9bbf00]">{fmt(it.unitPrice * it.quantity)}</p>
+              <p className="font-semibold text-[#F97316]">{fmt(it.unitPrice * it.quantity)}</p>
             </div>
           </div>
         ))}
@@ -99,7 +113,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
           <span>Pagamento</span><span>{o.paymentLabel || 'A combinar'}{o.paymentSurcharge > 0 ? ` — +${fmt(o.paymentSurcharge)}` : ''}</span>
         </div>
         <div className="flex justify-between font-bold text-base pt-2 border-t border-border mt-1">
-          <span>Total</span><span className="text-[#9bbf00]">{fmt(o.total)}</span>
+          <span>Total</span><span className="text-[#F97316]">{fmt(o.total)}</span>
         </div>
       </div>
 

@@ -37,8 +37,8 @@ export default async function ProdutosPage() {
                 <th className="p-3">Código</th>
                 <th className="p-3">Nome</th>
                 <th className="p-3">Categoria</th>
-                <th className="p-3">Atacado</th>
-                <th className="p-3">Varejo</th>
+                <th className="p-3">Unitário</th>
+                <th className="p-3">Por qtd.</th>
                 <th className="p-3">Estoque</th>
                 <th className="p-3">Conta atacado</th>
                 <th className="p-3">Ativo</th>
@@ -61,14 +61,14 @@ export default async function ProdutosPage() {
                     </div>
                   </td>
                   <td className="p-3">{p.category}</td>
-                  <td className="p-3">{fmt(p.priceWholesale)}</td>
                   <td className="p-3">{fmt(p.priceRetail)}</td>
+                  <td className="p-3">{fmt(p.priceWholesale)}</td>
                   <td className="p-3">{p.variants.reduce((a, v) => a + v.stock, 0)}</td>
                   <td className="p-3">{p.countsForWholesale ? 'Sim' : 'Não'}</td>
                   <td className="p-3">{p.active ? 'Sim' : 'Não'}</td>
                   <td className="p-3">
                     <div className="flex items-center gap-3">
-                      <Link href={`/painel/produtos/${p.id}`} className="text-[#9bbf00] hover:underline">Editar</Link>
+                      <Link href={`/painel/produtos/${p.id}`} className="text-[#F97316] hover:underline">Editar</Link>
                       <ProdutoActions id={p.id} active={p.active} />
                     </div>
                   </td>
@@ -92,12 +92,12 @@ export default async function ProdutosPage() {
                   <span className="mt-1 inline-block rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-semibold text-white">🔥 Promoção</span>
                 )}
                 <p className="text-xs text-muted-foreground">{p.category || 'Sem categoria'}</p>
-                <div className="text-sm mt-1">Varejo: {fmt(p.priceRetail)} · Atacado: {fmt(p.priceWholesale)}</div>
+                <div className="text-sm mt-1">Unitário: {fmt(p.priceRetail)} · Por qtd.: {fmt(p.priceWholesale)}</div>
                 <div className="text-xs text-muted-foreground">
                   Estoque: {p.variants.reduce((a, v) => a + v.stock, 0)} · {p.active ? 'Ativo' : 'Inativo'}
                 </div>
                 <div className="flex items-center gap-3 mt-2">
-                  <Link href={`/painel/produtos/${p.id}`} className="text-[#9bbf00] hover:underline">Editar</Link>
+                  <Link href={`/painel/produtos/${p.id}`} className="text-[#F97316] hover:underline">Editar</Link>
                   <ProdutoActions id={p.id} active={p.active} />
                 </div>
               </div>

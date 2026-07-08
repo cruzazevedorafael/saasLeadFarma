@@ -5,11 +5,25 @@ import { getPharmacyById } from '@/lib/data/pharmacy'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
 import { buildOrder, stockShortages, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
 import type { ProductWithVariants } from '@/lib/data/types'
+import { onlyDigits } from '@/lib/cpf'
+
+export interface CriarPedidoCliente {
+  cpf: string
+  cep: string
+  logradouro: string
+  numero: string
+  complemento: string
+  bairro: string
+  cidade: string
+  uf: string
+  lgpdConsent: boolean
+}
 
 export interface CriarPedidoInput {
   pharmacyId: string
   customerName: string
   customerPhone: string
+  cliente?: CriarPedidoCliente | null
   items: RequestedItem[]
   shippingMethodId?: string | null
   paymentMethodId?: string | null
@@ -80,12 +94,21 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
   const threshold = pharmacy?.wholesaleThreshold ?? 4
   const built = buildOrder(products, input.items, threshold, shipping, payment)
 
+  const cli = input.cliente
   const { data: order, error: oErr } = await db
     .from('orders')
     .insert({
       pharmacy_id: input.pharmacyId,
       customer_name: input.customerName,
       customer_phone: input.customerPhone,
+      customer_cpf: cli ? onlyDigits(cli.cpf) : '',
+      customer_cep: cli?.cep ?? '',
+      customer_logradouro: cli?.logradouro ?? '',
+      customer_numero: cli?.numero ?? '',
+      customer_complemento: cli?.complemento ?? '',
+      customer_bairro: cli?.bairro ?? '',
+      customer_cidade: cli?.cidade ?? '',
+      customer_uf: cli?.uf ?? '',
       status: 'pending',
       price_type: built.priceType,
       items_subtotal: built.itemsSubtotal,
@@ -105,6 +128,28 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
   if (iErr) {
     await db.from('orders').delete().eq('id', order.id)
     throw iErr
+  }
+
+  // Cadastro do cliente (registro/histórico) só é gravado COM consentimento LGPD.
+  // O pedido em si já guarda o snapshot acima (necessário pra atender a venda).
+  // Falha aqui não derruba o pedido — a venda continua válida.
+  if (cli && cli.lgpdConsent && onlyDigits(cli.cpf).length === 11) {
+    try {
+      const { data: customerId, error: cErr } = await db.rpc('upsert_customer', {
+        p_pharmacy_id: input.pharmacyId, p_cpf: onlyDigits(cli.cpf),
+        p_name: input.customerName, p_phone: input.customerPhone,
+        p_cep: cli.cep, p_logradouro: cli.logradouro, p_numero: cli.numero,
+        p_complemento: cli.complemento, p_bairro: cli.bairro, p_cidade: cli.cidade,
+        p_uf: cli.uf, p_consent: true,
+      })
+      if (cErr) throw cErr
+      if (customerId) {
+        await db.from('orders').update({ customer_id: customerId }).eq('id', order.id)
+        await db.rpc('increment_customer_orders', { p_customer_id: customerId })
+      }
+    } catch (e) {
+      console.error('[criarPedido] falha ao gravar cliente (pedido mantido):', e)
+    }
   }
 
   // Reserva o estoque (desconta as peças). Pode ficar negativo — não bloqueia,

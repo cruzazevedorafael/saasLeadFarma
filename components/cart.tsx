@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore, type CartItem } from '@/lib/store'
 import { cartPriceType, cartTotal, unitPriceFor, piecesUntilWholesale, type PriceType } from '@/lib/data/cart.helpers'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ShoppingCart, X, Trash2, Plus, Minus, Send, User, Phone, Tag } from 'lucide-react'
+import { ShoppingCart, X, Trash2, Plus, Minus, Send, Tag } from 'lucide-react'
 import { criarPedido } from '@/app/_actions/criar-pedido'
+import { CheckoutCliente, clienteVazio, clienteValido, type ClienteData } from '@/components/checkout-cliente'
+import { formatCpf as formatCpfMask } from '@/lib/cpf'
 import { reservarItem, liberarItem, liberarCarrinho } from '@/app/_actions/reserva-carrinho'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
@@ -40,8 +41,7 @@ const prettyBrPhone = (raw: string) => {
 export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethods, pharmacyId, storeName }: { threshold: number; whatsappNumber: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
-  const [customerName, setCustomerName] = useState('')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [cliente, setCliente] = useState<ClienteData>(clienteVazio)
   const [isLoading, setIsLoading] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
   const [shippingId, setShippingId] = useState<string>('')
@@ -104,9 +104,18 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     const date = new Date().toLocaleDateString('pt-BR')
     const fmtKg = (g: number) => `${(g / 1000).toFixed(3).replace('.', ',')} kg`
     let text = `Data: ${date}\n\n`
-    text += `*Cliente:* ${customerName}\n`
-    text += `*Telefone:* ${prettyBrPhone(customerPhone)}\n\n`
-    text += `*Tipo de preço:* ${priceType === 'wholesale' ? 'ATACADO' : 'VAREJO'}\n\n`
+    text += `*Cliente:* ${cliente.name}\n`
+    text += `*CPF:* ${cliente.cpf ? formatCpfMask(cliente.cpf) : '—'}\n`
+    text += `*Telefone:* ${prettyBrPhone(cliente.phone)}\n`
+    const endParts = [
+      cliente.logradouro && `${cliente.logradouro}${cliente.numero ? `, ${cliente.numero}` : ''}`,
+      cliente.complemento,
+      cliente.bairro,
+      (cliente.cidade || cliente.uf) && `${cliente.cidade}${cliente.uf ? `/${cliente.uf}` : ''}`,
+      cliente.cep && `CEP ${cliente.cep}`,
+    ].filter(Boolean)
+    if (endParts.length) text += `*Endereço:* ${endParts.join(' · ')}\n`
+    text += `\n*Tipo de preço:* ${priceType === 'wholesale' ? 'POR QUANTIDADE' : 'UNITÁRIO'}\n\n`
     text += `*ITENS DO PEDIDO:*\n`
     text += `━━━━━━━━━━━━━━━━━━\n\n`
     items.forEach((item, index) => {
@@ -131,7 +140,10 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
   }
 
   const handleSendOrder = async () => {
-    if (!customerName.trim() || !customerPhone.trim()) return
+    if (!clienteValido(cliente)) {
+      setAviso('Preencha nome, CPF, celular, endereço e marque a autorização de dados.')
+      return
+    }
     setIsLoading(true)
     setAviso(null)
 
@@ -143,8 +155,13 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     try {
       const r = await criarPedido({
         pharmacyId,
-        customerName,
-        customerPhone,
+        customerName: cliente.name,
+        customerPhone: cliente.phone,
+        cliente: {
+          cpf: cliente.cpf, cep: cliente.cep, logradouro: cliente.logradouro,
+          numero: cliente.numero, complemento: cliente.complemento, bairro: cliente.bairro,
+          cidade: cliente.cidade, uf: cliente.uf, lgpdConsent: cliente.lgpdConsent,
+        },
         items: items.map((i) => ({ productId: i.product.id, size: i.size, color: i.color, quantity: i.quantity })),
         shippingMethodId: shippingId || null,
         paymentMethodId: paymentId || null,
@@ -191,8 +208,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
       clearCart()
       setShowCheckout(false)
       setIsOpen(false)
-      setCustomerName('')
-      setCustomerPhone('')
+      setCliente(clienteVazio)
       setShippingId('')
       setPaymentId('')
     }, 1000)
@@ -284,22 +300,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                           <p className="text-xs md:text-sm text-muted-foreground">Preencha seus dados para enviar o pedido via WhatsApp</p>
                         </div>
 
-                        <div className="space-y-3 md:space-y-4">
-                          <div className="space-y-1.5 md:space-y-2">
-                            <Label htmlFor="name" className="text-xs md:text-sm">Seu Nome</Label>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input id="name" name="name" autoComplete="name" placeholder="Digite seu nome" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
-                            </div>
-                          </div>
-                          <div className="space-y-1.5 md:space-y-2">
-                            <Label htmlFor="phone" className="text-xs md:text-sm">Seu Telefone</Label>
-                            <div className="relative">
-                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input id="phone" name="tel" type="tel" inputMode="tel" autoComplete="tel" placeholder="(00) 00000-0000" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="pl-10 h-10 md:h-12 bg-muted border-border text-sm md:text-base" />
-                            </div>
-                          </div>
-                        </div>
+                        <CheckoutCliente pharmacyId={pharmacyId} value={cliente} onChange={setCliente} />
 
                         <div className="space-y-3 md:space-y-4">
                           <div className="space-y-1.5">
@@ -372,7 +373,7 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
                     {showCheckout ? (
                       <>
                         {aviso && <p className="text-xs text-amber-500">{aviso}</p>}
-                        <Button onClick={handleSendOrder} disabled={!customerName.trim() || !customerPhone.trim() || isLoading} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
+                        <Button onClick={handleSendOrder} disabled={!clienteValido(cliente) || isLoading} className="w-full h-12 md:h-14 bg-[#25D366] hover:bg-[#128C7E] text-white text-base md:text-lg font-semibold">
                           {isLoading ? (
                             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
                           ) : (

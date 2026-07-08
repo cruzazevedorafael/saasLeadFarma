@@ -63,8 +63,8 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   <div className="flex items-center gap-2">
                     <span className="font-bold">#{o.number}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
-                      o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#9bbf00]' : 'bg-muted text-muted-foreground'
-                    }`}>{o.priceType === 'wholesale' ? 'Atacado' : 'Varejo'}</span>
+                      o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#F97316]' : 'bg-muted text-muted-foreground'
+                    }`}>{o.priceType === 'wholesale' ? 'Por quantidade' : 'Unitário'}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
                       o.status === 'pending' ? 'bg-amber-500/15 text-amber-500'
                       : o.status === 'completed' ? 'bg-green-500/15 text-green-600'
@@ -79,7 +79,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   >{o.customerPhone || 'sem telefone'}</a>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-[#9bbf00]">{fmt(o.total)}</p>
+                  <p className="text-lg font-bold text-[#F97316]">{fmt(o.total)}</p>
                   {o.status === 'pending' && <PedidoActions orderId={o.id} />}
                 </div>
               </div>
@@ -105,7 +105,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   </div>
                 </div>
               </div>
-              <Link href={`/painel/pedidos/${o.id}`} className="inline-block text-sm font-medium text-[#9bbf00] hover:underline">
+              <Link href={`/painel/pedidos/${o.id}`} className="inline-block text-sm font-medium text-[#F97316] hover:underline">
                 Ver itens e fotos →
               </Link>
             </div>

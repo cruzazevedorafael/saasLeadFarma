@@ -22,6 +22,14 @@ export interface OrderWithItems {
   number: number
   customerName: string
   customerPhone: string
+  customerCpf: string
+  customerCep: string
+  customerLogradouro: string
+  customerNumero: string
+  customerComplemento: string
+  customerBairro: string
+  customerCidade: string
+  customerUf: string
   status: OrderStatus
   priceType: OrderPriceType
   total: number

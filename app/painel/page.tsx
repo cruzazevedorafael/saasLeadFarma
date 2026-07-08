@@ -38,12 +38,13 @@ export default async function PainelHome() {
         <Link href="/painel/envio" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Envio</Link>
         <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
+        <Link href="/painel/clientes" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Clientes</Link>
         <Link href="/painel/cadastro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Dados da farmácia</Link>
       </div>
 
       <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border p-4">
-        <Label htmlFor="threshold" className="text-sm font-medium">Peças para virar atacado</Label>
-        <p className="text-xs text-muted-foreground">A partir desta quantidade de peças que contam, o carrinho do cliente vira atacado.</p>
+        <Label htmlFor="threshold" className="text-sm font-medium">Quantidade para o preço por atacado</Label>
+        <p className="text-xs text-muted-foreground">A partir desta quantidade de itens que contam, o carrinho do cliente passa a usar o preço por quantidade.</p>
         <div className="flex gap-2">
           <Input id="threshold" name="threshold" type="number" min={1} defaultValue={settings.wholesaleThreshold} className="w-24" />
           <Button type="submit">Salvar</Button>
