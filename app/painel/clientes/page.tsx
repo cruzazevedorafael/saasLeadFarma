@@ -21,7 +21,23 @@ export default async function ClientesPage() {
       {clientes.length === 0 ? (
         <p className="text-muted-foreground">Nenhum cliente cadastrado ainda. Os cadastros aparecem quando o cliente finaliza um pedido e autoriza salvar os dados.</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border">
+        <>
+        {/* Mobile: cards */}
+        <div className="md:hidden space-y-3">
+          {clientes.map((c) => (
+            <Link key={c.id} href={`/painel/clientes/${c.id}`} className="block rounded-xl border border-border p-4 active:bg-muted/40">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium truncate">{c.name}</span>
+                <span className="shrink-0 text-xs rounded-full bg-[#F97316]/15 text-[#F97316] px-2 py-0.5">{c.ordersCount} pedido{c.ordersCount !== 1 ? 's' : ''}</span>
+              </div>
+              <p className="text-xs font-mono text-muted-foreground mt-1">{formatCpf(c.cpf)}</p>
+              <p className="text-sm text-muted-foreground">{c.phone || 'sem celular'}{(c.cidade || c.uf) ? ` · ${[c.cidade, c.uf].filter(Boolean).join('/')}` : ''}</p>
+              <span className="mt-2 inline-block text-sm font-medium text-[#F97316]">Ver histórico →</span>
+            </Link>
+          ))}
+        </div>
+        {/* Desktop: tabela */}
+        <div className="hidden md:block overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left">
               <tr>
@@ -49,6 +65,7 @@ export default async function ClientesPage() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   )

@@ -97,43 +97,51 @@ export function buildReceiptData(o: OrderWithItems, p: Pharmacy): ReceiptData {
 }
 
 const brl = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
-const kg = (g: number) => `${(g / 1000).toFixed(3).replace('.', ',')} kg`
 
-// Comprovante em TEXTO organizado (para copiar/colar / imprimir simples).
+// Comprovante em TEXTO organizado (para enviar no WhatsApp / copiar).
+// Estrutura limpa: cabeçalho da farmácia, dados do pedido, cliente, itens, totais.
 export function buildReceiptText(d: ReceiptData): string {
   const L: string[] = []
-  const sep = '================================'
-  L.push(d.pharmacyName.toUpperCase())
+  const linha = '──────────────────────'
+
+  // Cabeçalho da farmácia
+  L.push(`*${d.pharmacyName.toUpperCase()}*`)
   if (d.pharmacyLegal) L.push(d.pharmacyLegal)
-  if (d.pharmacyCnpj) L.push(`CNPJ: ${d.pharmacyCnpj}`)
+  if (d.pharmacyCnpj) L.push(`CNPJ ${d.pharmacyCnpj}`)
   if (d.pharmacyAddress) L.push(d.pharmacyAddress)
-  if (d.pharmacyPhone) L.push(`Tel: ${d.pharmacyPhone}`)
+  if (d.pharmacyPhone) L.push(`Tel ${d.pharmacyPhone}`)
   if (d.pharmacyResponsavel) L.push(d.pharmacyResponsavel)
-  L.push(sep)
-  L.push(`COMPROVANTE${d.orderNumber ? ` - PEDIDO #${d.orderNumber}` : ''}`)
-  L.push(d.date)
+
+  // Cabeçalho do comprovante
+  L.push(linha)
+  L.push(`*COMPROVANTE${d.orderNumber ? ` Nº ${d.orderNumber}` : ''}*`)
+  L.push(`🗓️ ${d.date}`)
   L.push(`Preço: ${d.priceType === 'wholesale' ? 'Por quantidade' : 'Unitário'}`)
-  L.push(sep)
-  L.push('CLIENTE')
-  L.push(d.customerName || '-')
-  if (d.customerCpf) L.push(`CPF: ${formatCpf(d.customerCpf)}`)
-  if (d.customerPhone) L.push(`Tel: ${d.customerPhone}`)
-  if (d.customerAddress) L.push(`Entrega: ${d.customerAddress}`)
-  L.push(sep)
-  L.push('ITENS')
+
+  // Cliente
+  L.push(linha)
+  L.push('*CLIENTE*')
+  L.push(d.customerName || '—')
+  if (d.customerCpf) L.push(`CPF ${formatCpf(d.customerCpf)}`)
+  if (d.customerPhone) L.push(`Contato ${d.customerPhone}`)
+  if (d.customerAddress) L.push(`📍 ${d.customerAddress}`)
+
+  // Itens
+  L.push(linha)
+  L.push('*ITENS*')
   d.items.forEach((it, i) => {
-    L.push(`${i + 1}. ${it.name}${it.code ? ` (${it.code})` : ''}`)
-    const attrs = joinParts([it.presentation && `Apres.: ${it.presentation}`, it.dosage && `Dosagem: ${it.dosage}`])
-    if (attrs) L.push(`   ${attrs}`)
-    L.push(`   ${it.quantity} x ${brl(it.unitPrice)} = ${brl(it.unitPrice * it.quantity)}`)
+    const attrs = joinParts([it.presentation, it.dosage], ' · ')
+    L.push(`${i + 1}. *${it.name}*${attrs ? ` — ${attrs}` : ''}`)
+    L.push(`   ${it.quantity} × ${brl(it.unitPrice)}  =  *${brl(it.unitPrice * it.quantity)}*`)
   })
-  L.push(sep)
+
+  // Totais
+  L.push(linha)
   L.push(`Subtotal: ${brl(d.subtotal)}`)
-  if (d.weightGrams > 0) L.push(`Peso: ${kg(d.weightGrams)}`)
-  L.push(`Envio: ${d.shippingLabel || 'A combinar'}${d.shippingPrice > 0 ? ` (${brl(d.shippingPrice)})` : ''}`)
+  L.push(`Envio: ${d.shippingPrice > 0 ? brl(d.shippingPrice) : (d.shippingLabel || 'A combinar')}`)
   L.push(`Pagamento: ${d.paymentLabel || 'A combinar'}${d.paymentSurcharge > 0 ? ` (+${brl(d.paymentSurcharge)})` : ''}`)
-  L.push(`TOTAL: ${brl(d.total)}`)
-  L.push(sep)
-  L.push('Emitido por LeadFarma')
+  L.push(`*TOTAL: ${brl(d.total)}*`)
+  L.push(linha)
+  L.push('_Emitido por LeadFarma_')
   return L.join('\n')
 }
