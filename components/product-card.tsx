@@ -7,6 +7,7 @@ import { useCartStore } from '@/lib/store'
 import type { ProductWithVariants } from '@/lib/data/types'
 import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons, stockOf } from '@/lib/data/products.helpers'
 import { ProductImages } from '@/components/product-images'
+import { ProductDetail } from '@/components/product-detail'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Minus, ShoppingBag, Check, Flame, FileText } from 'lucide-react'
@@ -27,6 +28,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   const addItem = useCartStore((state) => state.addItem)
   const available = isVariantAvailable(product, selectedSize, selectedColor)
@@ -65,6 +67,8 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
   }
 
   return (
+    <>
+    <ProductDetail product={product} threshold={threshold} open={detailOpen} onClose={() => setDetailOpen(false)} />
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -72,7 +76,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
       whileHover={{ y: -5 }}
       className="group relative overflow-hidden rounded-xl md:rounded-2xl border border-border/50 bg-card"
     >
-      <div className="relative aspect-[4/5] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden cursor-pointer" onClick={() => setDetailOpen(true)}>
         <ProductImages images={product.imageUrls} alt={product.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         <Badge className="absolute top-2 left-2 md:top-3 md:left-3 bg-[var(--brand)] text-[var(--brand-fg)] font-medium hover:bg-[var(--brand)] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1">
@@ -88,11 +92,14 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
       <div className="p-3 md:p-4 space-y-3 md:space-y-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm md:text-lg text-foreground leading-tight">{product.name}</h3>
+            <h3 onClick={() => setDetailOpen(true)} className="font-semibold text-sm md:text-lg text-foreground leading-tight cursor-pointer hover:text-[var(--brand)] transition-colors">{product.name}</h3>
           </div>
           {product.brand && <span className="text-[10px] md:text-xs font-medium text-[var(--brand)]">{product.brand}</span>}
           {product.code && <span className="block text-[10px] md:text-xs text-muted-foreground">Cód: {product.code}</span>}
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">{product.description}</p>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
+          <button type="button" onClick={() => setDetailOpen(true)} className="text-[11px] md:text-xs font-medium text-[var(--brand)] hover:underline mt-1">
+            Ver detalhes →
+          </button>
         </div>
 
         {/* Preços (informativos — a regra acontece no carrinho) */}
@@ -215,5 +222,6 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
         {aviso && <p className="text-xs text-amber-500 mt-2">{aviso}</p>}
       </div>
     </motion.div>
+    </>
   )
 }

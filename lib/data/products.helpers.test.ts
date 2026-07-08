@@ -5,7 +5,7 @@ import type { ProductWithVariants } from './types'
 
 const p: ProductWithVariants = {
   id: '1', code: 'LEG-001', name: 'Legging', brand: '', requiresPrescription: false, category: 'Leggings', description: '',
-  imageUrl: null, imageUrls: [], priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9, weightGrams: 250,
+  imageUrl: null, imageUrls: [], priceCost: 20, priceWholesale: 49.9, priceRetail: 89.9, hasWholesale: true, weightGrams: 250,
   countsForWholesale: true, onPromo: false, promoPrice: 0, active: true, sortOrder: 0,
   variants: [
     { id: 'v1', productId: '1', size: 'M', color: 'Preto', stock: 3 },

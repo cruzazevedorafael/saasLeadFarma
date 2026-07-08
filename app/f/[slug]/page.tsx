@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Catalog } from '@/app/_components/catalog'
 import { PwaRegister } from '@/components/pwa-register'
+import { AppSwitch } from '@/components/app-switch'
+import { getSessionProfile } from '@/lib/auth/session'
 import { getPharmacyBySlug } from '@/lib/data/pharmacy'
 import { getPublicProducts } from '@/lib/data/products'
 import { getPublicShippingMethods } from '@/lib/data/shipping'
@@ -28,15 +30,18 @@ export default async function CatalogoFarmacia({ params }: { params: Promise<{ s
   const pharmacy = await getPharmacyBySlug(slug)
   if (!pharmacy) notFound()
 
-  const [products, shippingMethods, paymentMethods] = await Promise.all([
+  const [products, shippingMethods, paymentMethods, session] = await Promise.all([
     getPublicProducts(pharmacy.id),
     getPublicShippingMethods(pharmacy.id).catch(() => []),
     getPublicPaymentMethods(pharmacy.id).catch(() => []),
+    getSessionProfile().catch(() => null),
   ])
+  const isDona = session?.pharmacyId === pharmacy.id
 
   return (
     <>
       <PwaRegister />
+      {isDona && <AppSwitch href="/painel" variant="painel" />}
       <Catalog
         products={products}
         threshold={pharmacy.wholesaleThreshold}

@@ -34,7 +34,10 @@ export default async function GestaoHome() {
                 <p className="font-medium truncate">{p.nome_exibicao ?? p.nome_fantasia ?? '—'}</p>
                 <Link href={`/f/${p.slug}`} target="_blank" className="text-xs text-[#F97316] hover:underline">/f/{p.slug}</Link>
               </div>
-              <StatusToggle id={p.id} status={p.status} />
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <Link href={`/gestao/${p.id}`} className="text-sm font-medium text-[#F97316] hover:underline">Gerenciar</Link>
+                <StatusToggle id={p.id} status={p.status} />
+              </div>
             </div>
             <div className="flex flex-wrap gap-1.5 text-xs">
               <span className={`px-2 py-0.5 rounded-full ${p.status === 'active' ? 'bg-emerald-500/15 text-emerald-600' : 'bg-red-500/15 text-red-500'}`}>{p.status === 'active' ? 'ativa' : 'suspensa'}</span>
@@ -80,7 +83,10 @@ export default async function GestaoHome() {
                     : <span className="text-destructive">suspensa</span>}
                 </td>
                 <td className="p-3">
-                  <StatusToggle id={p.id} status={p.status} />
+                  <div className="flex items-center gap-3">
+                    <Link href={`/gestao/${p.id}`} className="font-medium text-[#F97316] hover:underline">Gerenciar</Link>
+                    <StatusToggle id={p.id} status={p.status} />
+                  </div>
                 </td>
               </tr>
             ))}

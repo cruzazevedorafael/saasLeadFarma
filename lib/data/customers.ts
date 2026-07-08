@@ -55,6 +55,28 @@ export async function getCustomer(id: string): Promise<Customer | null> {
   return data ? mapCustomer(data) : null
 }
 
+export interface CustomerOrder {
+  id: string
+  number: number
+  total: number
+  status: 'pending' | 'completed' | 'cancelled'
+  createdAt: string
+}
+
+// Pedidos feitos por este cliente (RLS isola pela farmácia logada).
+export async function getCustomerOrders(customerId: string): Promise<CustomerOrder[]> {
+  const supabase = await createServerClient()
+  const { data } = await supabase
+    .from('orders')
+    .select('id, number, total, status, created_at')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: false })
+  return (data ?? []).map((o: any) => ({
+    id: o.id, number: Number(o.number), total: Number(o.total ?? 0),
+    status: o.status, createdAt: o.created_at,
+  }))
+}
+
 export async function getCustomerHistory(customerId: string): Promise<CustomerHistory[]> {
   const supabase = await createServerClient()
   const { data } = await supabase

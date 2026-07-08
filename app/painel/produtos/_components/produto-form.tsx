@@ -34,7 +34,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
       ? {
           code: produto.code, name: produto.name, brand: produto.brand, requiresPrescription: produto.requiresPrescription,
           category: produto.category, description: produto.description,
-          priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
+          priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail, hasWholesale: produto.hasWholesale,
           weightGrams: produto.weightGrams,
           onPromo: produto.onPromo, promoPrice: produto.promoPrice,
           countsForWholesale: produto.countsForWholesale, active: produto.active, imageUrl: produto.imageUrl,
@@ -43,7 +43,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
         }
       : {
           code: '', name: '', brand: '', requiresPrescription: false, category: '', description: '',
-          priceWholesale: 0, priceRetail: 0,
+          priceWholesale: 0, priceRetail: 0, hasWholesale: true,
           weightGrams: 0,
           onPromo: false, promoPrice: 0,
           countsForWholesale: true, active: true, imageUrl: null, imageUrls: [],
@@ -102,7 +102,12 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
       <h1 className="text-2xl font-bold">{mode === 'edit' ? 'Editar produto' : 'Novo produto'}</h1>
 
       <div className="space-y-2">
-        <Label>Fotos (até {MAX_FOTOS}) — a 1ª é a capa</Label>
+        <div className="flex items-center justify-between">
+          <Label>Fotos — a 1ª é a capa</Label>
+          <span className={`text-xs font-medium ${imageUrls.length > 0 ? 'text-[#F97316]' : 'text-muted-foreground'}`}>
+            {imageUrls.length} de {MAX_FOTOS} foto{imageUrls.length !== 1 ? 's' : ''}
+          </span>
+        </div>
         {imageUrls.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {imageUrls.map((url, i) => (
@@ -169,19 +174,36 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
         <Textarea id="description" {...register('description')} />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
           <Label htmlFor="priceRetail">Preço unitário (R$)</Label>
           <Input id="priceRetail" type="number" step="0.01" {...register('priceRetail', { valueAsNumber: true })} />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="priceWholesale">Preço por quantidade (R$)</Label>
-          <Input id="priceWholesale" type="number" step="0.01" {...register('priceWholesale', { valueAsNumber: true })} />
-        </div>
-        <div className="space-y-1">
           <Label htmlFor="weightGrams">Peso (g)</Label>
           <Input id="weightGrams" type="number" step="1" {...register('weightGrams', { valueAsNumber: true })} />
         </div>
+      </div>
+
+      {/* Preço por quantidade (atacado) — OPCIONAL por produto */}
+      <div className="space-y-3 rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2">
+          <Switch id="hasWholesale" checked={watch('hasWholesale')} onCheckedChange={(v) => setValue('hasWholesale', v)} />
+          <Label htmlFor="hasWholesale" className="text-sm">Tem preço por quantidade (atacado)?</Label>
+        </div>
+        {watch('hasWholesale') && (
+          <div className="space-y-3 pl-1">
+            <div className="space-y-1 max-w-[14rem]">
+              <Label htmlFor="priceWholesale" className="text-sm">Preço por quantidade (R$)</Label>
+              <Input id="priceWholesale" type="number" step="0.01" {...register('priceWholesale', { valueAsNumber: true })} />
+              <p className="text-xs text-muted-foreground">Vale quando o carrinho atinge a quantidade definida no painel.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox id="countsForWholesale" checked={watch('countsForWholesale')} onCheckedChange={(v) => setValue('countsForWholesale', v === true)} />
+              <Label htmlFor="countsForWholesale" className="text-sm">Este item conta para atingir a quantidade de atacado</Label>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3 rounded-xl border border-border p-4">

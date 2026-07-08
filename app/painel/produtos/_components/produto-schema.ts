@@ -18,6 +18,7 @@ export const produtoSchema = z.object({
   imageUrls: z.array(z.string()).max(5, 'Máximo de 5 fotos').default([]),
   priceWholesale: z.number().min(0),
   priceRetail: z.number().min(0),
+  hasWholesale: z.boolean().default(true),
   weightGrams: z.number().int().min(0).default(0),
   countsForWholesale: z.boolean().default(true),
   onPromo: z.boolean().default(false),

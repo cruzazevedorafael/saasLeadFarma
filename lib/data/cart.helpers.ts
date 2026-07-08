@@ -14,12 +14,14 @@ export function cartPriceType(items: CartItem[], threshold: number): PriceType {
 }
 
 export function unitPriceFor(
-  product: { priceWholesale: number; priceRetail: number; onPromo?: boolean; promoPrice?: number },
+  product: { priceWholesale: number; priceRetail: number; hasWholesale?: boolean; onPromo?: boolean; promoPrice?: number },
   priceType: PriceType,
 ): number {
   // Promoção tem preço fixo: vale para varejo e atacado.
   if (product.onPromo && (product.promoPrice ?? 0) > 0) return product.promoPrice as number
-  return priceType === 'wholesale' ? product.priceWholesale : product.priceRetail
+  // Produto sem preço por quantidade sempre usa o preço unitário.
+  if (priceType === 'wholesale' && product.hasWholesale !== false) return product.priceWholesale
+  return product.priceRetail
 }
 
 /** Total do carrinho aplicando o MESMO tipo de preço a todos os itens. */

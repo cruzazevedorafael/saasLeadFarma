@@ -28,7 +28,7 @@ if (!window.matchMedia) {
 
 const legging: Product = {
   id: 'L', code: 'LEG-001', name: 'Legging', brand: '', requiresPrescription: false, category: '', description: '', imageUrl: null, imageUrls: [],
-  priceCost: 20, priceWholesale: 50, priceRetail: 90, weightGrams: 250, countsForWholesale: true,
+  priceCost: 20, priceWholesale: 50, priceRetail: 90, hasWholesale: true, weightGrams: 250, countsForWholesale: true,
   onPromo: false, promoPrice: 0, active: true, sortOrder: 0,
 }
 
