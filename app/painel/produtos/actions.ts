@@ -11,7 +11,8 @@ export async function createProduto(input: ProdutoInput) {
   const db = createAdminClient()
   const { data: prod, error } = await db.from('products').insert({
     pharmacy_id: pharmacyId,
-    code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
+    code: data.code.trim() || null, name: data.name, brand: data.brand, requires_prescription: data.requiresPrescription,
+    category: data.category, description: data.description,
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active,
@@ -36,7 +37,8 @@ export async function updateProduto(id: string, input: ProdutoInput) {
   const data = produtoSchema.parse(input)
   const db = createAdminClient()
   await db.from('products').update({
-    code: data.code.trim() || null, name: data.name, category: data.category, description: data.description,
+    code: data.code.trim() || null, name: data.name, brand: data.brand, requires_prescription: data.requiresPrescription,
+    category: data.category, description: data.description,
     price_wholesale: data.priceWholesale, price_retail: data.priceRetail,
     weight_grams: data.weightGrams,
     counts_for_wholesale: data.countsForWholesale, active: data.active,

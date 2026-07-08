@@ -10,6 +10,8 @@ export interface Product {
   id: string
   code: string
   name: string
+  brand: string
+  requiresPrescription: boolean
   category: string
   description: string
   imageUrl: string | null

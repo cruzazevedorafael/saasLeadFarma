@@ -32,7 +32,8 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
     resolver: zodResolver(produtoSchema),
     defaultValues: produto
       ? {
-          code: produto.code, name: produto.name, category: produto.category, description: produto.description,
+          code: produto.code, name: produto.name, brand: produto.brand, requiresPrescription: produto.requiresPrescription,
+          category: produto.category, description: produto.description,
           priceWholesale: produto.priceWholesale, priceRetail: produto.priceRetail,
           weightGrams: produto.weightGrams,
           onPromo: produto.onPromo, promoPrice: produto.promoPrice,
@@ -41,7 +42,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           variants: produto.variants.map((v) => ({ size: v.size, color: v.color, stock: v.stock })),
         }
       : {
-          code: '', name: '', category: '', description: '',
+          code: '', name: '', brand: '', requiresPrescription: false, category: '', description: '',
           priceWholesale: 0, priceRetail: 0,
           weightGrams: 0,
           onPromo: false, promoPrice: 0,
@@ -133,8 +134,8 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <Label htmlFor="code">Número/Código (opcional)</Label>
-          <Input id="code" {...register('code')} />
+          <Label htmlFor="code">Cód. de barras (EAN) / código (opcional)</Label>
+          <Input id="code" inputMode="numeric" {...register('code')} />
           {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
         </div>
         <div className="space-y-1">
@@ -142,6 +143,11 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           <Input id="name" {...register('name')} />
           {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         </div>
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="brand">Marca / Laboratório</Label>
+        <Input id="brand" placeholder="Ex.: EMS, Medley, Neo Química..." {...register('brand')} />
       </div>
 
       <div className="space-y-1">
@@ -165,12 +171,12 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="space-y-1">
-          <Label htmlFor="priceWholesale">Atacado</Label>
-          <Input id="priceWholesale" type="number" step="0.01" {...register('priceWholesale', { valueAsNumber: true })} />
+          <Label htmlFor="priceRetail">Preço unitário (R$)</Label>
+          <Input id="priceRetail" type="number" step="0.01" {...register('priceRetail', { valueAsNumber: true })} />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="priceRetail">Varejo</Label>
-          <Input id="priceRetail" type="number" step="0.01" {...register('priceRetail', { valueAsNumber: true })} />
+          <Label htmlFor="priceWholesale">Preço por quantidade (R$)</Label>
+          <Input id="priceWholesale" type="number" step="0.01" {...register('priceWholesale', { valueAsNumber: true })} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="weightGrams">Peso (g)</Label>
@@ -185,16 +191,27 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
             checked={watch('onPromo')}
             onCheckedChange={(v) => setValue('onPromo', v)}
           />
-          <Label htmlFor="onPromo" className="text-sm">Em promoção (destaca a peça no catálogo)</Label>
+          <Label htmlFor="onPromo" className="text-sm">Em promoção (destaca o produto no catálogo)</Label>
         </div>
         {watch('onPromo') && (
           <div className="space-y-1">
             <Label htmlFor="promoPrice">Preço promocional (R$)</Label>
             <Input id="promoPrice" type="number" step="0.01" className="max-w-[12rem]" {...register('promoPrice', { valueAsNumber: true })} />
-            <p className="text-xs text-muted-foreground">O cliente vê só este preço, no balão de promoção (vale também no atacado).</p>
+            <p className="text-xs text-muted-foreground">O cliente vê só este preço, no balão de promoção (vale para qualquer quantidade).</p>
             {errors.promoPrice && <p className="text-xs text-destructive">{errors.promoPrice.message}</p>}
           </div>
         )}
+      </div>
+
+      <div className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+        <Switch
+          id="requiresPrescription"
+          checked={watch('requiresPrescription')}
+          onCheckedChange={(v) => setValue('requiresPrescription', v)}
+        />
+        <Label htmlFor="requiresPrescription" className="text-sm">
+          Exige receita médica (mostra selo no catálogo)
+        </Label>
       </div>
 
       <div className="flex items-center gap-2">
@@ -204,7 +221,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
           onCheckedChange={(v) => setValue('countsForWholesale', v === true)}
         />
         <Label htmlFor="countsForWholesale" className="text-sm">
-          Esta peça conta pro atacado (desmarque para meias/brindes)
+          Conta para o preço por quantidade (desmarque para itens avulsos)
         </Label>
       </div>
 
@@ -215,22 +232,23 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label>Variações (tamanho + cor + estoque) — opcional</Label>
+          <Label>Apresentações (apresentação + dosagem + estoque)</Label>
           <Button type="button" variant="outline" size="sm" onClick={() => append({ size: '', color: '', stock: 0 })}>
             <Plus className="h-4 w-4 mr-1" /> Adicionar
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground">Ex.: apresentação “Caixa 20 comp.”, dosagem “500 mg”. O estoque é controlado por apresentação.</p>
         {fields.map((field, i) => (
           <div key={field.id} className="flex gap-2 items-start">
-            <Input placeholder="Tamanho" {...register(`variants.${i}.size`)} />
-            <Input placeholder="Cor" {...register(`variants.${i}.color`)} />
+            <Input placeholder="Apresentação" {...register(`variants.${i}.size`)} />
+            <Input placeholder="Dosagem" {...register(`variants.${i}.color`)} />
             <Input placeholder="Estoque" type="number" {...register(`variants.${i}.stock`, { valueAsNumber: true })} />
             <Button type="button" variant="ghost" size="icon" onClick={() => remove(i)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         ))}
-        {errors.variants && <p className="text-xs text-destructive">{(errors.variants.message as string) ?? 'Verifique as variações'}</p>}
+        {errors.variants && <p className="text-xs text-destructive">{(errors.variants.message as string) ?? 'Verifique as apresentações'}</p>}
       </div>
 
       {submitError && <p className="text-sm text-destructive">{submitError}</p>}

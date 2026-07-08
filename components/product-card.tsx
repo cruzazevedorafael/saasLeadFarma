@@ -9,7 +9,7 @@ import { sizesOf, colorsOf, isVariantAvailable, shouldRenderAsButtons, stockOf }
 import { ProductImages } from '@/components/product-images'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, ShoppingBag, Check, Flame } from 'lucide-react'
+import { Plus, Minus, ShoppingBag, Check, Flame, FileText } from 'lucide-react'
 import { reservarItem } from '@/app/_actions/reserva-carrinho'
 import { addableFromGrant } from '@/lib/data/reserva.helpers'
 
@@ -54,7 +54,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
     const granted = variant ? await reservarItem(cartId, variant.id, desejado) : desejado
     const podeAdicionar = addableFromGrant(granted, jaNoCarrinho)
     if (podeAdicionar <= 0) {
-      setAviso('Essa peça acabou de ser reservada. Tente outra cor/tamanho.')
+      setAviso('Essa apresentação acabou de ser reservada. Tente outra dosagem/apresentação.')
       return
     }
 
@@ -78,9 +78,9 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
         <Badge className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#F97316] text-black font-medium hover:bg-[#F97316] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1">
           {product.category}
         </Badge>
-        {!product.countsForWholesale && (
-          <Badge variant="secondary" className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/80 text-amber-300 border border-amber-300/30 text-[9px] md:text-xs">
-            Não conta p/ atacado
+        {product.requiresPrescription && (
+          <Badge variant="secondary" className="absolute top-2 right-2 md:top-3 md:right-3 bg-black/80 text-amber-300 border border-amber-300/30 text-[9px] md:text-xs flex items-center gap-1">
+            <FileText className="h-2.5 w-2.5 md:h-3 md:w-3" /> Exige receita
           </Badge>
         )}
       </div>
@@ -90,7 +90,8 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-sm md:text-lg text-foreground leading-tight">{product.name}</h3>
           </div>
-          <span className="text-[10px] md:text-xs text-muted-foreground">Cód: {product.code}</span>
+          {product.brand && <span className="text-[10px] md:text-xs font-medium text-[#F97316]">{product.brand}</span>}
+          {product.code && <span className="block text-[10px] md:text-xs text-muted-foreground">Cód: {product.code}</span>}
           <p className="text-xs md:text-sm text-muted-foreground mt-1">{product.description}</p>
         </div>
 
@@ -105,19 +106,19 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
         ) : (
           <div className="flex items-end justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] md:text-xs text-muted-foreground">Varejo</span>
+              <span className="text-[10px] md:text-xs text-muted-foreground">Unitário</span>
               <span className="text-xl md:text-2xl font-bold text-foreground">{fmt(product.priceRetail)}</span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="text-[10px] md:text-xs text-muted-foreground">Atacado ({threshold}+ peças)</span>
+              <span className="text-[10px] md:text-xs text-muted-foreground">A partir de {threshold} un.</span>
               <span className="text-lg md:text-xl font-bold text-[#F97316]">{fmt(product.priceWholesale)}</span>
             </div>
           </div>
         )}
 
-        {/* Tamanho */}
+        {/* Apresentação */}
         <div>
-          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Tamanho</span>
+          <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">Apresentação</span>
           {sizes.length > 0 ? (
             <div className="flex gap-1.5 md:gap-2 flex-wrap">
               {sizes.map((size) => (
@@ -137,10 +138,10 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
           )}
         </div>
 
-        {/* Cor */}
+        {/* Dosagem */}
         <div>
           <span className="text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2 block">
-            Cor{!shouldRenderAsButtons(colors) ? `: ${colors[0] ?? '—'}` : `: ${selectedColor}`}
+            Dosagem{!shouldRenderAsButtons(colors) ? `: ${colors[0] ?? '—'}` : `: ${selectedColor}`}
           </span>
           {shouldRenderAsButtons(colors) && (
             <div className="flex gap-1.5 md:gap-2 flex-wrap">

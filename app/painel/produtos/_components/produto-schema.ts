@@ -10,6 +10,8 @@ export const variantSchema = z.object({
 export const produtoSchema = z.object({
   code: z.string().default(''),
   name: z.string().min(1, 'Nome obrigatório'),
+  brand: z.string().default(''),
+  requiresPrescription: z.boolean().default(false),
   category: z.string().default(''),
   description: z.string().default(''),
   imageUrl: z.string().nullable().default(null),

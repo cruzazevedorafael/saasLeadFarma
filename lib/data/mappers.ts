@@ -10,6 +10,8 @@ export function mapProductRow(r: any): Product {
     id: r.id,
     code: r.code ?? '',
     name: r.name,
+    brand: r.brand ?? '',
+    requiresPrescription: r.requires_prescription ?? false,
     category: r.category ?? '',
     description: r.description ?? '',
     imageUrl: r.image_url ?? null,

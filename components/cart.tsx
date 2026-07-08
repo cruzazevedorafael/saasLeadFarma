@@ -111,9 +111,11 @@ export function Cart({ threshold, whatsappNumber, shippingMethods, paymentMethod
     text += `━━━━━━━━━━━━━━━━━━\n\n`
     items.forEach((item, index) => {
       const price = unitPriceFor(item.product, priceType)
-      text += `${index + 1}. *${item.product.name}* (${item.product.code})\n`
-      text += `   Tamanho: ${item.size}\n`
-      text += `   Cor: ${item.color}\n`
+      text += `${index + 1}. *${item.product.name}*${item.product.code ? ` (${item.product.code})` : ''}\n`
+      if (item.product.brand) text += `   Marca: ${item.product.brand}\n`
+      if (item.size) text += `   Apresentação: ${item.size}\n`
+      if (item.color) text += `   Dosagem: ${item.color}\n`
+      if (item.product.requiresPrescription) text += `   ⚠️ Exige receita médica\n`
       text += `   Qtd: ${item.quantity} x ${formatPrice(price)}\n`
       text += `   Subtotal: *${formatPrice(price * item.quantity)}*\n\n`
     })
