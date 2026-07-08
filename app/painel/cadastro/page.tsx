@@ -1,7 +1,7 @@
 // app/painel/cadastro/page.tsx — cadastro obrigatório da empresa (onboarding).
 import { requirePharmacyAdmin, getCurrentPharmacy } from '@/lib/auth/guards'
 import { CadastroForm } from './cadastro-form'
-import type { CadastroInput } from './actions'
+import type { CadastroInput } from './schema'
 
 export default async function CadastroPage() {
   await requirePharmacyAdmin({ skipOnboardingGate: true })

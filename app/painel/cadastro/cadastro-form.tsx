@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { salvarCadastro, type CadastroInput } from './actions'
+import { salvarCadastro } from './actions'
+import type { CadastroInput } from './schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

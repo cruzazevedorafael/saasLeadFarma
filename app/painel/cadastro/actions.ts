@@ -1,30 +1,8 @@
 'use server'
-import { z } from 'zod'
 import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { updatePharmacy } from '@/lib/data/pharmacy'
+import { cadastroSchema, type CadastroInput } from './schema'
 import { revalidatePath } from 'next/cache'
-
-// Campos do cadastro da farmácia. Todos importantes (vão nos comprovantes), com
-// mensagem clara por campo — se faltar algum, o usuário vê exatamente qual.
-// 'numero' é opcional (endereços "S/N"). O consentimento de gravar funciona pela
-// sessão do usuário (não depende de chave secreta).
-export const cadastroSchema = z.object({
-  nomeFantasia: z.string().trim().min(2, 'Informe o nome da farmácia'),
-  whatsappNumber: z.string().trim().min(10, 'Informe o WhatsApp com DDD (ex.: 5511999998888)'),
-  razaoSocial: z.string().trim().min(2, 'Informe a razão social'),
-  cnpj: z.string().trim().min(11, 'Informe o CNPJ'),
-  cep: z.string().trim().min(8, 'Informe o CEP'),
-  logradouro: z.string().trim().min(2, 'Informe o logradouro (rua/avenida)'),
-  numero: z.string().trim().optional().default(''),
-  bairro: z.string().trim().min(2, 'Informe o bairro'),
-  cidade: z.string().trim().min(2, 'Informe a cidade'),
-  uf: z.string().trim().length(2, 'Informe a UF (2 letras, ex.: SP)'),
-  telefone: z.string().trim().min(8, 'Informe o telefone'),
-  email: z.string().trim().email('Informe um e-mail válido'),
-  farmaceuticoResponsavel: z.string().trim().min(2, 'Informe o farmacêutico responsável'),
-  crf: z.string().trim().min(2, 'Informe o CRF'),
-})
-export type CadastroInput = z.infer<typeof cadastroSchema>
 
 // redirect() do Next lança um "erro" com digest NEXT_REDIRECT — não é falha real.
 function isRedirect(e: unknown): boolean {
