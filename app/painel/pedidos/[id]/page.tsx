@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getAdminOrder } from '@/lib/data/orders'
+import { getCurrentPharmacy } from '@/lib/auth/guards'
 import { PedidoActions } from '../_components/pedido-actions'
-
+import { ComprovanteActions } from '../_components/comprovante-actions'
 import { formatCpf } from '@/lib/cpf'
 
 const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
@@ -18,6 +19,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
   const { id } = await params
   const o = await getAdminOrder(id)
   if (!o) notFound()
+  const pharmacy = await getCurrentPharmacy()
 
   const statusLabel = o.status === 'pending' ? 'Pendente' : o.status === 'completed' ? 'Baixado' : 'Cancelado'
   const statusClass =
@@ -115,6 +117,11 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
         <div className="flex justify-between font-bold text-base pt-2 border-t border-border mt-1">
           <span>Total</span><span className="text-[#F97316]">{fmt(o.total)}</span>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-border p-4">
+        <h2 className="font-semibold text-sm mb-2">Comprovante</h2>
+        <ComprovanteActions order={o} pharmacy={pharmacy} />
       </div>
 
       {o.status === 'pending' && (
