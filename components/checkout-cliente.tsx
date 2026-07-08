@@ -171,17 +171,17 @@ export function CheckoutCliente({
           </div>
         </div>
         <div className="grid grid-cols-6 gap-3">
-          <div className="col-span-3 space-y-1.5">
+          <div className="col-span-6 sm:col-span-3 space-y-1.5">
             <Label htmlFor="c-bairro" className="text-xs">Bairro</Label>
             <Input id="c-bairro" placeholder="Bairro" value={value.bairro}
               onChange={(e) => set({ bairro: e.target.value })} className="h-10 md:h-12 bg-muted border-border" />
           </div>
-          <div className="col-span-2 space-y-1.5">
+          <div className="col-span-4 sm:col-span-2 space-y-1.5">
             <Label htmlFor="c-cidade" className="text-xs">Cidade</Label>
             <Input id="c-cidade" placeholder="Cidade" value={value.cidade}
               onChange={(e) => set({ cidade: e.target.value })} className="h-10 md:h-12 bg-muted border-border" />
           </div>
-          <div className="space-y-1.5">
+          <div className="col-span-2 sm:col-span-1 space-y-1.5">
             <Label htmlFor="c-uf" className="text-xs">UF</Label>
             <Input id="c-uf" maxLength={2} placeholder="UF" value={value.uf}
               onChange={(e) => set({ uf: e.target.value.toUpperCase().slice(0, 2) })} className="h-10 md:h-12 bg-muted border-border uppercase" />
