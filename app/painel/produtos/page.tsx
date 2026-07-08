@@ -82,7 +82,7 @@ export default async function ProdutosPage() {
         <div className="md:hidden space-y-3">
           {produtos.map((p) => (
             <div key={p.id} className="rounded-xl border border-border p-3 flex gap-3">
-              <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-24 w-24 rounded-lg object-cover flex-shrink-0" />
+              <img src={p.imageUrl ?? '/placeholder.svg'} alt={p.name} className="h-24 w-24 rounded-lg object-cover shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium truncate">{p.name}</span>

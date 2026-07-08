@@ -82,7 +82,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
             <img
               src={it.imageUrl ?? '/placeholder.svg'}
               alt={it.productName}
-              className="h-20 w-20 rounded-lg object-cover flex-shrink-0 bg-muted"
+              className="h-20 w-20 rounded-lg object-cover shrink-0 bg-muted"
             />
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm">{it.productName || 'Produto'}</p>

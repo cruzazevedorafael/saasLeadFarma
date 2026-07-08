@@ -414,7 +414,7 @@ function CartItemCard({ item, index, priceType, onRemove, onUpdateQuantity }: {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -100 }} transition={{ delay: index * 0.05 }} className="flex gap-3 rounded-xl bg-muted/30 p-3 border border-border/50">
-      <div className="relative h-20 w-20 overflow-hidden rounded-lg bg-muted flex-shrink-0">
+      <div className="relative h-20 w-20 overflow-hidden rounded-lg bg-muted shrink-0">
         <img src={item.product.imageUrl ?? '/placeholder.svg'} alt={item.product.name} className="h-full w-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
