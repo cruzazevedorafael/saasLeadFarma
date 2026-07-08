@@ -14,6 +14,12 @@ NEXT_PUBLIC_SUPABASE_URL=https://<projeto>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
 SUPABASE_SERVICE_ROLE_KEY=<service_role key>   # SECRETA — só no servidor
 SUPABASE_ACCESS_TOKEN=sbp_...                  # PAT — usado só pelo script de seed/migração
+
+# ASAAS (Fase 5) — OPCIONAIS. Sem elas o SaaS roda em modo manual/teste
+# (farmácias em trial/ativas, sem cobrança). Preencher quando a conta for aprovada:
+ASAAS_API_KEY=$aact_...                         # chave da conta ASAAS
+ASAAS_ENV=sandbox                               # sandbox | production
+ASAAS_WEBHOOK_TOKEN=<token>                     # valida os webhooks em /api/asaas/webhook
 ```
 
 > ⚠️ **Segurança:** `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ACCESS_TOKEN` dão acesso total. Nunca comitar; se vazarem, **rotacionar** no painel do Supabase (Project Settings → API).
@@ -37,13 +43,27 @@ pnpm lint         # eslint
 
 ## Aplicar o schema + criar dados iniciais
 
-O script aplica as migrations e cria o super-admin, uma farmácia de teste e o login dela (idempotente):
+O script aplica as migrations da Fase 0 e cria o super-admin, uma farmácia de teste e o login dela (idempotente):
 
 ```bash
 node scripts/seed-fase0.mjs
 ```
 
 Ele lê tudo do `.env.local` e usa a Management API (PAT) + Auth Admin (service_role).
+
+### Migrations posteriores e dados demo
+
+```bash
+# aplica uma ou mais migrations (idempotentes) — usado nas Fases 1–6
+node scripts/apply-migration.mjs supabase/migrations/0003_produto_farmacia.sql \
+  supabase/migrations/0004_clientes_lgpd.sql \
+  supabase/migrations/0005_planos_assinaturas.sql \
+  supabase/migrations/0006_pharmacies_anon_colunas.sql
+
+node scripts/gen-icons.mjs           # gera public/icon-192.png e icon-512.png (PWA)
+node scripts/seed-produtos-demo.mjs  # produtos de farmácia de exemplo
+node scripts/seed-pedidos-demo.mjs   # pedidos concluídos + cliente (alimenta relatórios/clientes/comprovantes)
+```
 
 ## Credenciais de teste (ambiente de desenvolvimento)
 

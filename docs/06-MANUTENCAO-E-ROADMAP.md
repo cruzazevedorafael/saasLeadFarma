@@ -23,12 +23,13 @@ Pela **Gestão** (`/gestao` → "Nova farmácia"): informa nome, slug, e-mail e 
 
 ## Pontos de atenção / dívidas conhecidas
 
-- **Produto ainda no formato antigo** (variações tamanho/cor, preço atacado/varejo): reshape para farmácia é a **Fase 1**.
-- **Reserva de estoque de carrinho** (`cart_reservations` + `reservar_item`/`liberar_*`) ainda ativa: **remover na Fase 2** (checkout novo).
+- **Variações repurposadas:** as colunas físicas de `product_variants`/`order_items` seguem `size`/`color`, mas a UI/comprovantes as tratam como **Apresentação/Dosagem** (Fase 1). Renomear as colunas é opcional/futuro.
+- **Reserva de estoque de carrinho** (`cart_reservations` + `reservar_item`/`liberar_*`) **ainda ativa**: a remoção estava prevista na Fase 2, mas foi **adiada** para não arriscar o fluxo que funciona. Cleanup opcional.
+- **PII por CPF:** a action anônima `buscar-cliente` devolve o cadastro a partir do CPF (autofill do checkout). É enumerável — aceitável para farmácia pequena, **rever/proteger se escalar** (rate limit / fator extra). Escopo por farmácia + CPF válido já mitigam parcialmente.
+- **ASAAS pendente de credenciais:** o código está pronto e **desligado** até `ASAAS_API_KEY` existir (modo manual/teste). Sem chave, nada quebra.
 - **`order_number_seq` é global** (numeração de pedidos não é por-farmácia). Aceitável; rever se necessário.
-- **`wholesale_threshold`** em `pharmacies` é herança da regra de atacado; será revisto no modelo de preço da Fase 1/2.
-- **Storage** (bucket `produtos` para fotos/banner) precisa existir no Supabase para uploads funcionarem — configurar quando entrar o cadastro de produto com foto (Fase 1).
 - **Rotacionar** `service_role`/`PAT` do Supabase por precaução.
+- **Correção aplicada (0006):** o anon do catálogo **não lê mais** as colunas cadastrais sensíveis de `pharmacies` (cnpj, email, telefone, farmacêutico, CRF, ids ASAAS) — grant restrito só às colunas públicas.
 
 ## Roadmap detalhado
 
@@ -45,4 +46,6 @@ Pela **Gestão** (`/gestao` → "Nova farmácia"): informa nome, slug, e-mail e 
 
 ## Estado atual
 
-**Fase 0 concluída** na branch `feat/leadfarma-fase-0` (ainda não mergeada na `main`). Build de produção limpo, 91 testes verdes, isolamento RLS verificado. Ver [00 · Visão geral](./00-VISAO-GERAL.md) para o quadro de fases.
+**Fases 0–6 concluídas** na branch `feat/leadfarma-fase-0` (ainda não mergeada na `main`). Build de produção limpo, **102 testes verdes**, isolamento RLS e fluxos verificados live no Supabase. Migrations `0001`–`0006` aplicadas. Ver [00 · Visão geral](./00-VISAO-GERAL.md) para o quadro de fases.
+
+Falta o usuário decidir: **mergear** `feat/leadfarma-fase-0` na `main`, **ativar o ASAAS** (quando aprovado) e o **deploy na Vercel** (ver [05 · Setup](./05-SETUP-E-EXECUCAO.md)).
