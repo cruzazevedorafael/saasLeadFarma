@@ -1,6 +1,7 @@
 // app/painel/layout.tsx
 import type { Metadata } from 'next'
 import { PwaRegister } from '@/components/pwa-register'
+import { InstallButton } from '@/components/install-button'
 
 export const metadata: Metadata = {
   title: 'Painel · LeadFarma',
@@ -14,6 +15,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen bg-background">
       <PwaRegister />
       {children}
+      <InstallButton appName="Painel LeadFarma" />
     </div>
   )
 }

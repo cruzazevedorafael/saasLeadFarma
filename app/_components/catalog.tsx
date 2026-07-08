@@ -8,6 +8,7 @@ import { Hero } from '@/components/hero'
 import { CategoryFilter } from '@/components/category-filter'
 import { ProductCard } from '@/components/product-card'
 import { Cart } from '@/components/cart'
+import { InstallButton } from '@/components/install-button'
 import { Search } from 'lucide-react'
 import type { ProductWithVariants } from '@/lib/data/types'
 import type { ShippingMethod } from '@/lib/data/shipping'
@@ -105,6 +106,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
       </section>
 
       <Cart threshold={threshold} whatsappNumber={whatsappNumber} shippingMethods={shippingMethods} paymentMethods={paymentMethods} pharmacyId={pharmacyId} storeName={storeName} />
+      <InstallButton appName={storeName} />
 
       <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
         <span className="opacity-70">powered by</span>{' '}
