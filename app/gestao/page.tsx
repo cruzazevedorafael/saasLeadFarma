@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NovaFarmaciaForm } from './_components/nova-farmacia-form'
 import { StatusToggle } from './_components/status-toggle'
+import { planLabel, subscriptionLabel } from '@/lib/asaas/plans'
 
 export default async function GestaoHome() {
   const db = createAdminClient()
   const { data: pharmacies } = await db
     .from('pharmacies')
-    .select('id, slug, nome_exibicao, nome_fantasia, status, onboarding_completed, created_at')
+    .select('id, slug, nome_exibicao, nome_fantasia, status, onboarding_completed, plan, subscription_status, created_at')
     .order('created_at', { ascending: false })
 
   const rows = pharmacies ?? []
@@ -29,6 +30,7 @@ export default async function GestaoHome() {
               <th className="p-3 font-medium">Farmácia</th>
               <th className="p-3 font-medium">Catálogo</th>
               <th className="p-3 font-medium">Cadastro</th>
+              <th className="p-3 font-medium">Plano</th>
               <th className="p-3 font-medium">Status</th>
               <th className="p-3 font-medium">Ações</th>
             </tr>
@@ -46,6 +48,10 @@ export default async function GestaoHome() {
                     : <span className="text-muted-foreground">pendente</span>}
                 </td>
                 <td className="p-3">
+                  <span>{planLabel(p.plan)}</span>
+                  <span className="block text-xs text-muted-foreground">{subscriptionLabel(p.subscription_status)}</span>
+                </td>
+                <td className="p-3">
                   {p.status === 'active'
                     ? <span className="text-emerald-600">ativa</span>
                     : <span className="text-destructive">suspensa</span>}
@@ -56,7 +62,7 @@ export default async function GestaoHome() {
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Nenhuma farmácia ainda. Crie a primeira acima.</td></tr>
+              <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">Nenhuma farmácia ainda. Crie a primeira acima.</td></tr>
             )}
           </tbody>
         </table>

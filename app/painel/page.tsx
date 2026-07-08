@@ -39,6 +39,8 @@ export default async function PainelHome() {
         <Link href="/painel/pagamento" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pagamento</Link>
         <Link href="/painel/pedidos" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Pedidos</Link>
         <Link href="/painel/clientes" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Clientes</Link>
+        <Link href="/painel/relatorios" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Relatórios</Link>
+        <Link href="/painel/assinatura" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Assinatura</Link>
         <Link href="/painel/cadastro" className="rounded-lg border border-border px-4 py-2 hover:bg-muted">Dados da farmácia</Link>
       </div>
 

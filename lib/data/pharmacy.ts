@@ -27,6 +27,12 @@ export interface Pharmacy {
   email: string | null
   farmaceuticoResponsavel: string | null
   crf: string | null
+  // planos / assinatura (Fase 5)
+  plan: 'trial' | 'basic' | 'pro'
+  subscriptionStatus: 'trialing' | 'active' | 'past_due' | 'canceled'
+  trialEndsAt: string | null
+  asaasCustomerId: string | null
+  asaasSubscriptionId: string | null
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -54,6 +60,11 @@ export function mapPharmacyRow(r: any): Pharmacy {
     email: r.email ?? null,
     farmaceuticoResponsavel: r.farmaceutico_responsavel ?? null,
     crf: r.crf ?? null,
+    plan: r.plan ?? 'trial',
+    subscriptionStatus: r.subscription_status ?? 'trialing',
+    trialEndsAt: r.trial_ends_at ?? null,
+    asaasCustomerId: r.asaas_customer_id ?? null,
+    asaasSubscriptionId: r.asaas_subscription_id ?? null,
   }
 }
 

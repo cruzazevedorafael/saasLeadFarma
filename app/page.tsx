@@ -21,14 +21,21 @@ export default function Home() {
           Catálogo online para farmácias. Sua farmácia monta o catálogo, o cliente pede pelo WhatsApp —
           rápido, simples e com a sua marca.
         </p>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <Link
+            href="/cadastro"
+            className="rounded-full bg-[#F97316] px-6 py-3 font-semibold text-white hover:opacity-90 transition"
+          >
+            Criar minha farmácia
+          </Link>
           <Link
             href="/painel/login"
-            className="rounded-full bg-[#F97316] px-6 py-3 font-semibold text-white hover:opacity-90 transition"
+            className="rounded-full border border-border px-6 py-3 font-semibold hover:bg-muted transition"
           >
             Acessar painel
           </Link>
         </div>
+        <p className="text-xs text-muted-foreground">14 dias grátis · sem cartão</p>
       </div>
     </main>
   )

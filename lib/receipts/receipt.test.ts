@@ -11,6 +11,7 @@ const pharmacy: Pharmacy = {
   cnpj: '12.345.678/0001-90', cep: '01001-000', logradouro: 'Praça da Sé', numero: '100',
   bairro: 'Sé', cidade: 'São Paulo', uf: 'SP', telefone: '(11) 3333-4444',
   email: 'contato@bemestar.com', farmaceuticoResponsavel: 'Ana Souza', crf: 'SP-12345',
+  plan: 'pro', subscriptionStatus: 'active', trialEndsAt: null, asaasCustomerId: null, asaasSubscriptionId: null,
 }
 
 const order: OrderWithItems = {

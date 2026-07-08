@@ -2,6 +2,7 @@
 import { z } from 'zod'
 import { requireSuperadmin } from '@/lib/auth/guards'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { provisionPharmacy } from '@/lib/data/pharmacy-provisioning'
 import { revalidatePath } from 'next/cache'
 
 const novaSchema = z.object({
@@ -17,37 +18,16 @@ export async function criarFarmacia(input: NovaFarmaciaInput): Promise<{ ok: tru
   const parsed = novaSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Dados inválidos' }
   const d = parsed.data
-  const db = createAdminClient()
 
-  const { data: exist } = await db.from('pharmacies').select('id').eq('slug', d.slug).maybeSingle()
-  if (exist) return { ok: false, error: 'Já existe uma farmácia com esse slug.' }
-
-  const { data: ph, error } = await db
-    .from('pharmacies')
-    .insert({ slug: d.slug, nome_fantasia: d.nomeFantasia, nome_exibicao: d.nomeFantasia, status: 'active', onboarding_completed: false })
-    .select('id')
-    .single()
-  if (error || !ph) return { ok: false, error: error?.message ?? 'Falha ao criar farmácia' }
-
-  const { data: created, error: uErr } = await db.auth.admin.createUser({
-    email: d.emailAdmin,
-    password: d.senhaAdmin,
-    email_confirm: true,
+  // Farmácia criada pela Gestão já entra ativa (plano pro, sem período de teste).
+  const result = await provisionPharmacy({
+    nomeFantasia: d.nomeFantasia, slug: d.slug,
+    emailAdmin: d.emailAdmin, senhaAdmin: d.senhaAdmin, plan: 'pro',
   })
-  if (uErr || !created?.user) {
-    await db.from('pharmacies').delete().eq('id', ph.id)
-    return { ok: false, error: uErr?.message ?? 'Falha ao criar o login da farmácia' }
-  }
-
-  const { error: pErr } = await db.from('profiles').insert({ id: created.user.id, pharmacy_id: ph.id, role: 'pharmacy_admin' })
-  if (pErr) {
-    await db.auth.admin.deleteUser(created.user.id)
-    await db.from('pharmacies').delete().eq('id', ph.id)
-    return { ok: false, error: pErr.message }
-  }
+  if (!result.ok) return result
 
   revalidatePath('/gestao')
-  return { ok: true, pharmacyId: ph.id }
+  return { ok: true, pharmacyId: result.pharmacyId }
 }
 
 export async function alternarStatus(pharmacyId: string, status: 'active' | 'suspended'): Promise<void> {
