@@ -4,7 +4,7 @@ import type { OrderWithItems } from '@/lib/data/orders.types'
 import type { Pharmacy } from '@/lib/data/pharmacy'
 
 const pharmacy: Pharmacy = {
-  id: 'ph1', slug: 'farmacia-teste', nomeExibicao: 'Farmácia Bem Estar', logoUrl: null,
+  id: 'ph1', slug: 'farmacia-teste', nomeExibicao: 'Farmácia Bem Estar', logoUrl: null, accentColor: null,
   whatsappNumber: '5511999998888', bannerImageUrl: '', wholesaleThreshold: 4,
   status: 'active', onboardingCompleted: true,
   razaoSocial: 'Bem Estar Comércio de Medicamentos LTDA', nomeFantasia: 'Farmácia Bem Estar',

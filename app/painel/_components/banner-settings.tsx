@@ -25,8 +25,8 @@ export function BannerSettings({ current }: { current: string }) {
       await setBannerImage(url)
       setPreview(url)
       router.refresh()
-    } catch {
-      setError('Falha ao subir a imagem.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Falha ao subir a imagem.')
     } finally {
       setBusy(false)
     }

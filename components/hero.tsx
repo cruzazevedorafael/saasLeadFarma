@@ -11,7 +11,7 @@ export function Hero({ bannerImageUrl, storeName, logoUrl }: { bannerImageUrl?: 
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.08 }}
           transition={{ duration: 1 }}
-          className="absolute -top-20 -right-20 md:-top-40 md:-right-40 h-40 w-40 md:h-80 md:w-80 rounded-full bg-[#F97316] blur-3xl"
+          className="absolute -top-20 -right-20 md:-top-40 md:-right-40 h-40 w-40 md:h-80 md:w-80 rounded-full bg-[var(--brand)] blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0 }}
@@ -30,13 +30,13 @@ export function Hero({ bannerImageUrl, storeName, logoUrl }: { bannerImageUrl?: 
             className="relative mb-4 md:mb-6"
           >
             <div className="relative h-20 w-20 md:h-28 md:w-28">
-              <div className="absolute inset-0 rounded-full bg-[#F97316]/15 blur-xl" />
-              <div className="relative h-full w-full rounded-full overflow-hidden border-4 border-[#F97316]/40 bg-[#F97316]/10 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-[var(--brand)]/15 blur-xl" />
+              <div className="relative h-full w-full rounded-full overflow-hidden border-4 border-[var(--brand)]/40 bg-[var(--brand)]/10 flex items-center justify-center">
                 {logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={logoUrl} alt={storeName} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="text-3xl md:text-4xl font-bold text-[#F97316]">{initial}</span>
+                  <span className="text-3xl md:text-4xl font-bold text-[var(--brand)]">{initial}</span>
                 )}
               </div>
             </div>

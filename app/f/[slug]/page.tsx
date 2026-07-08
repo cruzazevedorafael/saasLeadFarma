@@ -47,6 +47,7 @@ export default async function CatalogoFarmacia({ params }: { params: Promise<{ s
         pharmacyId={pharmacy.id}
         storeName={pharmacy.nomeExibicao}
         logoUrl={pharmacy.logoUrl}
+        accentColor={pharmacy.accentColor}
       />
     </>
   )

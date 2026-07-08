@@ -75,7 +75,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
       <div className="relative aspect-[4/5] overflow-hidden">
         <ProductImages images={product.imageUrls} alt={product.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-        <Badge className="absolute top-2 left-2 md:top-3 md:left-3 bg-[#F97316] text-black font-medium hover:bg-[#F97316] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1">
+        <Badge className="absolute top-2 left-2 md:top-3 md:left-3 bg-[var(--brand)] text-[var(--brand-fg)] font-medium hover:bg-[var(--brand)] text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-1">
           {product.category}
         </Badge>
         {product.requiresPrescription && (
@@ -90,7 +90,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-sm md:text-lg text-foreground leading-tight">{product.name}</h3>
           </div>
-          {product.brand && <span className="text-[10px] md:text-xs font-medium text-[#F97316]">{product.brand}</span>}
+          {product.brand && <span className="text-[10px] md:text-xs font-medium text-[var(--brand)]">{product.brand}</span>}
           {product.code && <span className="block text-[10px] md:text-xs text-muted-foreground">Cód: {product.code}</span>}
           <p className="text-xs md:text-sm text-muted-foreground mt-1">{product.description}</p>
         </div>
@@ -111,7 +111,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
             </div>
             <div className="flex flex-col text-right">
               <span className="text-[10px] md:text-xs text-muted-foreground">A partir de {threshold} un.</span>
-              <span className="text-lg md:text-xl font-bold text-[#F97316]">{fmt(product.priceWholesale)}</span>
+              <span className="text-lg md:text-xl font-bold text-[var(--brand)]">{fmt(product.priceWholesale)}</span>
             </div>
           </div>
         )}
@@ -126,7 +126,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   className={`min-w-8 h-8 px-2 md:min-w-10 md:h-10 md:px-3 rounded-lg text-xs md:text-sm font-medium transition-all ${
-                    selectedSize === size ? 'bg-[#F97316] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                    selectedSize === size ? 'bg-[var(--brand)] text-[var(--brand-fg)]' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                   }`}
                 >
                   {size}
@@ -153,7 +153,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
                     onClick={() => setSelectedColor(color)}
                     disabled={!colorOk}
                     className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium transition-all ${
-                      selectedColor === color ? 'bg-[#F97316] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      selectedColor === color ? 'bg-[var(--brand)] text-[var(--brand-fg)]' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     } ${!colorOk ? 'opacity-40 line-through cursor-not-allowed' : ''}`}
                   >
                     {color}
@@ -192,7 +192,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
             onClick={handleAddToCart}
             disabled={!available}
             className={`w-full h-10 md:h-12 text-sm md:text-base font-semibold transition-all ${
-              isAdded ? 'bg-green-500 hover:bg-green-500 text-white' : 'bg-[#F97316] hover:bg-[#ea6a04] text-black'
+              isAdded ? 'bg-green-500 hover:bg-green-500 text-white' : 'bg-[var(--brand)] hover:opacity-90 text-[var(--brand-fg)]'
             } ${!available ? 'opacity-60' : ''}`}
           >
             <AnimatePresence mode="wait">

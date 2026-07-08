@@ -8,6 +8,8 @@ export interface StoreSettings {
   whatsappNumber: string
   wholesaleThreshold: number
   bannerImageUrl: string
+  logoUrl: string | null
+  accentColor: string | null
 }
 
 export async function getStoreSettings(): Promise<StoreSettings> {
@@ -17,5 +19,7 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     whatsappNumber: ph.whatsappNumber,
     wholesaleThreshold: ph.wholesaleThreshold,
     bannerImageUrl: ph.bannerImageUrl,
+    logoUrl: ph.logoUrl,
+    accentColor: ph.accentColor,
   }
 }

@@ -14,9 +14,19 @@ import type { ProductWithVariants } from '@/lib/data/types'
 import type { ShippingMethod } from '@/lib/data/shipping'
 import type { PaymentMethod } from '@/lib/data/payment'
 
-export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null }) {
+// luminância simples pra decidir se o texto sobre a cor da marca é claro ou escuro
+function textoSobre(cor: string): string {
+  const h = cor.replace('#', '')
+  if (h.length !== 6) return '#000'
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) < 150 ? '#fff' : '#111'
+}
+
+export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
+  const brand = accentColor || '#F97316'
+  const brandVars = { ['--brand']: brand, ['--brand-fg']: textoSobre(brand) } as React.CSSProperties
 
   const categories = useMemo(
     () => ['Todos', ...new Set(products.map((p) => p.category).filter(Boolean))],
@@ -34,7 +44,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
   }, [products, selectedCategory, searchQuery])
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background" style={brandVars}>
       <Header storeName={storeName} logoUrl={logoUrl} />
       <Hero bannerImageUrl={bannerImageUrl} storeName={storeName} logoUrl={logoUrl} />
 
@@ -53,7 +63,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
                 placeholder="Buscar produtos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-full bg-muted border border-border/50 text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F97316]/50 focus:border-[#F97316]/50 transition-all"
+                className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-full bg-muted border border-border/50 text-sm md:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/50 focus:border-[var(--brand)]/50 transition-all"
               />
             </div>
           </motion.div>
@@ -75,7 +85,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
               produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
             </p>
             {selectedCategory !== 'Todos' && (
-              <button onClick={() => setSelectedCategory('Todos')} className="text-xs md:text-sm text-[#F97316] hover:underline">
+              <button onClick={() => setSelectedCategory('Todos')} className="text-xs md:text-sm text-[var(--brand)] hover:underline">
                 Ver todos
               </button>
             )}
@@ -96,7 +106,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
               <p className="text-xs md:text-sm text-muted-foreground mt-1">Tente buscar por outro termo ou categoria</p>
               <button
                 onClick={() => { setSearchQuery(''); setSelectedCategory('Todos') }}
-                className="mt-4 text-xs md:text-sm text-[#F97316] hover:underline"
+                className="mt-4 text-xs md:text-sm text-[var(--brand)] hover:underline"
               >
                 Limpar filtros
               </button>
@@ -110,7 +120,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
 
       <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
         <span className="opacity-70">powered by</span>{' '}
-        <span className="font-semibold text-[#F97316]">LeadFarma</span>
+        <span className="font-semibold text-[var(--brand)]">LeadFarma</span>
       </footer>
     </main>
   )

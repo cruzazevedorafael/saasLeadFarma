@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BannerSettings } from './_components/banner-settings'
+import { LogoSettings } from './_components/logo-settings'
 import { Package, Tags, Truck, CreditCard, ShoppingBag, Users, BarChart3, Star, Building2, ChevronRight } from 'lucide-react'
 
 const NAV = [
@@ -87,6 +88,8 @@ export default async function PainelHome() {
         </div>
         <Button type="submit">Salvar contato</Button>
       </form>
+
+      <LogoSettings current={settings.logoUrl} currentColor={settings.accentColor} />
 
       <BannerSettings current={settings.bannerImageUrl} />
     </div>

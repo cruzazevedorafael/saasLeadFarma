@@ -1,8 +1,8 @@
 // app/painel/settings-actions.ts
 'use server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { updatePharmacy } from '@/lib/data/pharmacy'
+import { uploadImagem } from '@/lib/data/storage'
 import { revalidatePath } from 'next/cache'
 
 export async function setWholesaleThreshold(value: number) {
@@ -20,13 +20,18 @@ export async function setStoreContact(storeName: string, whatsappNumber: string)
 
 export async function uploadBannerImage(file: File): Promise<string> {
   await getCurrentPharmacyId()
-  const db = createAdminClient()
-  const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = `banner-${crypto.randomUUID()}.${ext}`
-  const { error } = await db.storage.from('produtos').upload(path, file, { upsert: false })
-  if (error) throw error
-  const { data } = db.storage.from('produtos').getPublicUrl(path)
-  return data.publicUrl
+  return uploadImagem(file, 'banner-')
+}
+
+export async function setLogo(url: string, accentColor: string | null) {
+  const pharmacyId = await getCurrentPharmacyId()
+  await updatePharmacy(pharmacyId, { logo_url: url || null, accent_color: accentColor || null })
+  revalidatePath('/painel')
+}
+
+export async function uploadLogoImage(file: File): Promise<string> {
+  await getCurrentPharmacyId()
+  return uploadImagem(file, 'logo-')
 }
 
 // url vazia ('') remove o banner.
