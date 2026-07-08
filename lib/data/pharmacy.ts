@@ -95,10 +95,15 @@ export async function getPharmacyById(id: string): Promise<Pharmacy | null> {
   return mapPharmacyRow(data)
 }
 
-/** Atualiza campos da farmácia (colunas em snake_case). */
+/**
+ * Atualiza a PRÓPRIA farmácia (onboarding/configurações) usando a SESSÃO do
+ * usuário logado + a policy RLS `pharmacies self update` (id = current_pharmacy_id()).
+ * Não depende do service_role — funciona só com as chaves públicas + sessão, e o
+ * RLS garante que a farmácia só altera a própria linha. (colunas em snake_case)
+ */
 export async function updatePharmacy(id: string, patch: Record<string, unknown>): Promise<void> {
-  const db = createAdminClient()
-  const { error } = await db
+  const supabase = await createServerClient()
+  const { error } = await supabase
     .from('pharmacies')
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq('id', id)
