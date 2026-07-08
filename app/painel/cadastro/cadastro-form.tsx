@@ -40,14 +40,19 @@ export function CadastroForm({ initial }: { initial: Partial<CadastroInput> }) {
     e.preventDefault()
     setSaving(true)
     setErro(null)
-    const r = await salvarCadastro(values as unknown as CadastroInput)
-    if (!r.ok) {
-      setErro(r.error)
+    try {
+      const r = await salvarCadastro(values as unknown as CadastroInput)
+      if (!r.ok) {
+        setErro(r.error)
+        return
+      }
+      router.push('/painel')
+      router.refresh()
+    } catch {
+      setErro('Não foi possível salvar agora. Tente novamente em instantes.')
+    } finally {
       setSaving(false)
-      return
     }
-    router.push('/painel')
-    router.refresh()
   }
 
   return (

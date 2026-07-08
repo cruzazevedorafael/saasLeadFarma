@@ -29,24 +29,32 @@ export async function salvarCadastro(input: CadastroInput): Promise<{ ok: true }
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Preencha todos os campos obrigatórios.' }
   }
   const d = parsed.data
-  await updatePharmacy(pharmacyId, {
-    razao_social: d.razaoSocial,
-    nome_fantasia: d.nomeFantasia,
-    nome_exibicao: d.nomeFantasia,
-    cnpj: d.cnpj,
-    cep: d.cep,
-    logradouro: d.logradouro,
-    numero: d.numero,
-    bairro: d.bairro,
-    cidade: d.cidade,
-    uf: d.uf.toUpperCase(),
-    telefone: d.telefone,
-    email: d.email,
-    farmaceutico_responsavel: d.farmaceuticoResponsavel,
-    crf: d.crf,
-    whatsapp_number: d.whatsappNumber,
-    onboarding_completed: true,
-  })
+  try {
+    await updatePharmacy(pharmacyId, {
+      razao_social: d.razaoSocial,
+      nome_fantasia: d.nomeFantasia,
+      nome_exibicao: d.nomeFantasia,
+      cnpj: d.cnpj,
+      cep: d.cep,
+      logradouro: d.logradouro,
+      numero: d.numero,
+      bairro: d.bairro,
+      cidade: d.cidade,
+      uf: d.uf.toUpperCase(),
+      telefone: d.telefone,
+      email: d.email,
+      farmaceutico_responsavel: d.farmaceuticoResponsavel,
+      crf: d.crf,
+      whatsapp_number: d.whatsappNumber,
+      onboarding_completed: true,
+    })
+  } catch (e) {
+    console.error('[salvarCadastro] falha ao gravar:', e)
+    const msg = e instanceof Error && e.message.includes('Configuração do servidor')
+      ? e.message
+      : 'Não foi possível salvar. Verifique a conexão e a configuração do servidor e tente de novo.'
+    return { ok: false, error: msg }
+  }
   revalidatePath('/painel')
   return { ok: true }
 }
