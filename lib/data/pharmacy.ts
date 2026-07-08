@@ -68,12 +68,18 @@ export function mapPharmacyRow(r: any): Pharmacy {
   }
 }
 
+// Colunas que o catálogo público (anon) precisa. NÃO inclui dados cadastrais
+// sensíveis (cnpj, email, telefone, farmacêutico, CRF, ids do ASAAS) — o anon
+// não tem privilégio de coluna para eles (ver migration 0006). Comprovantes e
+// painel usam getPharmacyById / getCurrentPharmacy (service_role/autenticado).
+const PUBLIC_PHARMACY_COLS = 'id, slug, nome_exibicao, nome_fantasia, logo_url, banner_image_url, whatsapp_number, wholesale_threshold, status'
+
 /** Público (anon): resolve a farmácia ativa pelo slug da URL. null se inexistente/suspensa. */
 export async function getPharmacyBySlug(slug: string): Promise<Pharmacy | null> {
   const supabase = await createServerClient()
   const { data, error } = await supabase
     .from('pharmacies')
-    .select('*')
+    .select(PUBLIC_PHARMACY_COLS)
     .eq('slug', slug)
     .eq('status', 'active')
     .single()
