@@ -30,7 +30,7 @@ export function PedidoActions({ orderId }: { orderId: string }) {
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
-        <Button size="sm" onClick={baixa} disabled={pending} className="bg-[#F97316] text-black hover:bg-[#ea6a04]">
+        <Button size="sm" onClick={baixa} disabled={pending} className="bg-primary text-primary-foreground hover:bg-brand-hover">
           Dar baixa
         </Button>
         <AlertDialog>

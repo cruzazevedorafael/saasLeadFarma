@@ -112,7 +112,7 @@ export function EditarFarmaciaForm({ pharmacy }: { pharmacy: Pharmacy }) {
       {erro && <p className="text-sm text-destructive">{erro}</p>}
       {ok && <p className="text-sm text-emerald-600">Dados salvos.</p>}
 
-      <Button type="submit" disabled={saving} className="bg-[#F97316] hover:opacity-90 text-white">
+      <Button type="submit" disabled={saving} className="bg-primary hover:opacity-90 text-white">
         {saving ? 'Salvando...' : 'Salvar alterações'}
       </Button>
     </form>

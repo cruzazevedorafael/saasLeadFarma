@@ -34,7 +34,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
         <div className="flex items-center gap-2 flex-wrap mt-1">
           <h1 className="text-2xl font-bold">Pedido #{o.number}</h1>
           <span className={`text-xs px-2 py-0.5 rounded ${statusClass}`}>{statusLabel}</span>
-          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#F97316]' : 'bg-muted text-muted-foreground'}`}>
+          <span className={`text-xs px-2 py-0.5 rounded ${o.priceType === 'wholesale' ? 'bg-brand/20 text-brand' : 'bg-muted text-muted-foreground'}`}>
             {o.priceType === 'wholesale' ? 'Por quantidade' : 'Unitário'}
           </span>
         </div>
@@ -94,7 +94,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
               <p className="text-sm mt-1 text-muted-foreground">{it.quantity} x {fmt(it.unitPrice)}</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-[#F97316]">{fmt(it.unitPrice * it.quantity)}</p>
+              <p className="font-semibold text-brand">{fmt(it.unitPrice * it.quantity)}</p>
             </div>
           </div>
         ))}
@@ -115,7 +115,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
           <span>Pagamento</span><span>{o.paymentLabel || 'A combinar'}{o.paymentSurcharge > 0 ? ` — +${fmt(o.paymentSurcharge)}` : ''}</span>
         </div>
         <div className="flex justify-between font-bold text-base pt-2 border-t border-border mt-1">
-          <span>Total</span><span className="text-[#F97316]">{fmt(o.total)}</span>
+          <span>Total</span><span className="text-brand">{fmt(o.total)}</span>
         </div>
       </div>
 

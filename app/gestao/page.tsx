@@ -32,10 +32,10 @@ export default async function GestaoHome() {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-medium truncate">{p.nome_exibicao ?? p.nome_fantasia ?? '—'}</p>
-                <Link href={`/f/${p.slug}`} target="_blank" className="text-xs text-[#F97316] hover:underline">/f/{p.slug}</Link>
+                <Link href={`/f/${p.slug}`} target="_blank" className="text-xs text-brand hover:underline">/f/{p.slug}</Link>
               </div>
               <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <Link href={`/gestao/${p.id}`} className="text-sm font-medium text-[#F97316] hover:underline">Gerenciar</Link>
+                <Link href={`/gestao/${p.id}`} className="text-sm font-medium text-brand hover:underline">Gerenciar</Link>
                 <StatusToggle id={p.id} status={p.status} />
               </div>
             </div>
@@ -66,7 +66,7 @@ export default async function GestaoHome() {
               <tr key={p.id} className="border-t border-border">
                 <td className="p-3 font-medium">{p.nome_exibicao ?? p.nome_fantasia ?? '—'}</td>
                 <td className="p-3">
-                  <Link href={`/f/${p.slug}`} className="text-[#F97316] hover:underline" target="_blank">/f/{p.slug}</Link>
+                  <Link href={`/f/${p.slug}`} className="text-brand hover:underline" target="_blank">/f/{p.slug}</Link>
                 </td>
                 <td className="p-3">
                   {p.onboarding_completed
@@ -84,7 +84,7 @@ export default async function GestaoHome() {
                 </td>
                 <td className="p-3">
                   <div className="flex items-center gap-3">
-                    <Link href={`/gestao/${p.id}`} className="font-medium text-[#F97316] hover:underline">Gerenciar</Link>
+                    <Link href={`/gestao/${p.id}`} className="font-medium text-brand hover:underline">Gerenciar</Link>
                     <StatusToggle id={p.id} status={p.status} />
                   </div>
                 </td>

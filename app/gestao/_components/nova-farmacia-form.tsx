@@ -61,7 +61,7 @@ export function NovaFarmaciaForm() {
       </div>
       {erro && <p className="text-sm text-destructive">{erro}</p>}
       {ok && <p className="text-sm text-emerald-600">{ok}</p>}
-      <Button type="submit" disabled={saving} className="bg-[#F97316] hover:opacity-90 text-white">
+      <Button type="submit" disabled={saving} className="bg-primary hover:opacity-90 text-white">
         {saving ? 'Criando...' : 'Criar farmácia + login'}
       </Button>
     </form>

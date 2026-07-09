@@ -14,7 +14,7 @@ export function BarList({ data, metric = 'receita' }: { data: Bucket[]; metric?:
           <div key={d.label} className="flex items-center gap-2 text-xs">
             <span className="w-20 shrink-0 text-muted-foreground truncate">{d.label}</span>
             <div className="flex-1 h-4 rounded bg-muted overflow-hidden">
-              <div className="h-full rounded bg-[#F97316]" style={{ width: `${(val / max) * 100}%` }} />
+              <div className="h-full rounded bg-primary" style={{ width: `${(val / max) * 100}%` }} />
             </div>
             <span className="w-24 shrink-0 text-right tabular-nums">
               {metric === 'receita' ? brl(d.receita) : `${d.pedidos} ped.`}

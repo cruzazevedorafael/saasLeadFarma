@@ -50,7 +50,7 @@ export default async function GestaoFarmacia({ params }: { params: Promise<{ id:
         <div className="min-w-0">
           <Link href="/gestao" className="text-xs text-muted-foreground hover:underline">← Voltar às farmácias</Link>
           <h1 className="mt-1 text-2xl font-bold truncate">{pharmacy.nomeExibicao}</h1>
-          <Link href={`/f/${pharmacy.slug}`} target="_blank" className="text-sm text-[#F97316] hover:underline">/f/{pharmacy.slug}</Link>
+          <Link href={`/f/${pharmacy.slug}`} target="_blank" className="text-sm text-brand hover:underline">/f/{pharmacy.slug}</Link>
         </div>
         <div className="flex items-center gap-2">
           <StatusToggle id={pharmacy.id} status={pharmacy.status} />

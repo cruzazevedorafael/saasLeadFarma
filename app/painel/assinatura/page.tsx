@@ -26,7 +26,7 @@ export default async function AssinaturaPage() {
       <div className="rounded-xl border border-border p-4 space-y-1">
         <p className="text-sm"><span className="text-muted-foreground">Plano atual:</span> <strong>{planLabel(ph.plan)}</strong></p>
         <p className="text-sm"><span className="text-muted-foreground">Status:</span> {subscriptionLabel(ph.subscriptionStatus)}</p>
-        {trialInfo && <p className="text-sm text-[#F97316]">{trialInfo}</p>}
+        {trialInfo && <p className="text-sm text-brand">{trialInfo}</p>}
       </div>
 
       <div className="space-y-3">

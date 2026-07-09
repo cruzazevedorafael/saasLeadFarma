@@ -12,7 +12,7 @@ export function AppSwitch({ href, variant }: { href: string; variant: 'catalogo'
       href={href}
       className={`fixed ${pos} z-40 flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-3 py-1.5 text-xs font-medium shadow-md backdrop-blur hover:bg-muted`}
     >
-      {catalogo ? <Store className="h-3.5 w-3.5 text-[#F97316]" /> : <LayoutDashboard className="h-3.5 w-3.5 text-[#F97316]" />}
+      {catalogo ? <Store className="h-3.5 w-3.5 text-brand" /> : <LayoutDashboard className="h-3.5 w-3.5 text-brand" />}
       {catalogo ? 'Ver catálogo' : 'Ir ao painel'}
     </Link>
   )

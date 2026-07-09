@@ -28,11 +28,11 @@ export default async function ClientesPage() {
             <Link key={c.id} href={`/painel/clientes/${c.id}`} className="block rounded-xl border border-border p-4 active:bg-muted/40">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium truncate">{c.name}</span>
-                <span className="shrink-0 text-xs rounded-full bg-[#F97316]/15 text-[#F97316] px-2 py-0.5">{c.ordersCount} pedido{c.ordersCount !== 1 ? 's' : ''}</span>
+                <span className="shrink-0 text-xs rounded-full bg-brand/15 text-brand px-2 py-0.5">{c.ordersCount} pedido{c.ordersCount !== 1 ? 's' : ''}</span>
               </div>
               <p className="text-xs font-mono text-muted-foreground mt-1">{formatCpf(c.cpf)}</p>
               <p className="text-sm text-muted-foreground">{c.phone || 'sem celular'}{(c.cidade || c.uf) ? ` · ${[c.cidade, c.uf].filter(Boolean).join('/')}` : ''}</p>
-              <span className="mt-2 inline-block text-sm font-medium text-[#F97316]">Ver histórico →</span>
+              <span className="mt-2 inline-block text-sm font-medium text-brand">Ver histórico →</span>
             </Link>
           ))}
         </div>
@@ -58,7 +58,7 @@ export default async function ClientesPage() {
                   <td className="p-3">{[c.cidade, c.uf].filter(Boolean).join('/') || '—'}</td>
                   <td className="p-3">{c.ordersCount}</td>
                   <td className="p-3">
-                    <Link href={`/painel/clientes/${c.id}`} className="text-[#F97316] hover:underline">Ver histórico</Link>
+                    <Link href={`/painel/clientes/${c.id}`} className="text-brand hover:underline">Ver histórico</Link>
                   </td>
                 </tr>
               ))}

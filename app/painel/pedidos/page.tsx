@@ -39,7 +39,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
             key={x.key}
             href={`/painel/pedidos?f=${x.key}`}
             className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-              x.key === filtro.key ? 'bg-[#F97316] text-black' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              x.key === filtro.key ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
             {x.label}
@@ -63,7 +63,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   <div className="flex items-center gap-2">
                     <span className="font-bold">#{o.number}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
-                      o.priceType === 'wholesale' ? 'bg-[#F97316]/20 text-[#F97316]' : 'bg-muted text-muted-foreground'
+                      o.priceType === 'wholesale' ? 'bg-brand/20 text-brand' : 'bg-muted text-muted-foreground'
                     }`}>{o.priceType === 'wholesale' ? 'Por quantidade' : 'Unitário'}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
                       o.status === 'pending' ? 'bg-amber-500/15 text-amber-500'
@@ -79,7 +79,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   >{o.customerPhone || 'sem telefone'}</a>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-[#F97316]">{fmt(o.total)}</p>
+                  <p className="text-lg font-bold text-brand">{fmt(o.total)}</p>
                   {o.status === 'pending' && <PedidoActions orderId={o.id} />}
                 </div>
               </div>
@@ -105,7 +105,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
                   </div>
                 </div>
               </div>
-              <Link href={`/painel/pedidos/${o.id}`} className="inline-block text-sm font-medium text-[#F97316] hover:underline">
+              <Link href={`/painel/pedidos/${o.id}`} className="inline-block text-sm font-medium text-brand hover:underline">
                 Ver itens e fotos →
               </Link>
             </div>

@@ -19,7 +19,7 @@ export function CadastroForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-lg">
       <div className="space-y-1">
         <Label htmlFor="nomeFantasia">Nome da farmácia</Label>
         <Input id="nomeFantasia" placeholder="Ex.: Farmácia Bem Estar" {...register('nomeFantasia', { required: 'Informe o nome' })} />
@@ -42,7 +42,7 @@ export function CadastroForm() {
 
       {erro && <p className="text-sm text-destructive">{erro}</p>}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-[#F97316] hover:bg-[#ea6a04] text-black font-semibold">
+      <Button type="submit" disabled={isSubmitting} className="w-full h-12 shadow-brand font-semibold">
         {isSubmitting ? 'Criando...' : 'Começar teste grátis de 14 dias'}
       </Button>
       <p className="text-center text-xs text-muted-foreground">

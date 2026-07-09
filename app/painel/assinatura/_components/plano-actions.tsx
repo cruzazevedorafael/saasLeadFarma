@@ -28,10 +28,10 @@ export function PlanoActions({ currentPlan }: { currentPlan: string }) {
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         {Object.values(PLANS).map((p) => (
-          <div key={p.id} className={`rounded-xl border p-4 ${currentPlan === p.id ? 'border-[#F97316] bg-[#F97316]/5' : 'border-border'}`}>
+          <div key={p.id} className={`rounded-xl border p-4 ${currentPlan === p.id ? 'border-brand bg-brand/5' : 'border-border'}`}>
             <div className="flex items-baseline justify-between">
               <h3 className="font-semibold">{p.name}</h3>
-              <span className="text-sm font-bold text-[#F97316]">{brl(p.priceMonthly)}<span className="text-xs font-normal text-muted-foreground">/mês</span></span>
+              <span className="text-sm font-bold text-brand">{brl(p.priceMonthly)}<span className="text-xs font-normal text-muted-foreground">/mês</span></span>
             </div>
             <ul className="mt-2 mb-3 space-y-1 text-xs text-muted-foreground">
               {p.features.map((f) => <li key={f}>• {f}</li>)}
@@ -49,7 +49,7 @@ export function PlanoActions({ currentPlan }: { currentPlan: string }) {
       </div>
       {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
       {link && (
-        <a href={link} target="_blank" rel="noopener noreferrer" className="inline-block rounded-lg bg-[#F97316] px-4 py-2 text-sm font-semibold text-black">
+        <a href={link} target="_blank" rel="noopener noreferrer" className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
           Pagar agora →
         </a>
       )}

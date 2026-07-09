@@ -51,7 +51,7 @@ export function InstallButton({ appName = 'o app' }: { appName?: string }) {
     <>
       <button
         onClick={onClick}
-        className="fixed bottom-4 left-4 z-40 flex items-center gap-2 rounded-full border border-[#F97316]/40 bg-background/90 px-4 py-2.5 text-sm font-semibold text-[#F97316] shadow-lg backdrop-blur"
+        className="fixed bottom-4 left-4 z-40 flex items-center gap-2 rounded-full border border-brand/40 bg-background/90 px-4 py-2.5 text-sm font-semibold text-brand shadow-lg backdrop-blur"
       >
         <Download className="h-4 w-4" /> Instalar app
       </button>

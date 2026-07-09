@@ -62,7 +62,7 @@ export function CadastroForm({ initial }: { initial: Partial<CadastroInput> }) {
         <div key={f.key} className={`space-y-1 ${f.className ?? ''}`}>
           <Label htmlFor={f.key}>
             {f.label}{f.required
-              ? <span className="text-[#F97316]"> *</span>
+              ? <span className="text-brand"> *</span>
               : <span className="text-muted-foreground text-xs"> (opcional)</span>}
           </Label>
           <Input
@@ -75,7 +75,7 @@ export function CadastroForm({ initial }: { initial: Partial<CadastroInput> }) {
       ))}
       {erro && <p className="sm:col-span-2 text-sm text-destructive">{erro}</p>}
       <div className="sm:col-span-2">
-        <Button type="submit" disabled={saving} className="bg-[#F97316] hover:opacity-90 text-white">
+        <Button type="submit" disabled={saving} className="bg-primary hover:opacity-90 text-white">
           {saving ? 'Salvando...' : 'Salvar e continuar'}
         </Button>
       </div>

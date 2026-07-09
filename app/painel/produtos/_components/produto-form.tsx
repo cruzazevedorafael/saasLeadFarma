@@ -104,7 +104,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>Fotos — a 1ª é a capa</Label>
-          <span className={`text-xs font-medium ${imageUrls.length > 0 ? 'text-[#F97316]' : 'text-muted-foreground'}`}>
+          <span className={`text-xs font-medium ${imageUrls.length > 0 ? 'text-brand' : 'text-muted-foreground'}`}>
             {imageUrls.length} de {MAX_FOTOS} foto{imageUrls.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -114,7 +114,7 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
               <div key={url} className="relative">
                 <img src={url} alt="" className="h-24 w-24 rounded-lg object-cover" />
                 {i === 0 && (
-                  <span className="absolute left-1 top-1 rounded bg-[#F97316] px-1 text-[10px] font-medium text-black">capa</span>
+                  <span className="absolute left-1 top-1 rounded bg-primary px-1 text-[10px] font-medium text-primary-foreground">capa</span>
                 )}
                 <button
                   type="button"

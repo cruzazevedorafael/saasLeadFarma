@@ -57,7 +57,7 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
                     <span className={`text-xs px-2 py-0.5 rounded ${p.status === 'pending' ? 'bg-amber-500/15 text-amber-600' : p.status === 'completed' ? 'bg-green-500/15 text-green-600' : 'bg-red-500/15 text-red-500'}`}>{statusLabel[p.status]}</span>
                     <span className="text-muted-foreground">{new Date(p.createdAt).toLocaleDateString('pt-BR')}</span>
                   </span>
-                  <span className="font-semibold text-[#F97316]">{brl(p.total)}</span>
+                  <span className="font-semibold text-brand">{brl(p.total)}</span>
                 </Link>
               </li>
             ))}

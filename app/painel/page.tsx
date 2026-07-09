@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BannerSettings } from './_components/banner-settings'
 import { LogoSettings } from './_components/logo-settings'
+import { LogoMark } from '@/components/brand/logo'
 import { Package, Tags, Truck, CreditCard, ShoppingBag, Users, BarChart3, Star, Building2, ChevronRight } from 'lucide-react'
 
 const NAV = [
@@ -39,9 +40,12 @@ export default async function PainelHome() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{settings.storeName}</h1>
-          <p className="text-xs text-muted-foreground">Painel · <span className="text-[#F97316] font-medium">LeadFarma</span></p>
+        <div className="flex items-center gap-3">
+          <LogoMark size="lg" />
+          <div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight leading-none">{settings.storeName}</h1>
+            <p className="mt-1 text-xs text-muted-foreground">Painel · <span className="text-brand font-semibold">LeadFarma</span></p>
+          </div>
         </div>
         <form action={logout}><Button variant="outline" type="submit">Sair</Button></form>
       </div>
@@ -51,9 +55,9 @@ export default async function PainelHome() {
           <Link
             key={href}
             href={href}
-            className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-[#F97316]/50 hover:bg-muted/40"
+            className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-brand/50 hover:shadow-md hover:-translate-y-0.5"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#F97316]/10 text-[#F97316]">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
               <Icon className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1">
@@ -67,7 +71,7 @@ export default async function PainelHome() {
 
       <h2 className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Configurações da loja</h2>
 
-      <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border p-4">
+      <form action={salvarLimite} className="max-w-sm space-y-2 rounded-xl border border-border bg-card p-4 shadow-sm">
         <Label htmlFor="threshold" className="text-sm font-medium">Quantidade para o preço por atacado</Label>
         <p className="text-xs text-muted-foreground">A partir desta quantidade de itens que contam, o carrinho do cliente passa a usar o preço por quantidade.</p>
         <div className="flex gap-2">
@@ -76,7 +80,7 @@ export default async function PainelHome() {
         </div>
       </form>
 
-      <form action={salvarContato} className="max-w-sm space-y-3 rounded-xl border border-border p-4">
+      <form action={salvarContato} className="max-w-sm space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
         <div className="space-y-1">
           <Label htmlFor="storeName" className="text-sm font-medium">Nome da loja</Label>
           <Input id="storeName" name="storeName" defaultValue={settings.storeName} />

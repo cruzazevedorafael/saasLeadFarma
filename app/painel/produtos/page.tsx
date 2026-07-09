@@ -68,7 +68,7 @@ export default async function ProdutosPage() {
                   <td className="p-3">{p.active ? 'Sim' : 'Não'}</td>
                   <td className="p-3">
                     <div className="flex items-center gap-3">
-                      <Link href={`/painel/produtos/${p.id}`} className="text-[#F97316] hover:underline">Editar</Link>
+                      <Link href={`/painel/produtos/${p.id}`} className="text-brand hover:underline">Editar</Link>
                       <ProdutoActions id={p.id} active={p.active} />
                     </div>
                   </td>
@@ -97,7 +97,7 @@ export default async function ProdutosPage() {
                   Estoque: {p.variants.reduce((a, v) => a + v.stock, 0)} · {p.active ? 'Ativo' : 'Inativo'}
                 </div>
                 <div className="flex items-center gap-3 mt-2">
-                  <Link href={`/painel/produtos/${p.id}`} className="text-[#F97316] hover:underline">Editar</Link>
+                  <Link href={`/painel/produtos/${p.id}`} className="text-brand hover:underline">Editar</Link>
                   <ProdutoActions id={p.id} active={p.active} />
                 </div>
               </div>
