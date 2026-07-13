@@ -7,6 +7,8 @@ import { getAdminProducts } from '@/lib/data/products'
 import { sortPromoFirst, isPromoActive } from '@/lib/data/products.helpers'
 import { Button } from '@/components/ui/button'
 import { ProdutoActions } from './_components/produto-actions'
+import { QuickAddProduto } from './_components/quick-add-produto'
+import { StockControl } from './_components/stock-control'
 
 export default async function ProdutosPage() {
   const supabase = await createClient()
@@ -25,6 +27,8 @@ export default async function ProdutosPage() {
         </div>
         <Link href="/painel/produtos/novo"><Button>Novo produto</Button></Link>
       </div>
+
+      <QuickAddProduto />
 
       {produtos.length === 0 ? (
         <p className="text-muted-foreground">Nenhum produto cadastrado ainda.</p>
@@ -64,7 +68,7 @@ export default async function ProdutosPage() {
                   <td className="p-3">{p.category}</td>
                   <td className="p-3">{fmt(p.priceRetail)}</td>
                   <td className="p-3">{fmt(p.priceWholesale)}</td>
-                  <td className="p-3">{p.variants.reduce((a, v) => a + v.stock, 0)}</td>
+                  <td className="p-3"><StockControl productId={p.id} initialStock={p.variants.reduce((a, v) => a + v.stock, 0)} variantCount={p.variants.length} /></td>
                   <td className="p-3">{p.countsForWholesale ? 'Sim' : 'Não'}</td>
                   <td className="p-3">{p.active ? 'Sim' : 'Não'}</td>
                   <td className="p-3">
@@ -94,8 +98,10 @@ export default async function ProdutosPage() {
                 )}
                 <p className="text-xs text-muted-foreground">{p.category || 'Sem categoria'}</p>
                 <div className="text-sm mt-1">Unitário: {fmt(p.priceRetail)} · Por qtd.: {fmt(p.priceWholesale)}</div>
-                <div className="text-xs text-muted-foreground">
-                  Estoque: {p.variants.reduce((a, v) => a + v.stock, 0)} · {p.active ? 'Ativo' : 'Inativo'}
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>Estoque:</span>
+                  <StockControl productId={p.id} initialStock={p.variants.reduce((a, v) => a + v.stock, 0)} variantCount={p.variants.length} />
+                  <span>· {p.active ? 'Ativo' : 'Inativo'}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-2">
                   <Link href={`/painel/produtos/${p.id}`} className="text-brand hover:underline">Editar</Link>
