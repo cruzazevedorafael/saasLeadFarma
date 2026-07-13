@@ -1,5 +1,6 @@
 // app/painel/assinatura/page.tsx — plano atual, período de teste e assinatura.
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { requirePharmacyAdmin, getCurrentPharmacy } from '@/lib/auth/guards'
 import { planLabel, subscriptionLabel } from '@/lib/asaas/plans'
 import { asaasEnabled } from '@/lib/asaas/client'
@@ -19,7 +20,7 @@ export default async function AssinaturaPage() {
   return (
     <div className="container mx-auto p-6 space-y-6 max-w-2xl">
       <div>
-        <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
+        <BackButton href="/painel" label="Painel" />
         <h1 className="text-2xl font-bold">Assinatura</h1>
       </div>
 

@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { getAdminProducts } from '@/lib/data/products'
 import { sortPromoFirst, isPromoActive } from '@/lib/data/products.helpers'
 import { Button } from '@/components/ui/button'
@@ -19,7 +20,7 @@ export default async function ProdutosPage() {
     <div className="container mx-auto p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
+          <BackButton href="/painel" label="Painel" />
           <h1 className="text-2xl font-bold">Produtos</h1>
         </div>
         <Link href="/painel/produtos/novo"><Button>Novo produto</Button></Link>

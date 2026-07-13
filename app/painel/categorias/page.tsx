@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { getCategories } from '@/lib/data/categories'
 import { CategoriasManager } from './_components/categorias-manager'
 
@@ -15,7 +16,7 @@ export default async function CategoriasPage() {
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-xl space-y-4">
       <div>
-        <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
+        <BackButton href="/painel" label="Painel" />
         <h1 className="text-2xl font-bold">Categorias</h1>
         <p className="text-sm text-muted-foreground">Crie, renomeie ou apague. Não dá pra apagar categoria em uso.</p>
       </div>

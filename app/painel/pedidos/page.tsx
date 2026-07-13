@@ -1,5 +1,6 @@
 // app/painel/pedidos/page.tsx
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getAdminOrders } from '@/lib/data/orders'
 import type { OrderStatus } from '@/lib/data/orders.types'
@@ -25,7 +26,7 @@ export default async function PedidosPage({ searchParams }: { searchParams: Prom
     <div className="container mx-auto p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
+          <BackButton href="/painel" label="Painel" />
           <h1 className="text-2xl font-bold">Pedidos</h1>
         </div>
       </div>

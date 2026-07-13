@@ -1,6 +1,7 @@
 // app/painel/pedidos/[id]/page.tsx
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { getAdminOrder } from '@/lib/data/orders'
 import { getCurrentPharmacy } from '@/lib/auth/guards'
 import { PedidoActions } from '../_components/pedido-actions'
@@ -26,7 +27,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-2xl space-y-5">
       <div>
-        <Link href="/painel/pedidos" className="text-sm text-muted-foreground hover:underline">← Pedidos</Link>
+        <BackButton href="/painel/pedidos" label="Pedidos" />
         <div className="flex items-center gap-2 flex-wrap mt-1">
           <h1 className="text-2xl font-bold">Pedido #{o.number}</h1>
           <span className={`text-xs px-2 py-0.5 rounded ${statusClass}`}>{statusLabel}</span>

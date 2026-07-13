@@ -1,5 +1,6 @@
 // app/painel/clientes/page.tsx — registro de clientes da farmácia (RLS isola por tenant).
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/back-button'
 import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getCustomers } from '@/lib/data/customers'
 import { formatCpf } from '@/lib/cpf'
@@ -11,7 +12,7 @@ export default async function ClientesPage() {
   return (
     <div className="container mx-auto p-6 space-y-4">
       <div>
-        <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
+        <BackButton href="/painel" label="Painel" />
         <h1 className="text-2xl font-bold">Clientes</h1>
         <p className="text-xs text-muted-foreground">
           Cadastros salvos com autorização do cliente (LGPD). {clientes.length} cliente{clientes.length !== 1 ? 's' : ''}.

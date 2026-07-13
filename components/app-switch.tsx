@@ -1,19 +1,18 @@
 import Link from 'next/link'
 import { LayoutDashboard, Store } from 'lucide-react'
 
-// Pílula flutuante pra alternar entre o App Catálogo e o App Painel.
-// variant 'catalogo' → botão que leva ao catálogo; 'painel' → leva ao painel.
+// Botão flutuante para a DONA da farmácia alternar entre o catálogo e o painel.
+// Só é renderizado quando o dono está logado (ver app/f/[slug]/page.tsx).
+// variant 'painel' → mostrado no catálogo, leva ao painel; 'catalogo' → o inverso.
 export function AppSwitch({ href, variant }: { href: string; variant: 'catalogo' | 'painel' }) {
   const catalogo = variant === 'catalogo'
-  // painel (mostrado no catálogo) → topo direito; catálogo (mostrado no painel) → base direita
-  const pos = catalogo ? 'bottom-4 right-4' : 'top-3 right-3'
   return (
     <Link
       href={href}
-      className={`fixed ${pos} z-40 flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-3 py-1.5 text-xs font-medium shadow-md backdrop-blur hover:bg-muted`}
+      className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full bg-foreground px-4 py-3 text-sm font-semibold text-background shadow-lg transition hover:brightness-110 active:scale-95"
     >
-      {catalogo ? <Store className="h-3.5 w-3.5 text-brand" /> : <LayoutDashboard className="h-3.5 w-3.5 text-brand" />}
-      {catalogo ? 'Ver catálogo' : 'Ir ao painel'}
+      {catalogo ? <Store className="h-4 w-4" /> : <LayoutDashboard className="h-4 w-4" />}
+      {catalogo ? 'Ver catálogo' : 'Ir ao meu painel'}
     </Link>
   )
 }
