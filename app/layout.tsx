@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next'
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
+import { Bricolage_Grotesque, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-// Tipografia da marca: Plus Jakarta Sans nos títulos (personalidade),
-// Inter no corpo (legibilidade). Carregadas de verdade via next/font.
-const display = Plus_Jakarta_Sans({
+// Tipografia da marca: Bricolage Grotesque nos títulos — grotesca editorial,
+// madura e com caráter (premium, não "app genérico"). Inter no corpo.
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-display',
   weight: ['500', '600', '700', '800'],

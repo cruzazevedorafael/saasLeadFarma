@@ -1,7 +1,6 @@
 // app/painel/pedidos/page.tsx
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getAdminOrders } from '@/lib/data/orders'
 import type { OrderStatus } from '@/lib/data/orders.types'
 import { PedidoActions } from './_components/pedido-actions'
@@ -16,13 +15,11 @@ const FILTROS: { key: string; label: string; status?: OrderStatus }[] = [
 const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
 export default async function PedidosPage({ searchParams }: { searchParams: Promise<{ f?: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/painel/login')
+  const { pharmacyId } = await requirePharmacyAdmin()
 
   const { f = 'pending' } = await searchParams
   const filtro = FILTROS.find((x) => x.key === f) ?? FILTROS[0]
-  const pedidos = await getAdminOrders(filtro.status)
+  const pedidos = await getAdminOrders(pharmacyId!, filtro.status)
 
   return (
     <div className="container mx-auto p-6 space-y-4">

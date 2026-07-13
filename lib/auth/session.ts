@@ -1,5 +1,6 @@
 // lib/auth/session.ts
 // Sessão + papel do usuário logado (server-side).
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 
 export type Role = 'superadmin' | 'pharmacy_admin'
@@ -10,8 +11,9 @@ export interface SessionProfile {
   pharmacyId: string | null
 }
 
-/** Lê o usuário autenticado e seu profile (papel + farmácia). null se não logado. */
-export async function getSessionProfile(): Promise<SessionProfile | null> {
+/** Lê o usuário autenticado e seu profile (papel + farmácia). null se não logado.
+ *  Memoizado por request (React cache): guard + header + settings não repetem getUser/profiles. */
+export const getSessionProfile = cache(async (): Promise<SessionProfile | null> => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -22,4 +24,4 @@ export async function getSessionProfile(): Promise<SessionProfile | null> {
     .single()
   if (error || !data) return null
   return { userId: user.id, role: data.role as Role, pharmacyId: data.pharmacy_id ?? null }
-}
+})

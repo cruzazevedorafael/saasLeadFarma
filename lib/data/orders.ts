@@ -52,9 +52,14 @@ function mapOrder(r: any): OrderWithItems {
   }
 }
 
-export async function getAdminOrders(status?: OrderStatus): Promise<OrderWithItems[]> {
+// SEGURANÇA (multi-tenant): estas funções usam service_role (bypassa RLS), então
+// PRECISAM receber o pharmacyId da farmácia logada e filtrar por ele. Sem isso,
+// uma farmácia veria pedidos/PII de todas as outras (vazamento cross-tenant + IDOR).
+export async function getAdminOrders(pharmacyId: string, status?: OrderStatus): Promise<OrderWithItems[]> {
   const db = createAdminClient()
-  let q = db.from('orders').select('*, order_items(*)').order('created_at', { ascending: false })
+  let q = db.from('orders').select('*, order_items(*)')
+    .eq('pharmacy_id', pharmacyId)
+    .order('created_at', { ascending: false })
   if (status) q = q.eq('status', status)
   const { data, error } = await q
   if (error) throw error
@@ -63,14 +68,17 @@ export async function getAdminOrders(status?: OrderStatus): Promise<OrderWithIte
 
 // Detalhe de um pedido, com a foto de cada item buscada pelo product_id
 // (o item guarda só o product_id; a foto vem do cadastro atual do produto).
-export async function getAdminOrder(id: string): Promise<OrderWithItems | null> {
+// Escopado por pharmacyId: pedido de outra farmácia retorna null (bloqueia IDOR).
+export async function getAdminOrder(id: string, pharmacyId: string): Promise<OrderWithItems | null> {
   const db = createAdminClient()
-  const { data, error } = await db.from('orders').select('*, order_items(*)').eq('id', id).single()
+  const { data, error } = await db.from('orders').select('*, order_items(*)')
+    .eq('id', id).eq('pharmacy_id', pharmacyId).single()
   if (error || !data) return null
   const order = mapOrder(data)
   const ids = [...new Set(order.items.map((i) => i.productId).filter((x): x is string => !!x))]
   if (ids.length > 0) {
-    const { data: prods } = await db.from('products').select('id, image_url').in('id', ids)
+    const { data: prods } = await db.from('products').select('id, image_url')
+      .eq('pharmacy_id', pharmacyId).in('id', ids)
     const fotos = new Map((prods ?? []).map((p: any) => [p.id, (p.image_url ?? null) as string | null]))
     order.items = order.items.map((it) => ({
       ...it,

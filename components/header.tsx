@@ -1,8 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
-export function Header({ storeName, logoUrl }: { storeName: string; logoUrl: string | null }) {
+export function Header({ storeName, logoUrl, homeHref = '#top' }: { storeName: string; logoUrl: string | null; homeHref?: string }) {
   const initial = (storeName || 'F').trim().charAt(0).toUpperCase()
   return (
     <motion.header
@@ -12,22 +13,24 @@ export function Header({ storeName, logoUrl }: { storeName: string; logoUrl: str
       className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl"
     >
       <div className="container mx-auto flex h-12 md:h-16 items-center justify-between px-3 md:px-4">
+        {/* Logo da FARMÁCIA → volta ao início do catálogo */}
         <motion.div
-          className="flex items-center gap-2 md:gap-2.5"
           whileHover={{ scale: 1.02 }}
           transition={{ type: 'spring', stiffness: 400 }}
         >
-          <div className="relative h-9 w-9 md:h-11 md:w-11 shrink-0 overflow-hidden rounded-full border-2 border-[var(--brand)]/50 bg-[var(--brand)]/10 flex items-center justify-center">
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt={storeName} className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-base md:text-lg font-bold text-[var(--brand)]">{initial}</span>
-            )}
-          </div>
-          <span className="text-base md:text-xl font-bold tracking-tight text-foreground leading-none">
-            {storeName}
-          </span>
+          <Link href={homeHref} aria-label={`Início · ${storeName}`} className="flex items-center gap-2 md:gap-2.5">
+            <div className="relative h-9 w-9 md:h-11 md:w-11 shrink-0 overflow-hidden rounded-full border-2 border-[var(--brand)]/50 bg-[var(--brand)]/10 flex items-center justify-center">
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt={storeName} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-base md:text-lg font-bold text-[var(--brand)]">{initial}</span>
+              )}
+            </div>
+            <span className="text-base md:text-xl font-bold tracking-tight text-foreground leading-none">
+              {storeName}
+            </span>
+          </Link>
         </motion.div>
 
         <motion.div

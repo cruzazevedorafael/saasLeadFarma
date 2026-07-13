@@ -4,10 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  LeadFarma — sistema de design (laranja · branco · preto)
-  Princípio: base branca, preto/grafite quente na estrutura e no texto,
-  laranja (#F97316) como DESTAQUE disciplinado — só em CTAs, foco e marca.
-  Neutros levam um toque quente (hue ~60) pra não parecerem "cinza de template".
+  LeadFarma — sistema de design · teoria das cores 60/30/10
+  Azul e laranja são COMPLEMENTARES (lados opostos do círculo cromático).
+  - 60% dominante: superfícies azul-claro (fundo) + cards brancos → conforto e divisão limpa
+  - 30% secundário: azul-grafite no texto/estrutura, neutros azulados, bordas
+  - 10% acento: laranja (#F97316) — só CTAs, foco e marca; é o que "salta"
+  Azul bem claro e confortável, sem atrito com o laranja.
 */
 :root {
   /* Marca */
@@ -16,39 +18,39 @@
   --brand-soft: oklch(0.96 0.045 65); /* laranja bem claro p/ fundos suaves */
   --brand-contrast: oklch(0.99 0.01 80); /* texto sobre laranja */
 
-  /* Superfícies e texto (neutros quentes) */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.22 0.012 55);
+  /* 60% — superfícies: fundo azul bem claro + cards brancos (divisão limpa) */
+  --background: oklch(0.976 0.014 248);
+  --foreground: oklch(0.25 0.03 258);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.012 55);
+  --card-foreground: oklch(0.25 0.03 258);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.012 55);
+  --popover-foreground: oklch(0.25 0.03 258);
 
-  /* Ação primária = laranja da marca */
+  /* 10% — ação primária = laranja da marca (acento complementar) */
   --primary: var(--brand);
   --primary-foreground: var(--brand-contrast);
 
-  /* Neutros de apoio (fundos sutis, hovers) — NÃO laranja */
-  --secondary: oklch(0.97 0.006 60);
-  --secondary-foreground: oklch(0.28 0.012 55);
-  --muted: oklch(0.97 0.006 60);
-  --muted-foreground: oklch(0.53 0.012 55);
-  --accent: oklch(0.96 0.008 60);
-  --accent-foreground: oklch(0.28 0.012 55);
+  /* 30% — neutros azulados de apoio (fundos sutis, hovers) */
+  --secondary: oklch(0.955 0.018 248);
+  --secondary-foreground: oklch(0.32 0.03 258);
+  --muted: oklch(0.955 0.016 248);
+  --muted-foreground: oklch(0.52 0.03 255);
+  --accent: oklch(0.94 0.024 248);
+  --accent-foreground: oklch(0.32 0.03 258);
 
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0.01 80);
 
-  --border: oklch(0.92 0.006 60);
-  --input: oklch(0.92 0.006 60);
+  --border: oklch(0.905 0.016 248);
+  --input: oklch(0.905 0.016 248);
   --ring: var(--brand);
 
-  /* Gráficos ancorados na marca (laranja + quentes + 1 teal de contraste) */
+  /* Gráficos: laranja (marca) + azuis complementares + teal/âmbar */
   --chart-1: var(--brand);
-  --chart-2: oklch(0.8 0.13 70);
-  --chart-3: oklch(0.55 0.11 45);
-  --chart-4: oklch(0.68 0.1 200);
-  --chart-5: oklch(0.35 0.02 55);
+  --chart-2: oklch(0.62 0.15 250);
+  --chart-3: oklch(0.75 0.11 240);
+  --chart-4: oklch(0.7 0.12 195);
+  --chart-5: oklch(0.8 0.13 70);
 
   --radius: 0.75rem;
 
@@ -61,13 +63,13 @@
   --shadow-brand: 0 8px 24px -6px oklch(0.7 0.19 48 / 0.35);
 
   /* Sidebar (painel/gestão) */
-  --sidebar: oklch(0.99 0.004 60);
-  --sidebar-foreground: oklch(0.28 0.012 55);
+  --sidebar: oklch(0.965 0.014 248);
+  --sidebar-foreground: oklch(0.32 0.03 258);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-contrast);
-  --sidebar-accent: oklch(0.96 0.008 60);
-  --sidebar-accent-foreground: oklch(0.28 0.012 55);
-  --sidebar-border: oklch(0.92 0.006 60);
+  --sidebar-accent: oklch(0.94 0.024 248);
+  --sidebar-accent-foreground: oklch(0.32 0.03 258);
+  --sidebar-border: oklch(0.905 0.016 248);
   --sidebar-ring: var(--brand);
 
   /* Compat: código legado ainda referencia --lime */
@@ -81,35 +83,35 @@
   --brand-soft: oklch(0.32 0.08 50);
   --brand-contrast: oklch(0.16 0.02 55);
 
-  --background: oklch(0.15 0.008 60);
-  --foreground: oklch(0.96 0.004 60);
-  --card: oklch(0.19 0.008 60);
-  --card-foreground: oklch(0.96 0.004 60);
-  --popover: oklch(0.19 0.008 60);
-  --popover-foreground: oklch(0.96 0.004 60);
+  --background: oklch(0.17 0.02 258);
+  --foreground: oklch(0.95 0.008 250);
+  --card: oklch(0.21 0.022 258);
+  --card-foreground: oklch(0.95 0.008 250);
+  --popover: oklch(0.21 0.022 258);
+  --popover-foreground: oklch(0.95 0.008 250);
 
   --primary: var(--brand);
   --primary-foreground: var(--brand-contrast);
 
-  --secondary: oklch(0.24 0.008 60);
-  --secondary-foreground: oklch(0.96 0.004 60);
-  --muted: oklch(0.24 0.008 60);
-  --muted-foreground: oklch(0.68 0.01 60);
-  --accent: oklch(0.27 0.01 60);
-  --accent-foreground: oklch(0.96 0.004 60);
+  --secondary: oklch(0.26 0.022 258);
+  --secondary-foreground: oklch(0.95 0.008 250);
+  --muted: oklch(0.26 0.022 258);
+  --muted-foreground: oklch(0.68 0.02 252);
+  --accent: oklch(0.3 0.026 258);
+  --accent-foreground: oklch(0.95 0.008 250);
 
   --destructive: oklch(0.62 0.2 25);
   --destructive-foreground: oklch(0.99 0.01 80);
 
-  --border: oklch(0.28 0.008 60);
-  --input: oklch(0.3 0.008 60);
+  --border: oklch(0.3 0.022 258);
+  --input: oklch(0.32 0.022 258);
   --ring: var(--brand);
 
   --chart-1: var(--brand);
-  --chart-2: oklch(0.8 0.13 70);
-  --chart-3: oklch(0.6 0.11 45);
-  --chart-4: oklch(0.7 0.1 200);
-  --chart-5: oklch(0.8 0.02 60);
+  --chart-2: oklch(0.68 0.14 250);
+  --chart-3: oklch(0.78 0.1 240);
+  --chart-4: oklch(0.72 0.12 195);
+  --chart-5: oklch(0.8 0.13 70);
 
   --shadow-color: 30 20% 4%;
 
@@ -187,11 +189,43 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'cv11', 'ss01';
+    letter-spacing: -0.006em;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  h1 { line-height: 1.02; }
+}
+
+@layer components {
+  /* Rótulo de seção (eyebrow) — premium, marca a divisão sem poluir.
+     Um filete laranja curto + label sobrescrita. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .eyebrow::before {
+    content: '';
+    width: 1.25rem;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--brand);
+  }
+  /* Divisor de seção discreto */
+  .hairline {
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
   }
 }
 

@@ -1,6 +1,5 @@
 // app/painel/pedidos/[id]/page.tsx
-import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getAdminOrder } from '@/lib/data/orders'
 import { getCurrentPharmacy } from '@/lib/auth/guards'
@@ -12,14 +11,11 @@ const fmt = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 const dataHora = (s: string | null) => (s ? new Date(s).toLocaleString('pt-BR') : null)
 
 export default async function PedidoDetalhe({ params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/painel/login')
+  const pharmacy = await getCurrentPharmacy()
 
   const { id } = await params
-  const o = await getAdminOrder(id)
+  const o = await getAdminOrder(id, pharmacy.id)
   if (!o) notFound()
-  const pharmacy = await getCurrentPharmacy()
 
   const statusLabel = o.status === 'pending' ? 'Pendente' : o.status === 'completed' ? 'Baixado' : 'Cancelado'
   const statusClass =

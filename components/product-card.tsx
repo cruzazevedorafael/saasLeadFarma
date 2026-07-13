@@ -72,7 +72,7 @@ export function ProductCard({ product, index, threshold }: ProductCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.35, delay: Math.min(index, 8) * 0.03 }}
       whileHover={{ y: -5 }}
       className="group relative overflow-hidden rounded-xl md:rounded-2xl border border-border/50 bg-card"
     >

@@ -1,5 +1,6 @@
 // lib/data/pharmacy.ts
 // Data-layer da farmácia (o tenant). Substitui o antigo store_settings singleton.
+import { cache } from 'react'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -76,8 +77,9 @@ export function mapPharmacyRow(r: any): Pharmacy {
 // painel usam getPharmacyById / getCurrentPharmacy (service_role/autenticado).
 const PUBLIC_PHARMACY_COLS = 'id, slug, nome_exibicao, nome_fantasia, logo_url, accent_color, banner_image_url, whatsapp_number, wholesale_threshold, status'
 
-/** Público (anon): resolve a farmácia ativa pelo slug da URL. null se inexistente/suspensa. */
-export async function getPharmacyBySlug(slug: string): Promise<Pharmacy | null> {
+/** Público (anon): resolve a farmácia ativa pelo slug da URL. null se inexistente/suspensa.
+ *  Memoizado por request (React cache): generateMetadata + a página não duplicam a query. */
+export const getPharmacyBySlug = cache(async (slug: string): Promise<Pharmacy | null> => {
   const supabase = await createServerClient()
   const { data, error } = await supabase
     .from('pharmacies')
@@ -87,15 +89,15 @@ export async function getPharmacyBySlug(slug: string): Promise<Pharmacy | null> 
     .single()
   if (error || !data) return null
   return mapPharmacyRow(data)
-}
+})
 
-/** Server (service-role): farmácia por id, sem RLS. */
-export async function getPharmacyById(id: string): Promise<Pharmacy | null> {
+/** Server (service-role): farmácia por id, sem RLS. Memoizado por request. */
+export const getPharmacyById = cache(async (id: string): Promise<Pharmacy | null> => {
   const db = createAdminClient()
   const { data, error } = await db.from('pharmacies').select('*').eq('id', id).single()
   if (error || !data) return null
   return mapPharmacyRow(data)
-}
+})
 
 /**
  * Atualiza a PRÓPRIA farmácia (onboarding/configurações) usando a SESSÃO do
