@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { produtoSchema, type ProdutoInput } from './produto-schema'
 import { createProduto, updateProduto, uploadProdutoImage } from '../actions'
+import { buscarProdutoPorGtin } from '../gtin-actions'
+import { BarcodeScanner } from './barcode-scanner'
 import { compressImage } from '@/lib/compress-image'
 import type { ProductWithVariants } from '@/lib/data/types'
 import { Button } from '@/components/ui/button'
@@ -85,6 +87,34 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
     setValue('imageUrl', todas[0] ?? null)
   }
 
+  const [scanBusy, setScanBusy] = useState(false)
+  const [scanStatus, setScanStatus] = useState<string | null>(null)
+
+  // Escaneou/digitou o EAN → preenche o código e busca dados do produto (autopreenche).
+  const onScanned = async (code: string) => {
+    setValue('code', code)
+    setScanStatus(null); setScanBusy(true)
+    try {
+      const r = await buscarProdutoPorGtin(code)
+      if (r.found) {
+        if (r.name) setValue('name', r.name)
+        if (r.brand) setValue('brand', r.brand)
+        if (r.category) setValue('category', r.category)
+        if (r.imageUrl && imageUrls.length === 0) {
+          const todas = [r.imageUrl]
+          setImageUrlsState(todas); setValue('imageUrls', todas); setValue('imageUrl', r.imageUrl)
+        }
+        setScanStatus('✓ Produto encontrado — confira e complete os dados (preço, estoque, foto própria).')
+      } else {
+        setScanStatus('Código registrado, mas o produto não está na base — preencha os dados manualmente.')
+      }
+    } catch {
+      setScanStatus('Não consegui buscar os dados agora — preencha manualmente.')
+    } finally {
+      setScanBusy(false)
+    }
+  }
+
   const onSubmit = async (data: ProdutoInput) => {
     setSubmitError(null)
     try {
@@ -137,17 +167,22 @@ export function ProdutoForm({ mode, produto, categorias }: { mode: 'create' | 'e
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="code">Cód. de barras (EAN) / código (opcional)</Label>
-          <Input id="code" inputMode="numeric" {...register('code')} />
-          {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
+      <div className="space-y-1 rounded-xl border border-border bg-muted/30 p-3">
+        <Label htmlFor="code">Cód. de barras (EAN) / código (opcional)</Label>
+        <div className="flex gap-2">
+          <Input id="code" inputMode="numeric" {...register('code')} className="flex-1" />
+          <BarcodeScanner onDetect={onScanned} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="name">Nome</Label>
-          <Input id="name" {...register('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-        </div>
+        {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
+        {scanBusy && <p className="text-xs text-muted-foreground">Buscando dados do produto…</p>}
+        {scanStatus && <p className="text-xs text-brand">{scanStatus}</p>}
+        <p className="text-[11px] text-muted-foreground">Escaneie o código para puxar nome, marca e foto automaticamente.</p>
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="name">Nome</Label>
+        <Input id="name" {...register('name')} />
+        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1">
