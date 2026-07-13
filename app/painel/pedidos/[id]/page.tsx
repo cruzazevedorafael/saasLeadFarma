@@ -124,7 +124,7 @@ export default async function PedidoDetalhe({ params }: { params: Promise<{ id: 
       {o.status === 'pending' && (
         <div className="rounded-xl border border-border p-4">
           <h2 className="font-semibold text-sm mb-2">Ações</h2>
-          <PedidoActions orderId={o.id} />
+          <PedidoActions order={o} pharmacy={pharmacy} />
         </div>
       )}
     </div>
