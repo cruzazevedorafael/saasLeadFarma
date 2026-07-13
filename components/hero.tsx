@@ -1,9 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { PromoCarousel } from '@/components/promo-carousel'
 
-export function Hero({ bannerImageUrl, storeName, logoUrl }: { bannerImageUrl?: string; storeName: string; logoUrl: string | null }) {
+export function Hero({ bannerImageUrl, storeName, logoUrl, promotions = [] }: { bannerImageUrl?: string; storeName: string; logoUrl: string | null; promotions?: string[] }) {
   const initial = (storeName || 'F').trim().charAt(0).toUpperCase()
+  // Promoções (até 10) em carrossel; sem elas, cai no banner único legado.
+  const destaques = promotions.length > 0 ? promotions : (bannerImageUrl ? [bannerImageUrl] : [])
   return (
     <section className="relative overflow-hidden py-8 md:py-16">
       <div className="absolute inset-0 overflow-hidden">
@@ -60,17 +63,14 @@ export function Hero({ bannerImageUrl, storeName, logoUrl }: { bannerImageUrl?: 
             Catálogo online · faça seu pedido pelo WhatsApp
           </motion.p>
 
-          {bannerImageUrl && (
+          {destaques.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-6 md:mt-10 w-full max-w-2xl px-1"
+              className="mt-6 md:mt-10 w-full flex justify-center"
             >
-              <div className="relative overflow-hidden rounded-xl md:rounded-2xl border border-border/60">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={bannerImageUrl} alt="Destaque" className="block w-full object-cover" />
-              </div>
+              <PromoCarousel images={destaques} />
             </motion.div>
           )}
         </div>

@@ -22,7 +22,7 @@ function textoSobre(cor: string): string {
   return (0.299 * r + 0.587 * g + 0.114 * b) < 150 ? '#fff' : '#111'
 }
 
-export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null }) {
+export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, promotions = [], shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; promotions?: string[]; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
   const brand = accentColor || '#F97316'
@@ -46,7 +46,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, s
   return (
     <main id="top" className="min-h-screen bg-background" style={brandVars}>
       <Header storeName={storeName} logoUrl={logoUrl} />
-      <Hero bannerImageUrl={bannerImageUrl} storeName={storeName} logoUrl={logoUrl} />
+      <Hero bannerImageUrl={bannerImageUrl} promotions={promotions} storeName={storeName} logoUrl={logoUrl} />
 
       <section className="sticky top-14 md:top-20 z-30 bg-background/80 backdrop-blur-xl border-b border-border/40 py-3 md:py-4">
         <div className="container mx-auto px-3 md:px-4 space-y-3 md:space-y-4">

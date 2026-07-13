@@ -7,6 +7,7 @@ import { AppSwitch } from '@/components/app-switch'
 import { getSessionProfile } from '@/lib/auth/session'
 import { getPharmacyBySlug } from '@/lib/data/pharmacy'
 import { getPublicProducts } from '@/lib/data/products'
+import { getPublicPromotions } from '@/lib/data/promotions'
 import { getPublicShippingMethods } from '@/lib/data/shipping'
 import { getPublicPaymentMethods } from '@/lib/data/payment'
 
@@ -30,8 +31,9 @@ export default async function CatalogoFarmacia({ params }: { params: Promise<{ s
   const pharmacy = await getPharmacyBySlug(slug)
   if (!pharmacy) notFound()
 
-  const [products, shippingMethods, paymentMethods, session] = await Promise.all([
+  const [products, promotions, shippingMethods, paymentMethods, session] = await Promise.all([
     getPublicProducts(pharmacy.id),
+    getPublicPromotions(pharmacy.id).catch(() => []),
     getPublicShippingMethods(pharmacy.id).catch(() => []),
     getPublicPaymentMethods(pharmacy.id).catch(() => []),
     getSessionProfile().catch(() => null),
@@ -47,6 +49,7 @@ export default async function CatalogoFarmacia({ params }: { params: Promise<{ s
         threshold={pharmacy.wholesaleThreshold}
         whatsappNumber={pharmacy.whatsappNumber}
         bannerImageUrl={pharmacy.bannerImageUrl}
+        promotions={promotions}
         shippingMethods={shippingMethods}
         paymentMethods={paymentMethods}
         pharmacyId={pharmacy.id}

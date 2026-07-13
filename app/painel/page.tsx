@@ -2,11 +2,12 @@
 import Link from 'next/link'
 import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getStoreSettings } from '@/lib/data/settings'
+import { getPromotions } from '@/lib/data/promotions'
 import { setWholesaleThreshold, setStoreContact } from './settings-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { BannerSettings } from './_components/banner-settings'
+import { PromotionsSettings } from './_components/promotions-settings'
 import { LogoSettings } from './_components/logo-settings'
 import { SectionHeader } from '@/components/ui/section-header'
 import { Package, Tags, Truck, CreditCard, ShoppingBag, Users, BarChart3, Star, Building2, ChevronRight } from 'lucide-react'
@@ -24,8 +25,11 @@ const NAV = [
 ]
 
 export default async function PainelHome() {
-  await requirePharmacyAdmin()
-  const settings = await getStoreSettings()
+  const { pharmacyId } = await requirePharmacyAdmin()
+  const [settings, promotions] = await Promise.all([
+    getStoreSettings(),
+    getPromotions(pharmacyId!),
+  ])
 
   async function salvarLimite(formData: FormData) {
     'use server'
@@ -95,7 +99,7 @@ export default async function PainelHome() {
 
         <LogoSettings current={settings.logoUrl} currentColor={settings.accentColor} />
 
-        <BannerSettings current={settings.bannerImageUrl} />
+        <PromotionsSettings promotions={promotions} />
       </section>
     </div>
   )
