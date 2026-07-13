@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PromotionsSettings } from './_components/promotions-settings'
 import { LogoSettings } from './_components/logo-settings'
+import { CatalogFontSettings } from './_components/catalog-font-settings'
 import { SectionHeader } from '@/components/ui/section-header'
 import { Package, Tags, Truck, CreditCard, ShoppingBag, Users, BarChart3, Star, Building2, ChevronRight } from 'lucide-react'
 
@@ -98,6 +99,8 @@ export default async function PainelHome() {
         </div>
 
         <LogoSettings current={settings.logoUrl} currentColor={settings.accentColor} />
+
+        <CatalogFontSettings current={settings.catalogFont} />
 
         <PromotionsSettings promotions={promotions} />
       </section>

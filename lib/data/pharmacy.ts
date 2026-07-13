@@ -10,6 +10,7 @@ export interface Pharmacy {
   nomeExibicao: string
   logoUrl: string | null
   accentColor: string | null
+  catalogFont: string | null
   whatsappNumber: string
   bannerImageUrl: string
   wholesaleThreshold: number
@@ -45,6 +46,7 @@ export function mapPharmacyRow(r: any): Pharmacy {
     nomeExibicao: r.nome_exibicao ?? r.nome_fantasia ?? 'Farmácia',
     logoUrl: r.logo_url ?? null,
     accentColor: r.accent_color ?? null,
+    catalogFont: r.catalog_font ?? null,
     whatsappNumber: r.whatsapp_number ?? '',
     bannerImageUrl: r.banner_image_url ?? '',
     wholesaleThreshold: Number(r.wholesale_threshold ?? 4),
@@ -75,7 +77,7 @@ export function mapPharmacyRow(r: any): Pharmacy {
 // sensíveis (cnpj, email, telefone, farmacêutico, CRF, ids do ASAAS) — o anon
 // não tem privilégio de coluna para eles (ver migration 0006). Comprovantes e
 // painel usam getPharmacyById / getCurrentPharmacy (service_role/autenticado).
-const PUBLIC_PHARMACY_COLS = 'id, slug, nome_exibicao, nome_fantasia, logo_url, accent_color, banner_image_url, whatsapp_number, wholesale_threshold, status'
+const PUBLIC_PHARMACY_COLS = 'id, slug, nome_exibicao, nome_fantasia, logo_url, accent_color, catalog_font, banner_image_url, whatsapp_number, wholesale_threshold, status'
 
 /** Público (anon): resolve a farmácia ativa pelo slug da URL. null se inexistente/suspensa.
  *  Memoizado por request (React cache): generateMetadata + a página não duplicam a query. */

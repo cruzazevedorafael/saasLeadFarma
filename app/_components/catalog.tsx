@@ -57,11 +57,14 @@ function catalogTheme(brand: string): React.CSSProperties {
   } as React.CSSProperties
 }
 
-export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, promotions = [], shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; promotions?: string[]; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null }) {
+export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, promotions = [], shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor, fontFamily }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; promotions?: string[]; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null; fontFamily?: string | null }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
   const brand = accentColor || '#F97316'
-  const brandVars = catalogTheme(brand)
+  // tema (cores) + fonte white-label da farmácia, escopados no catálogo
+  const brandVars = fontFamily
+    ? { ...catalogTheme(brand), fontFamily, ['--font-display']: fontFamily } as React.CSSProperties
+    : catalogTheme(brand)
 
   const categories = useMemo(
     () => ['Todos', ...new Set(products.map((p) => p.category).filter(Boolean))],

@@ -10,6 +10,7 @@ export interface StoreSettings {
   bannerImageUrl: string
   logoUrl: string | null
   accentColor: string | null
+  catalogFont: string | null
 }
 
 export async function getStoreSettings(): Promise<StoreSettings> {
@@ -21,5 +22,6 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     bannerImageUrl: ph.bannerImageUrl,
     logoUrl: ph.logoUrl,
     accentColor: ph.accentColor,
+    catalogFont: ph.catalogFont,
   }
 }

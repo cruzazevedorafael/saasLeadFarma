@@ -3,6 +3,7 @@
 import { getCurrentPharmacyId } from '@/lib/auth/guards'
 import { updatePharmacy } from '@/lib/data/pharmacy'
 import { uploadImagem } from '@/lib/data/storage'
+import { CATALOG_FONT_KEYS } from '@/lib/catalog-fonts.options'
 import { revalidatePath } from 'next/cache'
 
 export async function setWholesaleThreshold(value: number) {
@@ -38,5 +39,12 @@ export async function uploadLogoImage(file: File): Promise<string> {
 export async function setBannerImage(url: string) {
   const pharmacyId = await getCurrentPharmacyId()
   await updatePharmacy(pharmacyId, { banner_image_url: url })
+  revalidatePath('/painel')
+}
+
+export async function setCatalogFont(key: string) {
+  const pharmacyId = await getCurrentPharmacyId()
+  const val = CATALOG_FONT_KEYS.includes(key) && key !== 'padrao' ? key : null
+  await updatePharmacy(pharmacyId, { catalog_font: val })
   revalidatePath('/painel')
 }

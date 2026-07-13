@@ -8,6 +8,7 @@ import { getSessionProfile } from '@/lib/auth/session'
 import { getPharmacyBySlug } from '@/lib/data/pharmacy'
 import { getPublicProducts } from '@/lib/data/products'
 import { getPublicPromotions } from '@/lib/data/promotions'
+import { catalogFontFamily } from '@/lib/catalog-fonts'
 import { getPublicShippingMethods } from '@/lib/data/shipping'
 import { getPublicPaymentMethods } from '@/lib/data/payment'
 
@@ -56,6 +57,7 @@ export default async function CatalogoFarmacia({ params }: { params: Promise<{ s
         storeName={pharmacy.nomeExibicao}
         logoUrl={pharmacy.logoUrl}
         accentColor={pharmacy.accentColor}
+        fontFamily={catalogFontFamily(pharmacy.catalogFont)}
       />
     </>
   )
