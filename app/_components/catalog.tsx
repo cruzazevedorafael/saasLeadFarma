@@ -22,11 +22,46 @@ function textoSobre(cor: string): string {
   return (0.299 * r + 0.587 * g + 0.114 * b) < 150 ? '#fff' : '#111'
 }
 
+function parseHex(cor: string): [number, number, number] {
+  const h = cor.replace('#', '')
+  if (h.length !== 6) return [249, 115, 22] // fallback laranja
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
+}
+// mistura a cor com branco (t=1 → branco) → tons claros derivados da marca
+function tint([r, g, b]: [number, number, number], t: number): string {
+  const m = (c: number) => Math.round(c + (255 - c) * t)
+  return `rgb(${m(r)}, ${m(g)}, ${m(b)})`
+}
+
+// Tema do catálogo derivado da cor da logo (teoria das cores 60/30/10, SÓ no catálogo):
+// 60% = superfícies bem claras tingidas da marca (fundo) + cards brancos;
+// 30% = neutros tingidos (muted/bordas); 10% = a própria marca (acento/CTAs).
+function catalogTheme(brand: string): React.CSSProperties {
+  const rgb = parseHex(brand)
+  return {
+    ['--brand']: brand,
+    ['--brand-fg']: textoSobre(brand),
+    ['--background']: tint(rgb, 0.94),
+    ['--card']: '#ffffff',
+    ['--card-foreground']: 'oklch(0.22 0.02 60)',
+    ['--foreground']: 'oklch(0.22 0.02 60)',
+    ['--muted']: tint(rgb, 0.9),
+    ['--muted-foreground']: 'oklch(0.5 0.03 60)',
+    ['--secondary']: tint(rgb, 0.9),
+    ['--accent']: tint(rgb, 0.86),
+    ['--border']: tint(rgb, 0.82),
+    ['--input']: tint(rgb, 0.82),
+    ['--ring']: brand,
+    ['--primary']: brand,
+    ['--primary-foreground']: textoSobre(brand),
+  } as React.CSSProperties
+}
+
 export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, promotions = [], shippingMethods, paymentMethods, pharmacyId, storeName, logoUrl, accentColor }: { products: ProductWithVariants[]; threshold: number; whatsappNumber: string; bannerImageUrl: string; promotions?: string[]; shippingMethods: ShippingMethod[]; paymentMethods: PaymentMethod[]; pharmacyId: string; storeName: string; logoUrl: string | null; accentColor?: string | null }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [searchQuery, setSearchQuery] = useState('')
   const brand = accentColor || '#F97316'
-  const brandVars = { ['--brand']: brand, ['--brand-fg']: textoSobre(brand) } as React.CSSProperties
+  const brandVars = catalogTheme(brand)
 
   const categories = useMemo(
     () => ['Todos', ...new Set(products.map((p) => p.category).filter(Boolean))],
