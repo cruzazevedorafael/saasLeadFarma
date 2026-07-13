@@ -59,14 +59,18 @@ export function CheckoutCliente({
   const [avisoCep, setAvisoCep] = useState<string | null>(null)
   const set = (patch: Partial<ClienteData>) => onChange({ ...value, ...patch })
 
-  // Autofill por CPF: quando o CPF fica válido, procura cadastro na farmácia.
-  const onCpfBlur = async () => {
+  // Autofill: exige CPF válido + 2ª prova (últimos 4 dígitos do celular).
+  // Dispara no blur do CPF ou do celular, quando os dois já estão preenchidos.
+  const tentarAutofill = async () => {
     const d = onlyDigits(value.cpf)
-    if (!isValidCpf(d) || d === cpfBuscado) return
-    setCpfBuscado(d)
+    const last4 = onlyDigits(value.phone).slice(-4)
+    if (!isValidCpf(d) || last4.length !== 4) return
+    const chave = `${d}:${last4}`
+    if (chave === cpfBuscado) return
+    setCpfBuscado(chave)
     setBuscando(true)
     try {
-      const cli = await buscarClientePorCpf(pharmacyId, d)
+      const cli = await buscarClientePorCpf(pharmacyId, d, last4)
       if (cli && typeof window !== 'undefined' &&
           window.confirm('Encontramos um cadastro com este CPF. Preencher seus dados automaticamente?')) {
         onChange({
@@ -122,7 +126,7 @@ export function CheckoutCliente({
               <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="c-cpf" inputMode="numeric" autoComplete="off" placeholder="000.000.000-00"
                 value={formatCpf(value.cpf)} onChange={(e) => set({ cpf: onlyDigits(e.target.value) })}
-                onBlur={onCpfBlur} className="pl-10 h-10 md:h-12 bg-muted border-border" />
+                onBlur={tentarAutofill} className="pl-10 h-10 md:h-12 bg-muted border-border" />
             </div>
             {value.cpf.length > 0 && !isValidCpf(value.cpf) && (
               <p className="text-[11px] text-amber-500">CPF incompleto ou inválido.</p>
@@ -134,7 +138,8 @@ export function CheckoutCliente({
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="c-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="(00) 00000-0000"
-                value={value.phone} onChange={(e) => set({ phone: e.target.value })} className="pl-10 h-10 md:h-12 bg-muted border-border" />
+                value={value.phone} onChange={(e) => set({ phone: e.target.value })}
+                onBlur={tentarAutofill} className="pl-10 h-10 md:h-12 bg-muted border-border" />
             </div>
           </div>
         </div>

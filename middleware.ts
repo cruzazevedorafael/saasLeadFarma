@@ -54,17 +54,24 @@ export async function middleware(request: NextRequest) {
       if (!isLogin) return redirectTo('/painel/login')
       return response
     }
-    // pharmacy_admin logado tentando abrir a tela de login → manda pro painel
-    if (isLogin) return redirectTo('/painel')
-    // gate de onboarding
-    if (path !== '/painel/cadastro' && profile?.pharmacy_id) {
+    // status + onboarding numa query só
+    let suspended = false
+    let onboardingDone = true
+    if (profile?.pharmacy_id) {
       const { data: ph } = await supabase
         .from('pharmacies')
-        .select('onboarding_completed')
+        .select('status, onboarding_completed')
         .eq('id', profile.pharmacy_id)
         .single()
-      if (ph && !ph.onboarding_completed) return redirectTo('/painel/cadastro')
+      suspended = ph?.status === 'suspended'
+      onboardingDone = !!ph?.onboarding_completed
     }
+    // Farmácia suspensa: bloqueia o painel; só deixa ver a tela de login (com aviso).
+    if (suspended) return isLogin ? response : redirectTo('/painel/login?suspensa=1')
+    // logado tentando abrir a tela de login → manda pro painel
+    if (isLogin) return redirectTo('/painel')
+    // gate de onboarding
+    if (path !== '/painel/cadastro' && !onboardingDone) return redirectTo('/painel/cadastro')
   }
 
   return response
