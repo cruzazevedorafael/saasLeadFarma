@@ -2,15 +2,17 @@
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { computeAnalytics, type Analytics, type AnalyticsOrder } from './analytics.helpers'
 
-// Últimos 12 meses (limita o volume; suficiente para os relatórios).
-export async function getAnalytics(): Promise<Analytics> {
+// Calcula os relatórios da farmácia no período dado (default: últimos 12 meses).
+export async function getAnalytics(range?: { since: string; until: string }): Promise<Analytics> {
   const supabase = await createServerClient()
-  const desde = new Date(Date.now() - 365 * 86400_000).toISOString()
+  const since = range?.since ?? new Date(Date.now() - 365 * 86400_000).toISOString()
+  const until = range?.until ?? new Date().toISOString()
 
   const { data, error } = await supabase
     .from('orders')
     .select('total, status, created_at, order_items(product_id, product_name, quantity, unit_price)')
-    .gte('created_at', desde)
+    .gte('created_at', since)
+    .lte('created_at', until)
     .order('created_at', { ascending: false })
     .limit(2000)
   if (error) throw error

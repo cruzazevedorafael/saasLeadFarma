@@ -1,77 +1,76 @@
-// app/painel/relatorios/page.tsx — inteligência de vendas (últimos 12 meses).
-import Link from 'next/link'
+// app/painel/relatorios/page.tsx — inteligência de vendas, com filtro de período.
 import { requirePharmacyAdmin } from '@/lib/auth/guards'
 import { getAnalytics } from '@/lib/data/analytics'
+import { resolveRange } from '@/lib/data/analytics.range'
 import { BarList } from './_components/bar-list'
+import { RangeFilter } from './_components/range-filter'
+import { MetricCard } from '@/components/ui/metric-card'
+import { SectionHeader } from '@/components/ui/section-header'
+import { DollarSign, Receipt, ShoppingBag, Boxes } from 'lucide-react'
 
 const brl = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
-function Card({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-border p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
-      {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
-    </div>
-  )
-}
-
-export default async function RelatoriosPage() {
+export default async function RelatoriosPage({ searchParams }: { searchParams: Promise<{ range?: string; from?: string; to?: string }> }) {
   await requirePharmacyAdmin()
-  const a = await getAnalytics()
+  const sp = await searchParams
+  const range = resolveRange(sp)
+  const a = await getAnalytics(range)
+  const qs = new URLSearchParams(sp as Record<string, string>).toString()
+  const to = (m: string) => `/painel/relatorios/${m}${qs ? `?${qs}` : ''}`
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <Link href="/painel" className="text-sm text-muted-foreground hover:underline">← Painel</Link>
-        <h1 className="text-2xl font-bold">Relatórios</h1>
-        <p className="text-xs text-muted-foreground">Vendas dos últimos 12 meses.</p>
+    <div className="container mx-auto max-w-5xl p-6 space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span className="eyebrow">Relatórios</span>
+          <h1 className="mt-1.5 font-display text-3xl font-bold tracking-tight leading-none">Vendas</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{range.label} · clique numa métrica para o detalhe.</p>
+        </div>
+        <RangeFilter current={range.preset} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card label="Faturamento" value={brl(a.faturamento)} hint={`${a.concluidos} pedido(s) concluído(s)`} />
-        <Card label="Ticket médio" value={brl(a.ticketMedio)} />
-        <Card label="Pedidos" value={String(a.totalPedidos)} hint={`${a.cancelados} cancelado(s)`} />
-        <Card label="Itens vendidos" value={String(a.itensVendidos)} />
+        <MetricCard label="Faturamento" value={brl(a.faturamento)} hint={`${a.concluidos} concluído(s)`} href={to('faturamento')} icon={<DollarSign className="h-4 w-4" />} accent />
+        <MetricCard label="Ticket médio" value={brl(a.ticketMedio)} href={to('ticket')} icon={<Receipt className="h-4 w-4" />} />
+        <MetricCard label="Pedidos" value={a.totalPedidos} hint={`${a.cancelados} cancelado(s)`} href={to('pedidos')} icon={<ShoppingBag className="h-4 w-4" />} />
+        <MetricCard label="Itens vendidos" value={a.itensVendidos} href={to('produtos')} icon={<Boxes className="h-4 w-4" />} />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-xl border border-border p-4 space-y-3">
-          <h2 className="font-semibold text-sm">Mais vendidos</h2>
-          {a.topProdutos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem vendas ainda.</p>
-          ) : (
-            <div className="space-y-2">
-              {a.topProdutos.map((p, i) => (
-                <div key={p.name} className="flex items-center justify-between text-sm">
-                  <span className="truncate"><span className="text-muted-foreground mr-1">{i + 1}.</span>{p.name}</span>
-                  <span className="text-muted-foreground shrink-0 ml-2">{p.qtd} un · {brl(p.receita)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+      <section className="space-y-4">
+        <SectionHeader label="Detalhamento" title="Como as vendas se distribuem" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <h3 className="font-semibold text-sm">Mais vendidos</h3>
+            {a.topProdutos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sem vendas no período.</p>
+            ) : (
+              <div className="space-y-2">
+                {a.topProdutos.slice(0, 6).map((p, i) => (
+                  <div key={p.name} className="flex items-center justify-between text-sm">
+                    <span className="truncate"><span className="text-muted-foreground mr-1">{i + 1}.</span>{p.name}</span>
+                    <span className="text-muted-foreground shrink-0 ml-2 tabular-nums">{p.qtd} un · {brl(p.receita)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <section className="rounded-xl border border-border p-4 space-y-3">
-          <h2 className="font-semibold text-sm">Por categoria (receita)</h2>
-          <BarList data={a.porCategoria} metric="receita" />
-        </section>
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <h3 className="font-semibold text-sm">Por categoria (receita)</h3>
+            <BarList data={a.porCategoria} metric="receita" />
+          </div>
 
-        <section className="rounded-xl border border-border p-4 space-y-3">
-          <h2 className="font-semibold text-sm">Por mês (receita)</h2>
-          <BarList data={a.porMes} metric="receita" />
-        </section>
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <h3 className="font-semibold text-sm">Por dia da semana (pedidos)</h3>
+            <BarList data={a.porDiaSemana} metric="pedidos" />
+          </div>
 
-        <section className="rounded-xl border border-border p-4 space-y-3">
-          <h2 className="font-semibold text-sm">Por dia da semana (pedidos)</h2>
-          <BarList data={a.porDiaSemana} metric="pedidos" />
-        </section>
-
-        <section className="rounded-xl border border-border p-4 space-y-3 md:col-span-2">
-          <h2 className="font-semibold text-sm">Por horário (pedidos)</h2>
-          <BarList data={a.porHora} metric="pedidos" />
-        </section>
-      </div>
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <h3 className="font-semibold text-sm">Por horário (pedidos)</h3>
+            <BarList data={a.porHora} metric="pedidos" />
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
