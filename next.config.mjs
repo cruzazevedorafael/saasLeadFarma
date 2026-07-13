@@ -15,17 +15,17 @@ const nextConfig = {
     },
   },
   async headers() {
+    // no-cache SÓ nas áreas privadas (dados sensíveis, sempre frescos). O catálogo
+    // público /f/[slug] fica de fora → pode ser cacheado por CDN + ISR (revalidate
+    // na própria página), o que deixa o catálogo (o que o cliente mais acessa) rápido.
     return [
       {
-        // Páginas HTML sempre revalidam: assim, depois de cada deploy, os
-        // clientes pegam a versão nova logo (sem ficar presos em cache antigo,
-        // que era o que mostrava "convidar para o WhatsApp" da versão velha).
-        // Os arquivos com hash em /_next/static ficam de fora e seguem
-        // cacheáveis pra sempre (não mudam sem mudar o nome).
-        source: '/((?!_next/static|_next/image).*)',
-        headers: [
-          { key: 'Cache-Control', value: 'no-cache, must-revalidate' },
-        ],
+        source: '/painel/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+      {
+        source: '/gestao/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
       },
     ]
   },
