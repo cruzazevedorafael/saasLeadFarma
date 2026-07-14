@@ -5,7 +5,6 @@ import type { OrderWithItems } from '@/lib/data/orders.types'
 import type { Pharmacy } from '@/lib/data/pharmacy'
 import { buildReceiptData, buildReceiptText } from '@/lib/receipts/receipt'
 import { buildReceiptHtml } from '@/lib/receipts/html'
-import { buildReceiptPdf58mm } from '@/lib/receipts/pdf-58mm'
 import { enviarComprovantePdf } from '@/lib/receipts/client'
 import { Button } from '@/components/ui/button'
 import { Send, Printer, FileText, Receipt, ClipboardCopy, Check, FileDown } from 'lucide-react'
@@ -61,9 +60,14 @@ export function ComprovanteActions({ order, pharmacy }: { order: OrderWithItems;
     }
   }
 
-  const gerar58 = () => {
+  const gerar58 = async () => {
     setBusy('58')
-    try { baixar(buildReceiptPdf58mm(data)) } finally { setBusy(null) }
+    try {
+      const { buildReceiptPdf58mm } = await import('@/lib/receipts/pdf-58mm')
+      baixar(buildReceiptPdf58mm(data))
+    } finally {
+      setBusy(null)
+    }
   }
 
   const copiarTexto = async () => {
