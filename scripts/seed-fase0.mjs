@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { randomBytes } from 'node:crypto'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -21,13 +22,17 @@ const SERVICE = env.SUPABASE_SERVICE_ROLE_KEY
 const SUPA_URL = env.NEXT_PUBLIC_SUPABASE_URL
 if (!REF || !PAT || !SERVICE) { console.error('Faltam variáveis em .env.local'); process.exit(1) }
 
+function gerarSenha() {
+  return randomBytes(15).toString('base64url') + 'Aa1!'
+}
+
 const TEST = {
   superEmail: 'leadfarma.br@gmail.com',
-  superPass: 'Projetarcode321@',
+  superPass: process.env.SEED_SUPER_PASSWORD || gerarSenha(),
   phSlug: 'farmacia-teste',
   phName: 'Farmácia Teste',
   phEmail: 'farmaciateste@leadfarma.br',
-  phPass: 'FarmaciaTeste321@',
+  phPass: process.env.SEED_PHARMACY_PASSWORD || gerarSenha(),
 }
 
 // ---- Management API: roda SQL como postgres (bypassa RLS) ----
@@ -85,9 +90,9 @@ async function main() {
              on conflict (id) do update set role='pharmacy_admin', pharmacy_id='${phId}'`)
 
   console.log('\n✅ Seed concluído')
-  console.log(`   super-admin:   ${TEST.superEmail}  (id ${superId})`)
+  console.log(`   super-admin:   ${TEST.superEmail}  (id ${superId})  senha: ${TEST.superPass}`)
   console.log(`   farmácia:      ${TEST.phSlug}  (id ${phId})`)
-  console.log(`   admin farmácia:${TEST.phEmail}  (id ${phAdminId})`)
+  console.log(`   admin farmácia:${TEST.phEmail}  (id ${phAdminId})  senha: ${TEST.phPass}`)
 }
 
 main().catch((e) => { console.error('\n❌', e.message); process.exit(1) })

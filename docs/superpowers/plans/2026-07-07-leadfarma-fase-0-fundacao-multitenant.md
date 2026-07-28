@@ -17,7 +17,7 @@
 - **Sem branding "Karolla"/"Karolla Fit"** em nenhum arquivo ao final (verificável por grep).
 - **Paleta LeadFarma:** base branca; azul/verde saúde; **laranja** como cor de ação/destaque. Sem o tema fitness escuro + verde-limão `#CFFF04`.
 - **Produtos/pedidos mantêm a forma atual nesta fase** (só ganham `pharmacy_id`). Reshape de farmácia é Fase 1.
-- **Credenciais super-admin:** `leadfarma.br@gmail.com` / `Projetarcode321@`.
+- **Credenciais super-admin:** `leadfarma.br@gmail.com` / senha rotacionada em 2026-07-28 (ver `scripts/rotate-superadmin-password.mjs`).
 - Commits frequentes, um por tarefa concluída.
 
 ---
@@ -220,7 +220,7 @@ git commit -m "feat(db): tabelas de negócio tenant-izadas + views públicas por
 - [ ] **Step 1:** Aplicar `0001` e `0002` no projeto `emfraxjwxkvaxnvkubpz` via Management API (`POST /v1/projects/{ref}/database/query`) lendo o SQL dos arquivos.
 - [ ] **Step 2:** Verificar tabelas criadas: `select table_name from information_schema.tables where table_schema='public'` → contém `pharmacies`, `profiles`, `products`, etc.
 - [ ] **Step 3:** `scripts/seed-fase0.mjs`:
-  - cria usuário Auth `leadfarma.br@gmail.com` (senha `Projetarcode321@`, `email_confirm:true`) via `POST /auth/v1/admin/users` (service_role); insere `profiles(id=<uid>, pharmacy_id=null, role='superadmin')`.
+  - cria usuário Auth `leadfarma.br@gmail.com` (senha definida no momento da criação, `email_confirm:true`) via `POST /auth/v1/admin/users` (service_role); insere `profiles(id=<uid>, pharmacy_id=null, role='superadmin')`.
   - cria `pharmacies(slug='farmacia-teste', nome_fantasia='Farmácia Teste', nome_exibicao='Farmácia Teste', whatsapp_number='', status='active', onboarding_completed=false)`.
   - cria usuário Auth `farmaciateste@leadfarma.br` (senha de teste) + `profiles(pharmacy_id=<farmacia>, role='pharmacy_admin')`.
 - [ ] **Step 4:** Rodar `node scripts/seed-fase0.mjs`. Expected: imprime os UIDs criados; re-execução é idempotente (ignora "já existe").

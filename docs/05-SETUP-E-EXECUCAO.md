@@ -69,8 +69,8 @@ node scripts/seed-pedidos-demo.mjs   # pedidos concluídos + cliente (alimenta r
 
 | Acesso | URL | Login | Senha |
 |---|---|---|---|
-| **Gestão (super-admin)** | `/gestao` | `leadfarma.br@gmail.com` | `Projetarcode321@` |
-| **Painel (farmácia teste)** | `/painel/login` | `farmaciateste@leadfarma.br` | `FarmaciaTeste321@` |
+| **Gestão (super-admin)** | `/gestao` | `leadfarma.br@gmail.com` | rotacionada — ver gerenciador de senhas da equipe |
+| **Painel (farmácia teste)** | `/painel/login` | `farmaciateste@leadfarma.br` | gerada por `node scripts/seed-fase0.mjs` |
 | **Catálogo demo** | `/f/farmacia-teste` | — | — |
 
 > Estas senhas são de **teste**. Troque-as (ou rotacione as chaves) antes de qualquer uso real.
