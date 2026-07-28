@@ -48,10 +48,10 @@ describe('reservarItem', () => {
     expect(granted).toBe(3)
   })
 
-  it('acima do limite: devolve 0 sem chamar o banco', async () => {
+  it('acima do limite: best effort, devolve a quantidade pedida sem chamar o banco (não esvazia o carrinho)', async () => {
     rateLimitOk = false
     const granted = await reservarItem('cart-1', 'var-1', 3)
-    expect(granted).toBe(0)
+    expect(granted).toBe(3)
     expect(rpcCalls).toHaveLength(0)
   })
 })

@@ -51,4 +51,15 @@ describe('checkRateLimit', () => {
     expect(r.ok).toBe(false)
     expect(r.error).toContain('Muitas tentativas')
   })
+
+  it('Upstash configurado mas fora do ar (limiter.limit lança): deixa passar (fail-open) e loga erro', async () => {
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'https://fake')
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', 'fake-token')
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    limitMock.mockRejectedValue(new Error('upstash 5xx'))
+    const { checkRateLimit } = await import('./rate-limit')
+    const r = await checkRateLimit('login', '1.2.3.4')
+    expect(r.ok).toBe(true)
+    expect(consoleErrorSpy).toHaveBeenCalled()
+  })
 })

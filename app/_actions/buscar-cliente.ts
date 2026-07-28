@@ -34,6 +34,15 @@ export async function buscarClientePorCpf(
 ): Promise<ClienteAutofill | null> {
   const ip = await getClientIp()
   const rl = await checkRateLimit('buscarCliente', `${ip}:${pharmacyId}`)
+  // Checado ANTES da consulta ao banco, de propósito: o objetivo do rate
+  // limiter é aliviar carga do banco (shedding), então um pedido bloqueado
+  // precisa nunca tocar a tabela `customers`. Isso reabre uma janela estreita
+  // de timing entre "rate limited" e "não achou/2ª prova errada" — mas essa
+  // janela não vaza dado nenhum de cliente (só "você já tentou demais"),
+  // diferente do oráculo de existência de CPF que a checagem de rl.ok abaixo
+  // (mesmo retorno null pra "não achou" e "prova errada") protege. Não mover
+  // essa checagem pra depois da query de novo.
+  if (!rl.ok) return null
 
   const digits = onlyDigits(cpf)
   const prova = onlyDigits(phoneLast4).slice(-4)
@@ -47,9 +56,6 @@ export async function buscarClientePorCpf(
       .eq('pharmacy_id', pharmacyId)
       .eq('cpf', digits)
       .single()
-    // Check rate limit after DB query to avoid timing side-channel.
-    // If rate limited, discard result and return null at the same point as other null-returning paths.
-    if (!rl.ok) return null
     if (!data) return null
     // 2ª prova: os últimos 4 dígitos do celular precisam bater. Mismatch → null (igual a "não achou").
     if (onlyDigits(data.phone ?? '').slice(-4) !== prova) return null

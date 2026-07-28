@@ -26,12 +26,13 @@ beforeEach(() => {
 })
 
 describe('buscarClientePorCpf', () => {
-  it('acima do limite: devolve null consultando o banco (timing indistinto)', async () => {
+  it('acima do limite: devolve null SEM consultar o banco (shedding de carga)', async () => {
     rateLimitOk = false
     const r = await buscarClientePorCpf('ph1', '52998224725', '7777')
     expect(r).toBeNull()
-    // Verify DB was called (for timing indistinguishability from other null-returning paths)
-    expect(dbWasCalled).toBe(true)
+    // O rate limiter só protege o banco de carga se realmente evitar a query
+    // quando o pedido está bloqueado.
+    expect(dbWasCalled).toBe(false)
   })
 
   it('dentro do limite, CPF e 2ª prova corretos: devolve o cadastro', async () => {

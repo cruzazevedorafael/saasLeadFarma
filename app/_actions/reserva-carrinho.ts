@@ -13,7 +13,11 @@ export async function reservarItem(cartId: string, variantId: string, quantity: 
 
   const ip = await getClientIp()
   const rl = await checkRateLimit('reservarItem', ip)
-  if (!rl.ok) return 0
+  // Best effort igual ao caminho de erro de banco abaixo: devolver 0 aqui
+  // seria MAIS destrutivo que uma falha real de banco, já que os chamadores
+  // tratam 0 como "sem estoque" e removem o item do carrinho do cliente por
+  // causa de uma decisão de throttling do servidor.
+  if (!rl.ok) return quantity
 
   const db = createAdminClient()
   const { data, error } = await db.rpc('reservar_item', {
