@@ -53,4 +53,34 @@ describe('scrubPiiBeforeSend', () => {
     expect(result.breadcrumbs[0].data.cpf).toBe('[redacted]')
     expect(result.breadcrumbs[0].data.action).toBe('submit')
   })
+
+  // Cenário dormente: um PostgrestError (objeto plano, não Error) lançado com
+  // `throw error` em criar-pedido.ts é serializado inteiro pelo Sentry em
+  // extra.__serialized__. Chaves como `details`/`message`/`hint` não estão em
+  // PII_KEYS, então o valor só é protegido se o CONTEÚDO (não a chave) for
+  // varrido por padrão (CPF/CEP/telefone).
+  it('redige CPF embutido em texto livre dentro de extra.__serialized__ (PostgrestError serializado)', () => {
+    const event = {
+      extra: {
+        __serialized__: {
+          message: 'duplicate key value violates unique constraint "orders_cpf_key"',
+          details: 'Key (cpf)=(52998224725) already exists.',
+          hint: null,
+          code: '23505',
+        },
+      },
+    }
+    const result = scrubPiiBeforeSend(event)
+    expect(result.extra.__serialized__.details).toBe('Key (cpf)=([redacted]) already exists.')
+    expect(result.extra.__serialized__.code).toBe('23505')
+    expect(result.extra.__serialized__.message).toBe('duplicate key value violates unique constraint "orders_cpf_key"')
+  })
+
+  it('redige PII em valor de string livre, mesmo sob uma chave que não está na lista de PII_KEYS', () => {
+    const event = {
+      extra: { note: 'cliente telefone 11988887777' },
+    }
+    const result = scrubPiiBeforeSend(event)
+    expect(result.extra.note).toBe('cliente telefone [redacted]')
+  })
 })
