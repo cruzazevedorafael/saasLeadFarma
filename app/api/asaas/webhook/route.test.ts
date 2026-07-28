@@ -4,17 +4,25 @@ import { POST } from './route'
 let insertError: any = null
 let insertedEvents: any[] = []
 let updateCalls: any[] = []
+let updateError: any = null
+let deletedEvents: any[] = []
+let deleteError: any = null
 
 function fakeDb() {
   return {
     from(table: string) {
       if (table === 'asaas_webhook_events') {
-        return { insert: async (row: any) => { insertedEvents.push(row); return { error: insertError } } }
+        return {
+          insert: async (row: any) => { insertedEvents.push(row); return { error: insertError } },
+          delete: () => ({
+            eq: async (col: string, val: string) => { deletedEvents.push({ col, val }); return { error: deleteError } },
+          }),
+        }
       }
       if (table === 'pharmacies') {
         return {
           update: (patch: any) => ({
-            eq: async (col: string, val: string) => { updateCalls.push({ patch, col, val }); return { error: null } },
+            eq: async (col: string, val: string) => { updateCalls.push({ patch, col, val }); return { error: updateError } },
           }),
         }
       }
@@ -36,6 +44,9 @@ beforeEach(() => {
   insertError = null
   insertedEvents = []
   updateCalls = []
+  updateError = null
+  deletedEvents = []
+  deleteError = null
   vi.stubEnv('ASAAS_WEBHOOK_TOKEN', 'segredo-teste')
 })
 
@@ -68,6 +79,14 @@ describe('POST /api/asaas/webhook', () => {
     const r = await POST(req({ id: 'evt1', event: 'PAYMENT_CONFIRMED', payment: { customer: 'cus_1' } }, 'segredo-teste'))
     expect(r.status).toBe(200)
     expect(updateCalls).toHaveLength(0)
+  })
+
+  it('falha ao atualizar farmácia: desfaz o dedup e responde 500 (para o ASAAS reenviar)', async () => {
+    updateError = { code: 'XXYYZ', message: 'erro transitório de rede' }
+    const r = await POST(req({ id: 'evt1', event: 'PAYMENT_CONFIRMED', payment: { customer: 'cus_1' } }, 'segredo-teste'))
+    expect(r.status).toBe(500)
+    expect(insertedEvents).toEqual([{ event_id: 'evt1' }])
+    expect(deletedEvents).toEqual([{ col: 'event_id', val: 'evt1' }])
   })
 
   it('JSON inválido: 400', async () => {

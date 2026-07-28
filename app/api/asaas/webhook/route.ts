@@ -44,11 +44,14 @@ export async function POST(req: Request) {
   const db = createAdminClient()
 
   const eventId: string | undefined = body?.id
+  let dedupRowInserted = false
   if (eventId) {
     const { error: insertError } = await db.from('asaas_webhook_events').insert({ event_id: eventId })
     if (insertError) {
       if (insertError.code === '23505') return new Response('ok', { status: 200 }) // já processado
       console.error('[asaas webhook] falha ao registrar evento (seguindo mesmo assim):', insertError)
+    } else {
+      dedupRowInserted = true
     }
   }
 
@@ -61,7 +64,20 @@ export async function POST(req: Request) {
     const { error } = subscriptionId
       ? await q.eq('asaas_subscription_id', subscriptionId)
       : await q.eq('asaas_customer_id', customerId!)
-    if (error) console.error('[asaas webhook] falha ao atualizar farmácia:', error)
+    if (error) {
+      console.error('[asaas webhook] falha ao atualizar farmácia:', error)
+      // A linha de dedup já foi gravada para este event_id. Se deixarmos assim, uma
+      // futura reentrega do ASAAS vai bater no short-circuit de 23505 e nunca mais
+      // tentar essa atualização — a mudança de status ficaria perdida para sempre.
+      // Desfaz o "já visto" (best-effort) e responde 500 para o ASAAS reenviar depois.
+      if (dedupRowInserted && eventId) {
+        const { error: deleteError } = await db.from('asaas_webhook_events').delete().eq('event_id', eventId)
+        if (deleteError) {
+          console.error('[asaas webhook] falha ao desfazer dedup após erro de atualização (evento pode ficar perdido):', deleteError)
+        }
+      }
+      return new Response('internal error', { status: 500 })
+    }
   }
 
   // ASAAS espera 200 para não reenviar.
