@@ -1,6 +1,7 @@
 // app/_actions/criar-pedido.ts
 'use server'
 import { z } from 'zod'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getPharmacyById } from '@/lib/data/pharmacy'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
@@ -64,6 +65,7 @@ export async function criarPedido(input: unknown): Promise<CriarPedidoResult> {
     return await registrarPedido(parsed.data)
   } catch (e) {
     console.error('[criarPedido] falha ao registrar pedido:', e)
+    Sentry.captureException(e, { extra: { pharmacyId: parsed.data.pharmacyId } })
     return { ok: false, error: 'Não foi possível registrar o pedido. Verifique sua internet e tente de novo.' }
   }
 }

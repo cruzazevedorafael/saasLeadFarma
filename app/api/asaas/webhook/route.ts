@@ -7,6 +7,7 @@
 // Asaas na data desta implementação — confirme contra um payload real assim
 // que a integração for ativada de verdade (ASAAS_API_KEY configurada).
 import { timingSafeEqual } from 'node:crypto'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const EVENT_TO_STATUS: Record<string, 'active' | 'past_due' | 'canceled'> = {
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
       : await q.eq('asaas_customer_id', customerId!)
     if (error) {
       console.error('[asaas webhook] falha ao atualizar farmácia:', error)
+      Sentry.captureException(error, { extra: { eventId, subscriptionId, customerId, status } })
       // A linha de dedup já foi gravada para este event_id. Se deixarmos assim, uma
       // futura reentrega do ASAAS vai bater no short-circuit de 23505 e nunca mais
       // tentar essa atualização — a mudança de status ficaria perdida para sempre.

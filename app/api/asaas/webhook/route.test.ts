@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { POST } from './route'
 
+const captureExceptionMock = vi.fn()
+vi.mock('@sentry/nextjs', () => ({ captureException: (...args: any[]) => captureExceptionMock(...args) }))
+
 let insertError: any = null
 let insertedEvents: any[] = []
 let updateCalls: any[] = []
@@ -47,6 +50,7 @@ beforeEach(() => {
   updateError = null
   deletedEvents = []
   deleteError = null
+  captureExceptionMock.mockClear()
   vi.stubEnv('ASAAS_WEBHOOK_TOKEN', 'segredo-teste')
 })
 
@@ -87,6 +91,9 @@ describe('POST /api/asaas/webhook', () => {
     expect(r.status).toBe(500)
     expect(insertedEvents).toEqual([{ event_id: 'evt1' }])
     expect(deletedEvents).toEqual([{ col: 'event_id', val: 'evt1' }])
+    expect(captureExceptionMock).toHaveBeenCalledTimes(1)
+    const [err, ctx] = captureExceptionMock.mock.calls[0]
+    expect(ctx.extra).toMatchObject({ eventId: 'evt1' })
   })
 
   it('JSON inválido: 400', async () => {

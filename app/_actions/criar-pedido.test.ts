@@ -2,6 +2,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { criarPedido } from './criar-pedido'
 
+const captureExceptionMock = vi.fn()
+vi.mock('@sentry/nextjs', () => ({ captureException: (...args: any[]) => captureExceptionMock(...args) }))
+
 let productRows: any[] = []
 let variantRows: any[] = []
 let productsError: any = null
@@ -79,6 +82,7 @@ beforeEach(() => {
   rpcCalls = []
   pharmacyStatus = 'active'
   rateLimitOk = true
+  captureExceptionMock.mockClear()
 })
 
 describe('criarPedido', () => {
@@ -113,6 +117,16 @@ describe('criarPedido', () => {
     const r = await criarPedido(pedido(1))
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.error).toContain('Não foi possível registrar')
+  })
+
+  it('erro de banco: reporta pro Sentry com pharmacyId, sem dado pessoal do cliente', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    productsError = { message: 'boom' }
+    await criarPedido(pedido(1))
+    expect(captureExceptionMock).toHaveBeenCalledTimes(1)
+    const [err, ctx] = captureExceptionMock.mock.calls[0]
+    expect(err).toBe(productsError)
+    expect(ctx).toEqual({ extra: { pharmacyId: 'ph1' } })
   })
 
   it('reserva o estoque após criar o pedido (chama o rpc sem erro)', async () => {
