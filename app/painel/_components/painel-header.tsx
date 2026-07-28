@@ -15,22 +15,32 @@ export async function PainelHeader() {
   const ph = session?.pharmacyId ? await getPharmacyById(session.pharmacyId) : null
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 text-ink-foreground backdrop-blur">
       <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
         {/* Logo LeadFarma → volta ao início do painel */}
-        <Link href="/painel" aria-label="Início do painel" className="transition hover:opacity-80">
-          <Logo size="md" />
+        <Link href="/painel" aria-label="Início do painel" className="text-ink-foreground transition hover:opacity-80">
+          <Logo size="md" className="text-ink-foreground" />
         </Link>
         <nav className="flex items-center gap-2">
           {ph?.slug && (
-            <Button asChild variant="outline" size="sm">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="border-white/20 bg-transparent text-ink-foreground hover:bg-white/10 hover:text-ink-foreground"
+            >
               <Link href={`/f/${ph.slug}`}>
                 <Store className="h-4 w-4" /> Ver catálogo
               </Link>
             </Button>
           )}
           <form action={logout}>
-            <Button variant="ghost" size="sm" type="submit">
+            <Button
+              variant="ghost"
+              size="sm"
+              type="submit"
+              className="text-ink-foreground hover:bg-white/10 hover:text-ink-foreground"
+            >
               <LogOut className="h-4 w-4" /> Sair
             </Button>
           </form>
