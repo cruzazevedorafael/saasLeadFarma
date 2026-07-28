@@ -34,7 +34,6 @@ export async function buscarClientePorCpf(
 ): Promise<ClienteAutofill | null> {
   const ip = await getClientIp()
   const rl = await checkRateLimit('buscarCliente', `${ip}:${pharmacyId}`)
-  if (!rl.ok) return null
 
   const digits = onlyDigits(cpf)
   const prova = onlyDigits(phoneLast4).slice(-4)
@@ -48,6 +47,9 @@ export async function buscarClientePorCpf(
       .eq('pharmacy_id', pharmacyId)
       .eq('cpf', digits)
       .single()
+    // Check rate limit after DB query to avoid timing side-channel.
+    // If rate limited, discard result and return null at the same point as other null-returning paths.
+    if (!rl.ok) return null
     if (!data) return null
     // 2ª prova: os últimos 4 dígitos do celular precisam bater. Mismatch → null (igual a "não achou").
     if (onlyDigits(data.phone ?? '').slice(-4) !== prova) return null
