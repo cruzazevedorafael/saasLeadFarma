@@ -93,7 +93,7 @@ describe('POST /api/asaas/webhook', () => {
     expect(deletedEvents).toEqual([{ col: 'event_id', val: 'evt1' }])
     expect(captureExceptionMock).toHaveBeenCalledTimes(1)
     const [err, ctx] = captureExceptionMock.mock.calls[0]
-    expect(ctx.extra).toMatchObject({ eventId: 'evt1' })
+    expect(ctx.extra).toEqual({ eventId: 'evt1', subscriptionId: undefined, customerId: 'cus_1', status: 'active' })
   })
 
   it('JSON inválido: 400', async () => {
