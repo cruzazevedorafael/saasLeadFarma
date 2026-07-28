@@ -11,6 +11,8 @@
 'use server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isValidCpf, onlyDigits } from '@/lib/cpf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
 export interface ClienteAutofill {
   name: string
@@ -30,6 +32,10 @@ export async function buscarClientePorCpf(
   cpf: string,
   phoneLast4: string,
 ): Promise<ClienteAutofill | null> {
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('buscarCliente', `${ip}:${pharmacyId}`)
+  if (!rl.ok) return null
+
   const digits = onlyDigits(cpf)
   const prova = onlyDigits(phoneLast4).slice(-4)
   // Exige CPF válido + 4 dígitos de 2ª prova.
