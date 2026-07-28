@@ -1,6 +1,8 @@
 // app/_actions/reserva-carrinho.ts
 'use server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
 // Reserva (ou ajusta) a quantidade de uma variação para um carrinho.
 // Devolve quanto foi efetivamente reservado. Em falha de banco, devolve a
@@ -8,6 +10,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 // ainda valida o estoque.
 export async function reservarItem(cartId: string, variantId: string, quantity: number): Promise<number> {
   if (!cartId || !variantId) return 0
+
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('reservarItem', ip)
+  if (!rl.ok) return 0
+
   const db = createAdminClient()
   const { data, error } = await db.rpc('reservar_item', {
     p_cart_id: cartId, p_variant_id: variantId, p_quantity: quantity,
