@@ -2,10 +2,17 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
 export async function login(formData: FormData) {
   const email = String(formData.get('email'))
   const password = String(formData.get('password'))
+
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('login', `${ip}:${email}`)
+  if (!rl.ok) redirect('/painel/login?erro=limite')
+
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) redirect('/painel/login?erro=1')

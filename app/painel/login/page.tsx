@@ -19,7 +19,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             Esta farmácia está suspensa. Fale com o suporte para reativar o acesso.
           </p>
         )}
-        {erro && <p className="text-sm text-destructive text-center">E-mail ou senha inválidos.</p>}
+        {erro === 'limite' && (
+          <p className="text-sm text-destructive text-center">Muitas tentativas. Aguarde alguns minutos e tente de novo.</p>
+        )}
+        {erro && erro !== 'limite' && <p className="text-sm text-destructive text-center">E-mail ou senha inválidos.</p>}
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" name="email" type="email" required />
