@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { provisionPharmacy } from '@/lib/data/pharmacy-provisioning'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
 const schema = z.object({
   nomeFantasia: z.string().trim().min(2, 'Informe o nome da farmácia'),
@@ -29,6 +31,10 @@ async function slugUnico(nome: string): Promise<string> {
 }
 
 export async function autoCadastro(input: AutoCadastroInput): Promise<{ ok: false; error: string }> {
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('cadastro', ip)
+  if (!rl.ok) return { ok: false, error: rl.error! }
+
   const parsed = schema.safeParse(input)
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Dados inválidos' }
   const d = parsed.data
