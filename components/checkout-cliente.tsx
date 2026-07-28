@@ -200,8 +200,9 @@ export function CheckoutCliente({
           className="mt-0.5 h-4 w-4 accent-[#F97316]" />
         <span className="text-[11px] md:text-xs text-muted-foreground leading-snug">
           <ShieldCheck className="inline h-3.5 w-3.5 text-[#F97316] mr-1 align-text-bottom" />
-          Autorizo o uso dos meus dados (nome, CPF, contato e endereço) para processar este pedido e
-          agilizar compras futuras nesta farmácia, conforme a <strong className="text-foreground">LGPD</strong>.
+          Seus dados (nome, CPF, contato e endereço) sempre são usados para processar este pedido.
+          Autorizo também guardar meu cadastro para agilizar compras futuras nesta farmácia, conforme a{' '}
+          <strong className="text-foreground">LGPD</strong>.
         </span>
       </label>
     </div>
