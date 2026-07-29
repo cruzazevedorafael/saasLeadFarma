@@ -1,5 +1,6 @@
 // lib/data/payment.ts
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createAnonClient } from '@/lib/supabase/anon'
 
 export interface PaymentMethod {
   id: string
@@ -31,8 +32,9 @@ export async function getPaymentMethods(activeOnly = false): Promise<PaymentMeth
 }
 
 // PÚBLICO (anon): formas ativas de UMA farmácia (catálogo).
+// Client anônimo SEM cookies → mantém a página do catálogo estática/ISR.
 export async function getPublicPaymentMethods(pharmacyId: string): Promise<PaymentMethod[]> {
-  const supabase = await createServerClient()
+  const supabase = createAnonClient()
   const { data, error } = await supabase
     .from('payment_methods')
     .select('*')

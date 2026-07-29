@@ -11,7 +11,7 @@ export async function createShipping(name: string, price: number) {
   const db = createAdminClient()
   const { error } = await db.from('shipping_methods').insert({ pharmacy_id: pharmacyId, name: nome, price: Math.max(0, price || 0) })
   if (error) throw error
-  revalidatePath('/painel/envio'); revalidatePath('/')
+  revalidatePath('/painel/envio'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function updateShipping(id: string, name: string, price: number, active: boolean) {
@@ -23,7 +23,7 @@ export async function updateShipping(id: string, name: string, price: number, ac
     .update({ name: nome, price: Math.max(0, price || 0), active, updated_at: new Date().toISOString() })
     .eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
-  revalidatePath('/painel/envio'); revalidatePath('/')
+  revalidatePath('/painel/envio'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function deleteShipping(id: string) {
@@ -31,5 +31,5 @@ export async function deleteShipping(id: string) {
   const db = createAdminClient()
   const { error } = await db.from('shipping_methods').delete().eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
-  revalidatePath('/painel/envio'); revalidatePath('/')
+  revalidatePath('/painel/envio'); revalidatePath('/f/[slug]', 'page')
 }

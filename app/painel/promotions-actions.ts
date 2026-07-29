@@ -25,7 +25,7 @@ export async function addPromotion(url: string): Promise<{ ok: boolean; error?: 
 
   const { error } = await db.from('promotions').insert({ pharmacy_id: pharmacyId, image_url: url, sort_order: nextOrder })
   if (error) return { ok: false, error: error.message }
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
   return { ok: true }
 }
 
@@ -33,7 +33,7 @@ export async function removePromotion(id: string): Promise<void> {
   const pharmacyId = await getCurrentPharmacyId()
   const db = createAdminClient()
   await db.from('promotions').delete().eq('id', id).eq('pharmacy_id', pharmacyId)
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }
 
 /** Move a promoção para cima/baixo trocando o sort_order com o vizinho. */
@@ -50,5 +50,5 @@ export async function movePromotion(id: string, dir: 'up' | 'down'): Promise<voi
   // troca os sort_order
   await db.from('promotions').update({ sort_order: b.sort_order }).eq('id', a.id).eq('pharmacy_id', pharmacyId)
   await db.from('promotions').update({ sort_order: a.sort_order }).eq('id', b.id).eq('pharmacy_id', pharmacyId)
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }

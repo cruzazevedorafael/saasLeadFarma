@@ -1,5 +1,6 @@
 // lib/data/shipping.ts
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createAnonClient } from '@/lib/supabase/anon'
 
 export interface ShippingMethod {
   id: string
@@ -28,8 +29,9 @@ export async function getShippingMethods(activeOnly = false): Promise<ShippingMe
 }
 
 // PÚBLICO (anon): formas ativas de UMA farmácia (catálogo).
+// Client anônimo SEM cookies → mantém a página do catálogo estática/ISR.
 export async function getPublicShippingMethods(pharmacyId: string): Promise<ShippingMethod[]> {
-  const supabase = await createServerClient()
+  const supabase = createAnonClient()
   const { data, error } = await supabase
     .from('shipping_methods')
     .select('*')

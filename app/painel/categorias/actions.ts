@@ -12,7 +12,7 @@ export async function createCategoria(name: string) {
   const { error } = await db.from('categories').insert({ pharmacy_id: pharmacyId, name: nome })
   if (error) throw new Error('Não foi possível criar (nome duplicado?).')
   revalidatePath('/painel/categorias')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }
 
 export async function renameCategoria(id: string, oldName: string, newName: string) {
@@ -26,7 +26,7 @@ export async function renameCategoria(id: string, oldName: string, newName: stri
   await db.from('products').update({ category: nome, updated_at: new Date().toISOString() }).eq('category', oldName).eq('pharmacy_id', pharmacyId)
   revalidatePath('/painel/categorias')
   revalidatePath('/painel/produtos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }
 
 export async function deleteCategoria(id: string, name: string) {
@@ -44,5 +44,5 @@ export async function deleteCategoria(id: string, name: string) {
   const { error } = await db.from('categories').delete().eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
   revalidatePath('/painel/categorias')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }

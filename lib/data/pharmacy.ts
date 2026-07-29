@@ -3,6 +3,7 @@
 import { cache } from 'react'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createAnonClient } from '@/lib/supabase/anon'
 
 export interface Pharmacy {
   id: string
@@ -80,9 +81,10 @@ export function mapPharmacyRow(r: any): Pharmacy {
 const PUBLIC_PHARMACY_COLS = 'id, slug, nome_exibicao, nome_fantasia, logo_url, accent_color, catalog_font, banner_image_url, whatsapp_number, wholesale_threshold, status'
 
 /** Público (anon): resolve a farmácia ativa pelo slug da URL. null se inexistente/suspensa.
- *  Memoizado por request (React cache): generateMetadata + a página não duplicam a query. */
+ *  Memoizado por request (React cache): generateMetadata + a página não duplicam a query.
+ *  Client anônimo SEM cookies → mantém a página do catálogo estática/ISR. */
 export const getPharmacyBySlug = cache(async (slug: string): Promise<Pharmacy | null> => {
-  const supabase = await createServerClient()
+  const supabase = createAnonClient()
   const { data, error } = await supabase
     .from('pharmacies')
     .select(PUBLIC_PHARMACY_COLS)
@@ -92,6 +94,23 @@ export const getPharmacyBySlug = cache(async (slug: string): Promise<Pharmacy | 
   if (error || !data) return null
   return mapPharmacyRow(data)
 })
+
+/** Público (anon): slugs das farmácias ativas, para prerenderizar os catálogos no
+ *  build (generateStaticParams). Resiliente: qualquer erro → [] (os catálogos ainda
+ *  são gerados sob demanda por ISR; o build não quebra se o banco estiver fora). */
+export async function getActivePharmacySlugs(): Promise<string[]> {
+  try {
+    const supabase = createAnonClient()
+    const { data, error } = await supabase
+      .from('pharmacies')
+      .select('slug')
+      .eq('status', 'active')
+    if (error || !data) return []
+    return data.map((r: { slug: string }) => r.slug)
+  } catch {
+    return []
+  }
+}
 
 /** Server (service-role): farmácia por id, sem RLS. Memoizado por request. */
 export const getPharmacyById = cache(async (id: string): Promise<Pharmacy | null> => {

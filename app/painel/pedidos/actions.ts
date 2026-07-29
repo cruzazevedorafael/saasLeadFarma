@@ -27,7 +27,7 @@ export async function darBaixa(orderId: string): Promise<{ ok: boolean; error?: 
   const { error } = await db.rpc('complete_order', { p_order_id: orderId })
   if (error) return { ok: false, error: error.message }
   revalidatePath('/painel/pedidos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
   return { ok: true }
 }
 
@@ -43,6 +43,6 @@ export async function cancelarPedido(orderId: string): Promise<{ ok: boolean; er
   const { error } = await db.rpc('cancel_order', { p_order_id: orderId })
   if (error) return { ok: false, error: error.message }
   revalidatePath('/painel/pedidos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
   return { ok: true }
 }
