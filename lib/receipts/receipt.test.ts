@@ -6,6 +6,7 @@ import type { Pharmacy } from '@/lib/data/pharmacy'
 const pharmacy: Pharmacy = {
   id: 'ph1', slug: 'farmacia-teste', nomeExibicao: 'Farmácia Bem Estar', logoUrl: null, accentColor: null,
   whatsappNumber: '5511999998888', bannerImageUrl: '', wholesaleThreshold: 4,
+  catalogFont: null,
   status: 'active', onboardingCompleted: true,
   razaoSocial: 'Bem Estar Comércio de Medicamentos LTDA', nomeFantasia: 'Farmácia Bem Estar',
   cnpj: '12.345.678/0001-90', cep: '01001-000', logradouro: 'Praça da Sé', numero: '100',

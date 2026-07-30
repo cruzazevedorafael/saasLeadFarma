@@ -4,6 +4,7 @@ import { reservarItem, liberarItem, liberarCarrinho } from './reserva-carrinho'
 let rpcCalls: { name: string; params: any }[] = []
 let rpcData: any = 0
 let rpcError: any = null
+let rateLimitOk = true
 
 function fakeDb() {
   return {
@@ -14,11 +15,16 @@ function fakeDb() {
   }
 }
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: () => fakeDb() }))
+vi.mock('next/headers', () => ({ headers: async () => new Headers({ 'x-forwarded-for': '8.8.8.8' }) }))
+vi.mock('@/lib/rate-limit', () => ({
+  checkRateLimit: async () => (rateLimitOk ? { ok: true } : { ok: false, error: 'Muitas tentativas.' }),
+}))
 
 beforeEach(() => {
   rpcCalls = []
   rpcData = 0
   rpcError = null
+  rateLimitOk = true
 })
 
 describe('reservarItem', () => {
@@ -40,6 +46,13 @@ describe('reservarItem', () => {
     rpcError = { message: 'boom' }
     const granted = await reservarItem('cart-1', 'var-1', 3)
     expect(granted).toBe(3)
+  })
+
+  it('acima do limite: best effort, devolve a quantidade pedida sem chamar o banco (não esvazia o carrinho)', async () => {
+    rateLimitOk = false
+    const granted = await reservarItem('cart-1', 'var-1', 3)
+    expect(granted).toBe(3)
+    expect(rpcCalls).toHaveLength(0)
   })
 })
 

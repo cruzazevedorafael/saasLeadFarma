@@ -30,7 +30,7 @@ export async function createProduto(input: ProdutoInput) {
     if (vErr) throw vErr
   }
   revalidatePath('/painel/produtos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
   return prod.id as string
 }
 
@@ -57,7 +57,7 @@ export async function updateProduto(id: string, input: ProdutoInput) {
     )
   }
   revalidatePath('/painel/produtos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }
 
 export async function setProdutoActive(id: string, active: boolean) {
@@ -66,7 +66,7 @@ export async function setProdutoActive(id: string, active: boolean) {
   const { error } = await db.from('products').update({ active }).eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
   revalidatePath('/painel/produtos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }
 
 export async function deleteProduto(id: string) {
@@ -74,7 +74,7 @@ export async function deleteProduto(id: string) {
   const db = createAdminClient()
   await db.from('products').delete().eq('id', id).eq('pharmacy_id', pharmacyId) // variações caem por ON DELETE CASCADE
   revalidatePath('/painel/produtos')
-  revalidatePath('/')
+  revalidatePath('/f/[slug]', 'page')
 }
 
 export async function uploadProdutoImage(file: File): Promise<string> {

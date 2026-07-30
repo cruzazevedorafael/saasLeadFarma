@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 
 export default function PainelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <PwaRegister />
       <PainelHeader />
       {children}
-      <InstallButton appName="Painel LeadFarma" />
+      <InstallButton appName="app da sua farmácia" />
     </div>
   )
 }

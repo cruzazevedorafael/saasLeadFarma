@@ -1,15 +1,26 @@
 // app/gestao/layout.tsx — área de gestão da plataforma (só super-admin).
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { requireSuperadmin } from '@/lib/auth/guards'
 import { logout } from '@/app/painel/login/actions'
 import { Logo } from '@/components/brand/logo'
 import { Button } from '@/components/ui/button'
+import { PwaRegister } from '@/components/pwa-register'
+import { InstallButton } from '@/components/install-button'
 import { LogOut } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Gestão · LeadFarma',
+  manifest: '/gestao/manifest.webmanifest',
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'LeadFarma Gestão' },
+  icons: { icon: '/icon-192.png', apple: '/icon-192.png' },
+}
 
 export default async function GestaoLayout({ children }: { children: React.ReactNode }) {
   await requireSuperadmin()
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
+      <PwaRegister />
       <header className="sticky top-0 z-40 border-b border-border bg-card/85 backdrop-blur">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
@@ -25,6 +36,7 @@ export default async function GestaoLayout({ children }: { children: React.React
         </div>
       </header>
       {children}
+      <InstallButton appName="Gestão LeadFarma" />
     </div>
   )
 }

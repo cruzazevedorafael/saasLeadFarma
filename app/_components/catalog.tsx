@@ -82,7 +82,7 @@ export function Catalog({ products, threshold, whatsappNumber, bannerImageUrl, p
   }, [products, selectedCategory, searchQuery])
 
   return (
-    <main id="top" className="min-h-screen bg-background" style={brandVars}>
+    <main id="top" className="min-h-screen bg-background pb-28" style={brandVars}>
       <Header storeName={storeName} logoUrl={logoUrl} />
       <Hero bannerImageUrl={bannerImageUrl} promotions={promotions} storeName={storeName} logoUrl={logoUrl} />
 

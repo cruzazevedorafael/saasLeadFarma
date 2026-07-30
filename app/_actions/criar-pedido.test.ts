@@ -2,7 +2,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { criarPedido } from './criar-pedido'
 
-// Estado mutável que controla o banco fake de cada teste.
+const captureExceptionMock = vi.fn()
+vi.mock('@sentry/nextjs', () => ({ captureException: (...args: any[]) => captureExceptionMock(...args) }))
+
 let productRows: any[] = []
 let variantRows: any[] = []
 let productsError: any = null
@@ -11,6 +13,8 @@ let insertedOrders: any[] = []
 let rpcError: any = null
 let deletedOrderIds: string[] = []
 let rpcCalls: { name: string; params: any }[] = []
+let pharmacyStatus: 'active' | 'suspended' = 'active'
+let rateLimitOk = true
 
 function fakeDb() {
   return {
@@ -47,7 +51,11 @@ function fakeDb() {
 
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: () => fakeDb() }))
 vi.mock('@/lib/data/pharmacy', () => ({
-  getPharmacyById: async () => ({ id: 'ph1', wholesaleThreshold: 4, nomeExibicao: 'Farmácia Teste', whatsappNumber: '' }),
+  getPharmacyById: async () => ({ id: 'ph1', wholesaleThreshold: 4, nomeExibicao: 'Farmácia Teste', whatsappNumber: '', status: pharmacyStatus }),
+}))
+vi.mock('next/headers', () => ({ headers: async () => new Headers({ 'x-forwarded-for': '3.3.3.3' }) }))
+vi.mock('@/lib/rate-limit', () => ({
+  checkRateLimit: async () => (rateLimitOk ? { ok: true } : { ok: false, error: 'Muitas tentativas.' }),
 }))
 
 const legging = {
@@ -72,6 +80,9 @@ beforeEach(() => {
   rpcError = null
   deletedOrderIds = []
   rpcCalls = []
+  pharmacyStatus = 'active'
+  rateLimitOk = true
+  captureExceptionMock.mockClear()
 })
 
 describe('criarPedido', () => {
@@ -108,6 +119,16 @@ describe('criarPedido', () => {
     if (!r.ok) expect(r.error).toContain('Não foi possível registrar')
   })
 
+  it('erro de banco: reporta pro Sentry com pharmacyId, sem dado pessoal do cliente', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    productsError = { message: 'boom' }
+    await criarPedido(pedido(1))
+    expect(captureExceptionMock).toHaveBeenCalledTimes(1)
+    const [err, ctx] = captureExceptionMock.mock.calls[0]
+    expect(err).toBe(productsError)
+    expect(ctx).toEqual({ extra: { pharmacyId: 'ph1' } })
+  })
+
   it('reserva o estoque após criar o pedido (chama o rpc sem erro)', async () => {
     const r = await criarPedido(pedido(2))
     expect(r.ok).toBe(true)
@@ -132,5 +153,33 @@ describe('criarPedido', () => {
   it('sem cartId: não chama liberar_carrinho', async () => {
     await criarPedido(pedido(2))
     expect(rpcCalls.map((c) => c.name)).toEqual(['reserve_order'])
+  })
+
+  it('acima do limite de rate limit: retorna ok false sem tocar no banco', async () => {
+    rateLimitOk = false
+    const r = await criarPedido(pedido(2))
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error).toContain('Muitas tentativas')
+    expect(insertedOrders).toHaveLength(0)
+  })
+
+  it('farmácia suspensa: recusa o pedido', async () => {
+    pharmacyStatus = 'suspended'
+    const r = await criarPedido(pedido(2))
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error).toContain('não está disponível')
+    expect(insertedOrders).toHaveLength(0)
+  })
+
+  it('payload inválido (nome vazio): rejeita antes de tocar no banco', async () => {
+    const r = await criarPedido({ ...pedido(2), customerName: '' })
+    expect(r.ok).toBe(false)
+    expect(insertedOrders).toHaveLength(0)
+  })
+
+  it('quantidade de item inválida (zero): rejeita antes de tocar no banco', async () => {
+    const r = await criarPedido(pedido(0))
+    expect(r.ok).toBe(false)
+    expect(insertedOrders).toHaveLength(0)
   })
 })

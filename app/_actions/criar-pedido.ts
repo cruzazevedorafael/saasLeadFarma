@@ -1,34 +1,48 @@
 // app/_actions/criar-pedido.ts
 'use server'
+import { z } from 'zod'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getPharmacyById } from '@/lib/data/pharmacy'
 import { mapProductRow, mapVariantRow } from '@/lib/data/mappers'
-import { buildOrder, stockShortages, type RequestedItem, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
+import { buildOrder, stockShortages, type ChosenShipping, type ChosenPayment } from '@/lib/data/order.helpers'
 import type { ProductWithVariants } from '@/lib/data/types'
 import { onlyDigits } from '@/lib/cpf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
-export interface CriarPedidoCliente {
-  cpf: string
-  cep: string
-  logradouro: string
-  numero: string
-  complemento: string
-  bairro: string
-  cidade: string
-  uf: string
-  lgpdConsent: boolean
-}
+const clienteSchema = z.object({
+  cpf: z.string().max(20),
+  cep: z.string().max(12),
+  logradouro: z.string().max(200),
+  numero: z.string().max(20),
+  complemento: z.string().max(200),
+  bairro: z.string().max(120),
+  cidade: z.string().max(120),
+  uf: z.string().max(2),
+  lgpdConsent: z.boolean(),
+})
 
-export interface CriarPedidoInput {
-  pharmacyId: string
-  customerName: string
-  customerPhone: string
-  cliente?: CriarPedidoCliente | null
-  items: RequestedItem[]
-  shippingMethodId?: string | null
-  paymentMethodId?: string | null
-  cartId?: string | null
-}
+const itemSchema = z.object({
+  productId: z.string().min(1),
+  size: z.string().max(60),
+  color: z.string().max(60),
+  quantity: z.number().int().positive().max(999),
+})
+
+const criarPedidoSchema = z.object({
+  pharmacyId: z.string().min(1),
+  customerName: z.string().trim().min(1).max(120),
+  customerPhone: z.string().trim().min(1).max(20),
+  cliente: clienteSchema.nullable().optional(),
+  items: z.array(itemSchema).min(1).max(100),
+  shippingMethodId: z.string().nullable().optional(),
+  paymentMethodId: z.string().nullable().optional(),
+  cartId: z.string().nullable().optional(),
+})
+
+export type CriarPedidoInput = z.infer<typeof criarPedidoSchema>
+export type CriarPedidoCliente = NonNullable<CriarPedidoInput['cliente']>
 
 // Erros esperados (produto removido, banco fora) voltam como { ok: false } com
 // mensagem própria — em produção o Next mascara mensagens de erro lançadas em
@@ -39,19 +53,32 @@ export type CriarPedidoResult =
   | { ok: true; number: number; total: number; priceType: 'retail' | 'wholesale'; stockWarning: string | null }
   | { ok: false; error: string }
 
-export async function criarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
+export async function criarPedido(input: unknown): Promise<CriarPedidoResult> {
+  const parsed = criarPedidoSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, error: 'Dados do pedido inválidos. Atualize a página e tente de novo.' }
+
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('criarPedido', ip)
+  if (!rl.ok) return { ok: false, error: rl.error! }
+
   try {
-    return await registrarPedido(input)
+    return await registrarPedido(parsed.data)
   } catch (e) {
     console.error('[criarPedido] falha ao registrar pedido:', e)
+    Sentry.captureException(e, { extra: { pharmacyId: parsed.data.pharmacyId } })
     return { ok: false, error: 'Não foi possível registrar o pedido. Verifique sua internet e tente de novo.' }
   }
 }
 
 async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResult> {
   if (!input.items?.length) return { ok: false, error: 'Carrinho vazio' }
-
   if (!input.pharmacyId) return { ok: false, error: 'Farmácia não identificada.' }
+
+  const pharmacy = await getPharmacyById(input.pharmacyId)
+  if (!pharmacy || pharmacy.status !== 'active') {
+    return { ok: false, error: 'Esta farmácia não está disponível para pedidos no momento.' }
+  }
+
   const db = createAdminClient()
   const ids = [...new Set(input.items.map((i) => i.productId))]
 
@@ -90,8 +117,7 @@ async function registrarPedido(input: CriarPedidoInput): Promise<CriarPedidoResu
     if (pm) payment = { label: pm.name, percent: Number(pm.surcharge_percent ?? 0), fixed: Number(pm.surcharge_fixed ?? 0) }
   }
 
-  const pharmacy = await getPharmacyById(input.pharmacyId)
-  const threshold = pharmacy?.wholesaleThreshold ?? 4
+  const threshold = pharmacy.wholesaleThreshold ?? 4
   const built = buildOrder(products, input.items, threshold, shipping, payment)
 
   const cli = input.cliente

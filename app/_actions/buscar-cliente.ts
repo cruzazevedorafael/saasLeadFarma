@@ -11,6 +11,8 @@
 'use server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isValidCpf, onlyDigits } from '@/lib/cpf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/request-ip'
 
 export interface ClienteAutofill {
   name: string
@@ -30,6 +32,18 @@ export async function buscarClientePorCpf(
   cpf: string,
   phoneLast4: string,
 ): Promise<ClienteAutofill | null> {
+  const ip = await getClientIp()
+  const rl = await checkRateLimit('buscarCliente', `${ip}:${pharmacyId}`)
+  // Checado ANTES da consulta ao banco, de propósito: o objetivo do rate
+  // limiter é aliviar carga do banco (shedding), então um pedido bloqueado
+  // precisa nunca tocar a tabela `customers`. Isso reabre uma janela estreita
+  // de timing entre "rate limited" e "não achou/2ª prova errada" — mas essa
+  // janela não vaza dado nenhum de cliente (só "você já tentou demais"),
+  // diferente do oráculo de existência de CPF que a checagem de rl.ok abaixo
+  // (mesmo retorno null pra "não achou" e "prova errada") protege. Não mover
+  // essa checagem pra depois da query de novo.
+  if (!rl.ok) return null
+
   const digits = onlyDigits(cpf)
   const prova = onlyDigits(phoneLast4).slice(-4)
   // Exige CPF válido + 4 dígitos de 2ª prova.

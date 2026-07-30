@@ -1,14 +1,15 @@
 // lib/data/promotions.ts — promoções da farmácia (até 10). Catálogo lê a view pública.
-import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createAnonClient } from '@/lib/supabase/anon'
 
 export { MAX_PROMOTIONS } from './promotions.types'
 export type { Promotion } from './promotions.types'
 import type { Promotion } from './promotions.types'
 
-/** Público (anon): promoções ativas da farmácia, ordenadas, pro carrossel do catálogo. */
+/** Público (anon): promoções ativas da farmácia, ordenadas, pro carrossel do catálogo.
+ *  Client anônimo SEM cookies → mantém a página do catálogo estática/ISR. */
 export async function getPublicPromotions(pharmacyId: string): Promise<string[]> {
-  const supabase = await createServerClient()
+  const supabase = createAnonClient()
   const { data } = await supabase
     .from('public_promotions')
     .select('image_url, sort_order')

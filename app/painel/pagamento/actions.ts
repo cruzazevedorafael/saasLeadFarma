@@ -16,7 +16,7 @@ export async function createPayment(name: string, percent: number, fixed: number
     surcharge_fixed: Math.max(0, fixed || 0),
   })
   if (error) throw error
-  revalidatePath('/painel/pagamento'); revalidatePath('/')
+  revalidatePath('/painel/pagamento'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function updatePayment(id: string, name: string, percent: number, fixed: number, active: boolean) {
@@ -32,7 +32,7 @@ export async function updatePayment(id: string, name: string, percent: number, f
     updated_at: new Date().toISOString(),
   }).eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
-  revalidatePath('/painel/pagamento'); revalidatePath('/')
+  revalidatePath('/painel/pagamento'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function deletePayment(id: string) {
@@ -40,5 +40,5 @@ export async function deletePayment(id: string) {
   const db = createAdminClient()
   const { error } = await db.from('payment_methods').delete().eq('id', id).eq('pharmacy_id', pharmacyId)
   if (error) throw error
-  revalidatePath('/painel/pagamento'); revalidatePath('/')
+  revalidatePath('/painel/pagamento'); revalidatePath('/f/[slug]', 'page')
 }

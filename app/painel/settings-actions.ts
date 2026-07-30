@@ -10,13 +10,13 @@ export async function setWholesaleThreshold(value: number) {
   const pharmacyId = await getCurrentPharmacyId()
   const threshold = Math.max(1, Math.floor(Number(value) || 1))
   await updatePharmacy(pharmacyId, { wholesale_threshold: threshold })
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function setStoreContact(storeName: string, whatsappNumber: string) {
   const pharmacyId = await getCurrentPharmacyId()
   await updatePharmacy(pharmacyId, { nome_exibicao: storeName, whatsapp_number: whatsappNumber })
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function uploadBannerImage(file: File): Promise<string> {
@@ -27,7 +27,7 @@ export async function uploadBannerImage(file: File): Promise<string> {
 export async function setLogo(url: string, accentColor: string | null) {
   const pharmacyId = await getCurrentPharmacyId()
   await updatePharmacy(pharmacyId, { logo_url: url || null, accent_color: accentColor || null })
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function uploadLogoImage(file: File): Promise<string> {
@@ -39,12 +39,12 @@ export async function uploadLogoImage(file: File): Promise<string> {
 export async function setBannerImage(url: string) {
   const pharmacyId = await getCurrentPharmacyId()
   await updatePharmacy(pharmacyId, { banner_image_url: url })
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }
 
 export async function setCatalogFont(key: string) {
   const pharmacyId = await getCurrentPharmacyId()
   const val = CATALOG_FONT_KEYS.includes(key) && key !== 'padrao' ? key : null
   await updatePharmacy(pharmacyId, { catalog_font: val })
-  revalidatePath('/painel')
+  revalidatePath('/painel'); revalidatePath('/f/[slug]', 'page')
 }

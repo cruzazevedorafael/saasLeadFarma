@@ -1,12 +1,14 @@
 // lib/data/products.ts
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createAnonClient } from '@/lib/supabase/anon'
 import { mapProductRow, mapVariantRow } from './mappers'
 import type { ProductWithVariants } from './types'
 
 // PÚBLICO (anon): catálogo de UMA farmácia. Lê as VIEWS public_* filtrando por
 // pharmacy_id (a view expõe pharmacy_id/slug e já filtra farmácia ativa).
+// Usa o client anônimo SEM cookies → mantém a página do catálogo estática/ISR.
 export async function getPublicProducts(pharmacyId: string): Promise<ProductWithVariants[]> {
-  const supabase = await createServerClient()
+  const supabase = createAnonClient()
   const { data: products, error } = await supabase
     .from('public_products')
     .select('*')

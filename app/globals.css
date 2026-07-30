@@ -16,7 +16,14 @@
   --brand: #f97316;
   --brand-hover: #ea6a04;
   --brand-soft: oklch(0.96 0.045 65); /* laranja bem claro p/ fundos suaves */
-  --brand-contrast: oklch(0.99 0.01 80); /* texto sobre laranja */
+  --brand-contrast: oklch(0.22 0.03 258); /* texto sobre laranja — grafite (~7:1), antes era quase branco e reprovava WCAG AA */
+
+  /* Âncora escura + secundária violeta — blocos de destaque pontuais (hero, CTA final,
+     header do painel), independente do tema claro/escuro do usuário. Referência Hotmart. */
+  --ink: #0f1220;
+  --ink-foreground: oklch(0.95 0.01 258);
+  --violet: #6d3bf5;
+  --gradient-brand: linear-gradient(135deg, var(--brand), var(--violet));
 
   /* 60% — superfícies: fundo azul bem claro + cards brancos (divisão limpa) */
   --background: oklch(0.976 0.014 248);
@@ -155,6 +162,9 @@
   --color-brand-hover: var(--brand-hover);
   --color-brand-soft: var(--brand-soft);
   --color-brand-contrast: var(--brand-contrast);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-violet: var(--violet);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -226,6 +236,34 @@
   .hairline {
     height: 1px;
     background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* Gradiente da marca — laranja → violeta. Uso restrito: hero e CTA final, no
+     máximo 2 vezes por página (ver briefing de direção criativa). */
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+
+  /* Destaque de "pedido novo" na lista do painel — pulso de fundo laranja que
+     desvanece sozinho, sem badge piscando indefinidamente. */
+  .order-highlight {
+    animation: order-highlight-fade 2.2s ease-out forwards;
+  }
+}
+
+@keyframes order-highlight-fade {
+  0% {
+    background-color: color-mix(in oklch, var(--brand) 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-highlight {
+    animation: none;
+    background-color: color-mix(in oklch, var(--brand) 12%, transparent);
   }
 }
 

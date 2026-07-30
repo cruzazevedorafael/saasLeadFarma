@@ -75,8 +75,10 @@ export async function buildReceiptPdfA4(d: ReceiptData): Promise<File> {
   const linha = (label: string, valor: string) => {
     if (!valor) return
     doc.setFont('helvetica', 'bold'); doc.text(label, margin, y)
-    doc.setFont('helvetica', 'normal'); doc.text(valor, margin + 26, y)
-    y += 5.5
+    doc.setFont('helvetica', 'normal')
+    const lines = doc.splitTextToSize(valor, pageW - margin - (margin + 26)) as string[]
+    doc.text(lines, margin + 26, y)
+    y += 5.5 * lines.length
   }
   linha('Cliente:', d.customerName || '-')
   linha('CPF:', d.customerCpf ? formatCpf(d.customerCpf) : '')
@@ -90,19 +92,27 @@ export async function buildReceiptPdfA4(d: ReceiptData): Promise<File> {
   doc.text('Itens', margin, y); y += 2.5
   doc.setDrawColor(...ACCENT); doc.setLineWidth(0.4); doc.line(margin, y, pageW - margin, y); y += 6
 
-  const rowH = 14
+  const nameMaxW = pageW - margin * 2 - 30 // deixa a coluna de valor livre à direita
   d.items.forEach((it, i) => {
-    if (y + rowH > pageH - 55) { doc.addPage(); y = margin }
-    doc.setTextColor(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5)
-    doc.text(`${i + 1}. ${it.name}`, margin, y + 3)
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(90)
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5)
+    const nameLines = doc.splitTextToSize(`${i + 1}. ${it.name}`, nameMaxW) as string[]
     const attrs = [it.code && `Cód: ${it.code}`, it.presentation && `Apres.: ${it.presentation}`,
       it.dosage && `Dosagem: ${it.dosage}`].filter(Boolean).join('   ')
-    if (attrs) doc.text(attrs, margin, y + 7.5)
-    doc.text(`${it.quantity} x ${brl(it.unitPrice)}`, margin, y + (attrs ? 11.5 : 7.5))
+    const attrLines = attrs ? (doc.splitTextToSize(attrs, nameMaxW) as string[]) : []
+    const blockH = nameLines.length * 5 + (attrLines.length ? attrLines.length * 4 + 1 : 0) + 5 + 5
+
+    if (y + blockH > pageH - 55) { doc.addPage(); y = margin }
+    const top = y
+    let yy = y + 3
     doc.setTextColor(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5)
-    doc.text(brl(it.unitPrice * it.quantity), pageW - margin, y + 5, { align: 'right' })
-    y += rowH
+    doc.text(nameLines, margin, yy); yy += nameLines.length * 5
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(90)
+    if (attrLines.length) { doc.text(attrLines, margin, yy); yy += attrLines.length * 4 + 1 }
+    doc.text(`${it.quantity} x ${brl(it.unitPrice)}`, margin, yy)
+    // valor da linha alinhado à direita, no topo do bloco
+    doc.setTextColor(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5)
+    doc.text(brl(it.unitPrice * it.quantity), pageW - margin, top + 5, { align: 'right' })
+    y = yy + 4
     doc.setDrawColor(230); doc.setLineWidth(0.2); doc.line(margin, y - 2, pageW - margin, y - 2)
   })
 
